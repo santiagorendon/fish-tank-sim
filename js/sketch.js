@@ -5,7 +5,6 @@ var rockArray = []
 var grassAray = []
 var state = 'sand'
 var canvas;
-
 var yoff = 0;
 var level1=700;
 var level2=800;
@@ -16,9 +15,33 @@ var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
 
+class Fish{
+  constructor(type){
+    this.type = type;
+    this.width = 100;
+    this.height = 100;
+    this.x = 500;
+    this.y = 500;
+    this.frameDelay = 25;
+    this.frameCount = 0;
+    this.frame = 0;
+    this.frameNum = 2;
+  }
+  draw(){
+    this.frameCount += 1;
+    if(this.frameCount >= this.frameDelay){
+      this.frame = (this.frame+1)%this.frameNum //num between 0 and 1;
+      this.frameCount = 0;
+    }
+    if(this.type === "commonFish"){
+      image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
+    }
 
+  }
+}
 
 function preload(){
+  commonFishImgArr = [loadImage('images/commonFish1.png'), loadImage('images/commonFish2.png')]
   rock = loadImage('images/rock.png')
   fishImage = loadImage('images/fish.png')
   waterImage = loadImage('images/water.png')
@@ -31,6 +54,7 @@ function setup() {
   canvas.parent('#container');
   canvas.style('width', '100%');
   canvas.style('height', '100%');
+  commonFish1 = new Fish("commonFish");
 }
 
 function draw() {
@@ -66,10 +90,8 @@ function draw() {
     if(sandLevel<=200){
       sandLevel +=1
     }
+
   }
-
-
-
 
   // DISPLAY CLASSES
   for (var i = sandArray.length-1; i >= 0; i--) {
@@ -92,6 +114,9 @@ function draw() {
 
   // DRAW BUTTONS
   buttonImages()
+
+  commonFish1.draw();
+
 }
 
 
