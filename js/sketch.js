@@ -45,8 +45,8 @@ class Fish{
     // update our position
     this.x += xMovement;
     this.y += yMovement;
-    constrain(this.x, 0, width)
-    constrain(this.y, 0, height)
+    constrain(this.x, 0, width-this.width)
+    constrain(this.y, 0, height-this.height)
 
   
     // update our noise offset values
@@ -72,6 +72,8 @@ function setup() {
   canvas.style('width', '100%');
   canvas.style('height', '100%');
   commonFish1 = new Fish("commonFish");
+  noiseDetail(24);
+
 }
 
 function draw() {
