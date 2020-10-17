@@ -26,6 +26,9 @@ class Fish{
     this.frameCount = 0;
     this.frame = 0;
     this.frameNum = 2;
+    // create a "noise offset" to keep track of our position in Perlin Noise space
+    this.xNoiseOffset = random(0,1000);
+    this.yNoiseOffset = random(1000,2000);
   }
   draw(){
     this.frameCount += 1;
@@ -36,6 +39,20 @@ class Fish{
     if(this.type === "commonFish"){
       image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
     }
+    var xMovement = map( noise(this.xNoiseOffset), 0, 1, -1, 1 );
+    var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
+
+    // update our position
+    this.x += xMovement;
+    this.y += yMovement;
+    constrain(this.x, 0, width)
+    constrain(this.y, 0, height)
+
+  
+    // update our noise offset values
+    this.xNoiseOffset += 0.01;
+    this.yNoiseOffset += 0.01;
+
 
   }
 }
