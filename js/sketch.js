@@ -1,4 +1,4 @@
-var sand, rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage
+var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage
 var sandArray = []
 var waterArray = []
 var rockArray = []
@@ -19,7 +19,6 @@ var grassLevel = 0
 
 
 function preload(){
-  sand = loadImage('images/sand.png')
   rock = loadImage('images/rock.png')
   fishImage = loadImage('images/fish.png')
   waterImage = loadImage('images/water.png')
@@ -61,7 +60,7 @@ function draw() {
   if (mouseIsPressed && state=='sand' && mouseY >= 100){
     var tempSand = new Sand(mouseX, mouseY)
     sandArray.push(tempSand)
-    if(sandLevel<=100){
+    if(sandLevel<=200){
       sandLevel +=1
     }
   }
@@ -105,15 +104,28 @@ class Rock {
 }
 
 // SAND CLASS
+
 class Sand {
   constructor(x, y){
-    this.x = x
-    this.y = y
+      this.x = x
+      this.y = y
+      this.xSpeed = random(-1, 1)
+      this.ySpeed = 2
+      this.alpha = 255
+      this.radius = random(10, 50)
   }
   display(){
-    image(sand, this.x, this.y, 100, 100)
+      noStroke()
+      fill(255,222,173,this.alpha);
+      if (this.y <= height-this.radius){
+        this.x += this.xSpeed
+        this.y += this.ySpeed
+      }
+      ellipse(this.x, this.y, this.radius, this.radius)
+ 
   }
 }
+
 
 // GRASS CLASS
 class Grass {
@@ -168,7 +180,7 @@ function displayEnvironmentalStats(){
   var waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
   text("Water level: " + waterLevelMapped + "%", 20, 20 )
 
-  var sandLevelMapped = int(map(sandLevel, 0, 100, 1, 100))
+  var sandLevelMapped = int(map(sandLevel, 0, 200, 1, 100))
   text("Sand level: " + sandLevelMapped + "%", 20, 60 )
 
   var rockLevelMapped = int(map(rockLevel, 0, 4, 1, 100))
