@@ -1,4 +1,4 @@
-var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage
+var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage
 var sandArray = []
 var waterArray = []
 var rockArray = []
@@ -22,8 +22,9 @@ function preload(){
   rock = loadImage('images/rock.png')
   fishImage = loadImage('images/fish.png')
   waterImage = loadImage('images/water.png')
-  // waterSound = loadSound("sounds/bubbles.mp3")
+  waterSound = loadSound("sounds/bubbles.mp3")
   grassImage = loadImage('images/grass.png')
+  sandImage = loadImage('images/sand.png')
 }
 
 function setup() {
@@ -39,16 +40,16 @@ function draw() {
 
   // FILL TANK
   drawwater();
-  if (mouseIsPressed && state == 'fillingTank'){
+  if (mouseIsPressed && state == 'fillingTank' && mouseY >= 200){
     drawwater();
     if (waterLevel<=500){
       waterLevel +=1
     }
-    // if (level2>50){
-    //   if (! waterSound.isPlaying() ) { // .isPlaying() returns a boolean
-    //   waterSound.play();
-    // }
-  // }
+    if (level2>50){
+      if (! waterSound.isPlaying() ) { // .isPlaying() returns a boolean
+      waterSound.play();
+    }
+  }
     level1 -= 1.5;
     level2 -= 1.5;
     var drop = new Water(mouseX, mouseY);
@@ -58,17 +59,19 @@ function draw() {
   // DISPLAY STATS
   displayEnvironmentalStats()
 
+  displayButtons()
+ 
+
+
 
   // ADD SAND
-  if (mouseIsPressed && state=='sand' && mouseY >= 100){
+  if (mouseIsPressed && state=='sand' && mouseY >= 200){
     var tempSand = new Sand(mouseX, mouseY)
     sandArray.push(tempSand)
     if(sandLevel<=200){
       sandLevel +=1
     }
   }
-
-
 
 
   // DISPLAY CLASSES
@@ -90,8 +93,7 @@ function draw() {
   stroke(0)
   tankWalls()
 
-  // DRAW BUTTONS
-  buttonImages()
+
 }
 
 
@@ -186,29 +188,29 @@ function tankWalls() {
 function displayEnvironmentalStats(){
   fill(0)
   var waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
-  text("Water level: " + waterLevelMapped + "%", 20, 20 )
+  text("Water level: " + waterLevelMapped + "%", width-120, 20 )
 
   var sandLevelMapped = int(map(sandLevel, 0, 200, 1, 100))
-  text("Sand level: " + sandLevelMapped + "%", 20, 60 )
+  text("Sand level: " + sandLevelMapped + "%", width-120, 60 )
 
   var rockLevelMapped = int(map(rockLevel, 0, 4, 1, 100))
-  text("Rock level: " + rockLevelMapped + "%", 20, 100 )
+  text("Rock level: " + rockLevelMapped + "%", width-120, 100 )
 
   var grassLevelMapped = int(map(grassLevel, 0, 4, 1, 100))
-  text("Grass level: " + grassLevelMapped + "%", 20, 140 )
+  text("Grass level: " + grassLevelMapped + "%", width-120, 140 )
 }
 
 
 // display rocks and grass
 function mousePressed(){
-  if (state == 'rock'){
+  if (state == 'rock'&& mouseY >= 200){
     var tempRock = new Rock(mouseX, mouseY)
     rockArray.push(tempRock)
     if (rockLevel <=3){
       rockLevel +=1
     }
   }
-  else if (state == 'grass'){
+  else if (state == 'grass' && mouseY >= 200){
     var tempGrass = new Grass(mouseX, mouseY)
     grassAray.push(tempGrass)
     if (grassLevel <=3){
@@ -223,27 +225,14 @@ function drawwater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
   background(254,254,255);
   fill(100,200,255,200);
   stroke(254,254,255);
-
-  // We are going to draw a polygon out of the wave points
-  beginShape();
-
-  var xoff = 0; // Option #1: 2D Noise
-
-  // Iterate over horizontal pixels
-  for (var x = 0; x <= width; x += 10) {
-      // Calculate a y value according to noise, map to
-
-      // Option #1: 2D Noise
+  beginShape();  // We are going to draw a polygon out of the wave points
+  var xoff = 0; // 2D Noise
+  for (var x = 0; x <= width; x += 10) {  // Iterate over horizontal pixels
       var y = map(noise(xoff, yoff), 0, 1, level1, level2);
-
-
-      // Set the vertex
-      vertex(x, y);
-      // Increment x dimension for noise
-      xoff += 0.05;
+      vertex(x, y);      // Set the vertex
+      xoff += 0.05;      // Increment x dimension for noise
   }
-  // increment y dimension for noise
-  yoff += 0.005;
+  yoff += 0.005;   // increment y dimension for noise
   vertex(width, height);
   vertex(0, height);
   endShape(CLOSE);
@@ -251,35 +240,72 @@ function drawwater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
 
 
 
-// need a better way of doing this
-function buttonImages(){
-  clickedSand.onclick = function(){
-    clickedSand.style.backgroundColor = 'black'
-    clickedRock.style.backgroundColor = 'white'
-    clickedGrass.style.backgroundColor = 'white'
-    clickedWater.style.background = 'white'
-    state = 'sand'
-  }
-  clickedRock.onclick = function(){
-    clickedSand.style.backgroundColor = 'white'
-    clickedRock.style.backgroundColor = 'black'
-    clickedGrass.style.backgroundColor = 'white'
-    clickedWater.style.background = 'white'
-    state = 'rock'
-  }
-  clickedGrass.onclick = function(){
-    clickedSand.style.backgroundColor = 'white'
-    clickedRock.style.backgroundColor = 'white'
-    clickedGrass.style.backgroundColor = 'black'
-    clickedWater.style.background = 'white'
-    state = 'grass'
-}
-  clickedWater.onclick = function(){
-    clickedSand.style.backgroundColor = 'white'
-    clickedRock.style.backgroundColor = 'white'
-    clickedGrass.style.backgroundColor = 'white'
-    clickedWater.style.background = 'black'
-    state = 'fillingTank'
+
+
+class Button{
+  constructor(x, y, buttonX, buttonY, specificButton){
+    this.x = x
+    this.y = y
+    this.buttonX = buttonX
+    this.buttonY = buttonY
+    this.specificButton = specificButton
   }
 
+  drawButton(testX, testY){
+      // image(this.specificButton, this.buttonX, this.buttonY, 50, 50);
+      rect(this.buttonX, this.buttonY, 50, 50)
+      text(this.specificButton, this.buttonX, this.buttonY+75)
+  }
+
+  isButtonPressed(testX, testY) {
+
+    if (testX > this.buttonX && testX < this.buttonX+50 && testY > this.buttonY && testY < this.buttonY + 50) {
+      return true
+      
+    }
+    
+    // not over the button - return false
+    else {
+      return false;
+    }
+}
+}
+
+
+function displayButtons(){
+  var GrassButton = new Button(mouseX, mouseY, 50, 50, "grass")
+  GrassButton.drawButton(mouseX, mouseY);
+  if (mouseIsPressed){
+    var checked = GrassButton.isButtonPressed(mouseX, mouseY)
+    if (checked) {
+      state = 'grass'
+    }
+  }
+  
+  var RockButton = new Button(mouseX, mouseY, 100, 50, "rock")
+  RockButton.drawButton(mouseX, mouseY);
+  if (mouseIsPressed){
+    var checked = RockButton.isButtonPressed(mouseX, mouseY)
+    if (checked) {
+      state = 'rock'
+    }
+  }
+
+  var SandButton = new Button(mouseX, mouseY, 150, 50, "sand")
+  SandButton.drawButton(mouseX, mouseY);
+  if (mouseIsPressed){
+    var checked = SandButton.isButtonPressed(mouseX, mouseY)
+    if (checked) {
+      state = 'sand'
+    }
+  }
+  
+  var WaterButton = new Button(mouseX, mouseY, 200, 50, "water")
+  WaterButton.drawButton(mouseX, mouseY);
+  if (mouseIsPressed){
+    var checked = WaterButton.isButtonPressed(mouseX, mouseY)
+    if (checked) {
+      state = 'fillingTank'
+    }
+  }
 }
