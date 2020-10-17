@@ -4,11 +4,11 @@ var waterArray = []
 var rockArray = []
 var grassAray = []
 var state = 'sand'
-
+var canvas;
 
 var yoff = 0;
 var level1=700;
-var level2=800;    
+var level2=800;
 
 
 var waterLevel = 0
@@ -27,7 +27,10 @@ function preload(){
 }
 
 function setup() {
-  createCanvas(1000, 800);
+  canvas = createCanvas(1000, 800);
+  canvas.parent('#container');
+  canvas.style('width', '100%');
+  canvas.style('height', '100%');
 }
 
 function draw() {
@@ -41,7 +44,7 @@ function draw() {
     if (waterLevel<=500){
       waterLevel +=1
     }
-    // if (level2>50){ 
+    // if (level2>50){
     //   if (! waterSound.isPlaying() ) { // .isPlaying() returns a boolean
     //   waterSound.play();
     // }
@@ -67,7 +70,7 @@ function draw() {
 
 
 
- 
+
   // DISPLAY CLASSES
   for (var i = sandArray.length-1; i >= 0; i--) {
     sandArray[i].display()
@@ -76,11 +79,11 @@ function draw() {
     rockArray[i].display()
     }
     for (var i = waterArray.length-1; i >= 0; i--) {
-      waterArray[i].display()    
+      waterArray[i].display()
   }
-  
+
   for (var i = grassAray.length-1; i >= 0; i--) {
-    grassAray[i].display()    
+    grassAray[i].display()
 }
 
   // DRAW TANK WALLS
@@ -122,7 +125,7 @@ class Sand {
         this.y += this.ySpeed
       }
       ellipse(this.x, this.y, this.radius, this.radius)
- 
+
   }
 }
 
@@ -185,7 +188,7 @@ function displayEnvironmentalStats(){
 
   var rockLevelMapped = int(map(rockLevel, 0, 4, 1, 100))
   text("Rock level: " + rockLevelMapped + "%", 20, 100 )
-  
+
   var grassLevelMapped = int(map(grassLevel, 0, 4, 1, 100))
   text("Grass level: " + grassLevelMapped + "%", 20, 140 )
 }
@@ -215,7 +218,7 @@ function drawwater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
   background(254,254,255);
   fill(100,200,255,200);
   stroke(254,254,255);
-  
+
   // We are going to draw a polygon out of the wave points
   beginShape();
 
@@ -223,12 +226,12 @@ function drawwater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
 
   // Iterate over horizontal pixels
   for (var x = 0; x <= width; x += 10) {
-      // Calculate a y value according to noise, map to 
+      // Calculate a y value according to noise, map to
 
       // Option #1: 2D Noise
       var y = map(noise(xoff, yoff), 0, 1, level1, level2);
 
-  
+
       // Set the vertex
       vertex(x, y);
       // Increment x dimension for noise
@@ -250,7 +253,7 @@ function buttonImages(){
     clickedRock.style.backgroundColor = 'white'
     clickedGrass.style.backgroundColor = 'white'
     clickedWater.style.background = 'white'
-    state = 'sand' 
+    state = 'sand'
   }
   clickedRock.onclick = function(){
     clickedSand.style.backgroundColor = 'white'
@@ -273,7 +276,5 @@ function buttonImages(){
     clickedWater.style.background = 'black'
     state = 'fillingTank'
   }
-  
+
 }
-
-

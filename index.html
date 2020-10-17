@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
   <head>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    	<script src="js/jquery.documentsize.js"></script>
     <script src="p5/p5.min.js"></script>
     <!-- <script src="p5/addons/p5.sound.min.js"></script> -->
     <script src="js/sketch.js"></script>
@@ -14,8 +16,107 @@
       <img style='background-color: black;' id='clickedSand' src='images/sand.png' width='50px' height='50px' alt='sand'>
       <img id='clickedGrass' src='images/grass.png' width='50px' height='50px' alt='grass'>
       <img id='clickedWater' src='images/water.png' width='50px' height='50px' alt='water'>
-
     </div>
-  </body>
+    <div id="container"></div>
+
+          <script>
+
+          // global scaling factor
+          var scalingFactor = 1.0;
+
+          // reference to our container
+          let container = document.getElementById('container')
+
+          // resize the visible window based on available space
+          $(document).ready(function() {
+
+            var desiredWidth = 1000;
+            var desiredHeight = 800;
+            var container = $("#container");
+            var lastWW = 0;
+            var lastWH = 0;
+
+            function doResize() {
+              var ww = $.windowWidth();
+              var wh = $.windowHeight();
+
+              if (lastWW != ww || lastWH != wh) {
+                lastWW = ww;
+                lastWH = wh;
+
+                // plenty of space on all sides, float the window in the center at full resolution
+                if (ww > desiredWidth && wh > desiredHeight) {
+                  scalingFactor = 1.0;
+                  container.css('width', desiredWidth+'px');
+                  container.css('height', desiredHeight+'px');
+                  var left = parseInt((ww-desiredWidth)/2);
+                  var top = parseInt((wh-desiredHeight)/2);
+                  container.css('left', left+'px');
+                  container.css('top', top+'px');
+                }
+
+                // plenty of space horizontally, the limiting factor is the height of the page
+                else if (ww > desiredWidth) {
+                  scalingFactor = wh/desiredHeight;
+                  container.css('width', parseInt(desiredWidth*scalingFactor)+'px');
+                  container.css('height', parseInt(desiredHeight*scalingFactor)+'px');
+                  var left = parseInt((ww-desiredWidth*scalingFactor)/2);
+                  var top = 0;
+                  container.css('left', left+'px');
+                  container.css('top', top+'px');
+                }
+
+                // plenty of space vertically, the limiting factor is the width of the page
+                else if (wh > desiredHeight) {
+                  scalingFactor = ww/desiredWidth;
+                  container.css('width', parseInt(desiredWidth*scalingFactor)+'px');
+                  container.css('height', parseInt(desiredHeight*scalingFactor)+'px');
+                  var left = 0;
+                  var top = parseInt((wh-desiredHeight*scalingFactor)/2);
+                  container.css('left', left+'px');
+                  container.css('top', top+'px');
+                }
+
+                // limited space on all sides
+                else {
+                  var scalingFactorW = ww/desiredWidth;
+                  var scalingFactorH = wh/desiredHeight;
+
+                  if (scalingFactorW < scalingFactorH) {
+                    scalingFactor = scalingFactorW;
+                    container.css('width', parseInt(desiredWidth*scalingFactor)+'px');
+                    container.css('height', parseInt(desiredHeight*scalingFactor)+'px');
+                    var left = 0;
+                    var top = parseInt((wh-desiredHeight*scalingFactor)/2);
+                    container.css('left', left+'px');
+                    container.css('top', top+'px');
+                  }
+                  else {
+                    scalingFactor = scalingFactorH;
+                    container.css('width', parseInt(desiredWidth*scalingFactor)+'px');
+                    container.css('height', parseInt(desiredHeight*scalingFactor)+'px');
+                    var left = parseInt((ww-desiredWidth*scalingFactor)/2);
+                    var top = 0;
+                    container.css('left', left+'px');
+                    container.css('top', top+'px');
+                  }
+                }
+                var c = document.getElementById('container');
+                window.scrollTo(0, 1);
+              }
+              container.show();
+              setTimeout(doResize,10);
+            }
+            doResize();
+            window.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+
+            window.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+          });
+
+          </script>
   </body>
 </html>
