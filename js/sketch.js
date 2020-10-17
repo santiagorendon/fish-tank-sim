@@ -100,6 +100,9 @@ class Rock {
   }
   display(){
     image(rock, this.x, this.y, 200, 100)
+    if (this.y < (height-50)){
+      this.y += 1
+    }
   }
 }
 
@@ -126,7 +129,6 @@ class Sand {
   }
 }
 
-
 // GRASS CLASS
 class Grass {
   constructor(x, y){
@@ -135,6 +137,9 @@ class Grass {
   }
   display(){
     image(grassImage, this.x, this.y, 100, 100)
+    if (this.y < (height-50)){
+      this.y += 1
+    }
   }
 }
 
