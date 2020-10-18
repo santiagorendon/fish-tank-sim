@@ -41,7 +41,7 @@ function setup() {
   var waterObject = {
     name: "water",
     image: waterImage,
-    cost: 0,
+    cost: '0',
     locked: false
   }
   var sandObject = {
@@ -303,7 +303,8 @@ class Button{
         }
         noStroke()
         fill(0)
-        text(buttonArray[i].name, this.buttonX, this.buttonY+75)
+        text(buttonArray[i].name , this.buttonX, this.buttonY+75)
+        text('$' + buttonArray[i].cost , this.buttonX, this.buttonY+95)
         this.buttonX += 50
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
           return buttonArray[i].name
