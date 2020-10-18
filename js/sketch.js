@@ -125,7 +125,7 @@ class Sand {
   display(){
       noStroke()
       fill(255,222,173,this.alpha);
-      if (this.y <= height-this.radius){
+      if (this.y <= height-10){
         this.x += this.xSpeed
         this.y += this.ySpeed
       }
