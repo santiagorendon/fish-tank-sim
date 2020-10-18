@@ -74,10 +74,6 @@ function draw() {
     waterArray.push(drop)
   }
 
-  // DISPLAY STATS, BUTTONS, AND TANK WALLS
-  displayEnvironmentalStats()
-  displayButtons()
-  displayTankWalls()
 
 
 
@@ -106,7 +102,12 @@ function draw() {
     grassAray[i].display()
   }
 
+  // DISPLAY STATS, BUTTONS, AND TANK WALLS
+  displayEnvironmentalStats()
+  displayButtons()
+  displayTankWalls()
 
+  
 }
 
 
