@@ -6,22 +6,133 @@ var grassAray = []
 var state, tempState
 var canvas;
 
+
 var waterLevelMapped, grassLevelMapped, rockLevelMapped, sandLevelMapped
 
 var yoff = 0;
 var level1=700;
 var level2=800;
+var canvasHeight = 800;
+var canvasWidth = 1000;
 
 var waterLevel = 0
 var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
 var buttonArray
-
 var balance = 150
 
+class Game{
+  constructor(){
+    // this.scene = 'tank';
+    this.scene = 'tank';
+  }
+  drawStore(){
+    backgroundFill(214, 253, 255);
+    fill(0, 0, 0);
+    textAlign(LEFT, TOP)
+   .textSize(80);
+    textFont(fishFont);
+    textAlign(CENTER, TOP);
+    text('STORE', canvasWidth/2, 10)
+  }
+  drawTank(){
+    // FILL TANK
+    drawwater();
+    if (mouseIsPressed && state == 'water' && mouseY >= 200){
+      drawwater();
+      if (waterLevel<=500){
+        waterLevel +=1
+      }
+      if (level2>50){
+        if (! waterSound.isPlaying() ) { // .isPlaying() returns a boolean
+        waterSound.play();
+      }
+    }
+      level1 -= 1.5;
+      level2 -= 1.5;
+      var drop = new Water(mouseX, mouseY);
+      waterArray.push(drop)
+    }
+
+
+
+
+
+    // ADD SAND
+    if (mouseIsPressed && state=='sand' && mouseY >= 200 && buttonArray[1].locked == false){
+      var tempSand = new Sand(mouseX, mouseY)
+      sandArray.push(tempSand)
+      balance-=.01
+
+      if(sandLevel<=200){
+        sandLevel +=1
+      }
+    }
+
+
+    // DISPLAY CLASSES
+    for (var i = sandArray.length-1; i >= 0; i--) {
+      sandArray[i].display()
+    }
+    for (var i = rockArray.length-1; i >= 0; i--) {
+      rockArray[i].display()
+    }
+    for (var i = waterArray.length-1; i >= 0; i--) {
+      waterArray[i].display()
+    }
+    for (var i = grassAray.length-1; i >= 0; i--) {
+      grassAray[i].display()
+    }
+
+    // DISPLAY STATS, BUTTONS, AND TANK WALLS
+    displayEnvironmentalStats()
+    displayButtons()
+    displayTankWalls()
+  }
+}
+class Fish{
+  constructor(type){
+    this.type = type;
+    this.width = 100;
+    this.height = 100;
+    this.x = 500;
+    this.y = 500;
+    this.frameDelay = 25;
+    this.frameCount = 0;
+    this.frame = 0;
+    this.frameNum = 2;
+    // create a "noise offset" to keep track of our position in Perlin Noise space
+    this.xNoiseOffset = random(0,1000);
+    this.yNoiseOffset = random(1000,2000);
+  }
+  draw(){
+    this.frameCount += 1;
+    if(this.frameCount >= this.frameDelay){
+      this.frame = (this.frame+1)%this.frameNum //num between 0 and 1;
+      this.frameCount = 0;
+    }
+    if(this.type === "commonFish"){
+      image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
+    }
+    var xMovement = map( noise(this.xNoiseOffset), 0, 1, -1, 1 );
+    var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 10);
+
+
+    this.x += xMovement;
+    this.y += yMovement;
+    this.x = constrain(this.x, this.width, width-this.width)
+    this.y = constrain(this.y, this.height, height-this.height)
+
+    // update our noise offset values
+    this.xNoiseOffset += 0.01;
+    this.yNoiseOffset += 0.01;
+  }
+}
 
 function preload(){
+  fishFont = loadFont('font/FISH.TTF');
+  commonFishImgArr = [loadImage('images/commonFish1.png'), loadImage('images/commonFish2.png')]
   rockImage = loadImage('images/rock.png')
   fishImage = loadImage('images/fish.png')
   waterImage = loadImage('images/water.png')
@@ -32,11 +143,13 @@ function preload(){
 
 
 function setup() {
-  canvas = createCanvas(1000, 800);
+  canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('#container');
   canvas.style('width', '100%');
   canvas.style('height', '100%');
-
+  game = new Game();
+  commonFish1 = new Fish("commonFish");
+  noiseDetail(24);
   // objects and array used to hold button info
   var waterObject = {
     name: "water",
@@ -73,61 +186,12 @@ function setup() {
 
 function draw() {
   imageMode(CENTER)
-
-  // FILL TANK
-  drawwater();
-  if (mouseIsPressed && state == 'water' && mouseY >= 200){
-    drawwater();
-    if (waterLevel<=500){
-      waterLevel +=1
-    }
-    if (level2>50){
-      if (! waterSound.isPlaying() ) { // .isPlaying() returns a boolean
-      waterSound.play();
-    }
+  if(game.scene === "tank"){
+      game.drawTank();
   }
-    level1 -= 1.5;
-    level2 -= 1.5;
-    var drop = new Water(mouseX, mouseY);
-    waterArray.push(drop)
+  else if(game.scene === "store"){
+      game.drawStore();
   }
-
-
-
-
-
-  // ADD SAND
-  if (mouseIsPressed && state=='sand' && mouseY >= 200 && buttonArray[1].locked == false){
-    var tempSand = new Sand(mouseX, mouseY)
-    sandArray.push(tempSand)
-    balance-=.01
-
-    if(sandLevel<=200){
-      sandLevel +=1
-    }
-  }
-
-
-  // DISPLAY CLASSES
-  for (var i = sandArray.length-1; i >= 0; i--) {
-    sandArray[i].display()
-  }
-  for (var i = rockArray.length-1; i >= 0; i--) {
-    rockArray[i].display()
-  }
-  for (var i = waterArray.length-1; i >= 0; i--) {
-    waterArray[i].display()
-  }
-  for (var i = grassAray.length-1; i >= 0; i--) {
-    grassAray[i].display()
-  }
-
-  // DISPLAY STATS, BUTTONS, AND TANK WALLS
-  displayEnvironmentalStats()
-  displayButtons()
-  displayTankWalls()
-
-  
 }
 
 
@@ -259,10 +323,14 @@ function mousePressed(){
   }
 }
 
+function backgroundFill(r, g, b){
+  fill(r, g, b);
+  rect(0, 0, canvasWidth, canvasHeight);
+}
 
 // MAKE THE WATER BOUNCE
-function drawwater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
-  background(254,254,255);
+function drawWater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
+  backgroundFill(254,254,255);
   fill(100,200,255,200);
   stroke(254,254,255);
   beginShape();  // We are going to draw a polygon out of the wave points
