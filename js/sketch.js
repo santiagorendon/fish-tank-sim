@@ -44,10 +44,14 @@ class Fish{
     var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
 
     // update our position
+    if(this.x+this.width >= canvasWidth){
+      this.x = canvasWidth-this.width-5;
+      xMovement *= -1;
+    }
     this.x += xMovement;
     this.y += yMovement;
-    constrain(this.x, 0, width-this.width)
-    constrain(this.y, 0, height-this.height)
+    // constrain(this.x, 0, width-this.width)
+    // constrain(this.y, 0, height-this.height)
 
     // update our noise offset values
     this.xNoiseOffset += 0.01;
