@@ -16,6 +16,73 @@ var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
 
+class Game{
+  constructor(){
+    // this.scene = 'tank';
+    this.scene = 'tank';
+  }
+  drawStore(){
+    backgroundFill(214, 253, 255);
+    fill(0, 0, 0);
+    textAlign(LEFT, TOP)
+   .textSize(80);
+    textFont(fishFont);
+    textAlign(CENTER, TOP);
+    text('STORE', canvasWidth/2, 10)
+  }
+  drawTank(){
+    // FILL TANK
+    drawWater();
+    if (mouseIsPressed && state == 'fillingTank'){
+      drawWater();
+      if (waterLevel<=500){
+        waterLevel +=1
+      }
+      // if (level2>50){
+      //   if (! waterSound.isPlaying() ) { // .isPlaying() returns a boolean
+      //   waterSound.play();
+      // }
+    // }
+      level1 -= 1.5;
+      level2 -= 1.5;
+      var drop = new Water(mouseX, mouseY);
+      waterArray.push(drop)
+    }
+    // DISPLAY STATS
+    displayEnvironmentalStats()
+    // ADD SAND
+    if (mouseIsPressed && state=='sand' && mouseY >= 100){
+      var tempSand = new Sand(mouseX, mouseY)
+      sandArray.push(tempSand)
+      if(sandLevel<=200){
+        sandLevel +=1
+      }
+    }
+    // DISPLAY CLASSES
+    for(var i = sandArray.length-1; i >= 0; i--) {
+      sandArray[i].display()
+    }
+    for(var i = rockArray.length-1; i >= 0; i--) {
+      rockArray[i].display()
+    }
+    for(var i = waterArray.length-1; i >= 0; i--) {
+      waterArray[i].display()
+    }
+
+    for(var i = grassAray.length-1; i >= 0; i--) {
+      grassAray[i].display()
+    }
+
+    // DRAW TANK WALLS
+    stroke(0)
+    tankWalls()
+
+    // DRAW BUTTONS
+    buttonImages()
+
+    commonFish1.draw();
+  }
+}
 class Fish{
   constructor(type){
     this.type = type;
@@ -60,6 +127,7 @@ class Fish{
 }
 
 function preload(){
+  fishFont = loadFont('font/FISH.TTF');
   commonFishImgArr = [loadImage('images/commonFish1.png'), loadImage('images/commonFish2.png')]
   rock = loadImage('images/rock.png')
   fishImage = loadImage('images/fish.png')
@@ -73,6 +141,7 @@ function setup() {
   canvas.parent('#container');
   canvas.style('width', '100%');
   canvas.style('height', '100%');
+  game = new Game();
   commonFish1 = new Fish("commonFish");
   noiseDetail(24);
 
@@ -80,64 +149,12 @@ function setup() {
 
 function draw() {
   imageMode(CENTER)
-
-
-  // FILL TANK
-  drawwater();
-  if (mouseIsPressed && state == 'fillingTank'){
-    drawwater();
-    if (waterLevel<=500){
-      waterLevel +=1
-    }
-    // if (level2>50){
-    //   if (! waterSound.isPlaying() ) { // .isPlaying() returns a boolean
-    //   waterSound.play();
-    // }
-  // }
-    level1 -= 1.5;
-    level2 -= 1.5;
-    var drop = new Water(mouseX, mouseY);
-    waterArray.push(drop)
+  if(game.scene === "tank"){
+      game.drawTank();
   }
-
-  // DISPLAY STATS
-  displayEnvironmentalStats()
-
-
-  // ADD SAND
-  if (mouseIsPressed && state=='sand' && mouseY >= 100){
-    var tempSand = new Sand(mouseX, mouseY)
-    sandArray.push(tempSand)
-    if(sandLevel<=200){
-      sandLevel +=1
-    }
-
+  else if(game.scene === "store"){
+      game.drawStore();
   }
-
-  // DISPLAY CLASSES
-  for (var i = sandArray.length-1; i >= 0; i--) {
-    sandArray[i].display()
-    }
-  for (var i = rockArray.length-1; i >= 0; i--) {
-    rockArray[i].display()
-    }
-    for (var i = waterArray.length-1; i >= 0; i--) {
-      waterArray[i].display()
-  }
-
-  for (var i = grassAray.length-1; i >= 0; i--) {
-    grassAray[i].display()
-}
-
-  // DRAW TANK WALLS
-  stroke(0)
-  tankWalls()
-
-  // DRAW BUTTONS
-  buttonImages()
-
-  commonFish1.draw();
-
 }
 
 
@@ -269,7 +286,7 @@ function backgroundFill(r, g, b){
 }
 
 // MAKE THE WATER BOUNCE
-function drawwater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
+function drawWater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
   backgroundFill(254,254,255);
   fill(100,200,255,200);
   stroke(254,254,255);
