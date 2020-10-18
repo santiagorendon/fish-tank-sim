@@ -8,7 +8,8 @@ var canvas;
 var yoff = 0;
 var level1=700;
 var level2=800;
-
+var canvasHeight = 800;
+var canvasWidth = 1000;
 
 var waterLevel = 0
 var sandLevel = 0
@@ -48,12 +49,9 @@ class Fish{
     constrain(this.x, 0, width-this.width)
     constrain(this.y, 0, height-this.height)
 
-  
     // update our noise offset values
     this.xNoiseOffset += 0.01;
     this.yNoiseOffset += 0.01;
-
-
   }
 }
 
@@ -67,7 +65,7 @@ function preload(){
 }
 
 function setup() {
-  canvas = createCanvas(1000, 800);
+  canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('#container');
   canvas.style('width', '100%');
   canvas.style('height', '100%');
@@ -261,10 +259,14 @@ function mousePressed(){
   }
 }
 
+function backgroundFill(r, g, b){
+  fill(r, g, b);
+  rect(0, 0, canvasWidth, canvasHeight);
+}
 
 // MAKE THE WATER BOUNCE
 function drawwater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
-  background(254,254,255);
+  backgroundFill(254,254,255);
   fill(100,200,255,200);
   stroke(254,254,255);
 
