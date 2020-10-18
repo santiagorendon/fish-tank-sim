@@ -38,9 +38,9 @@ class Game{
   }
   drawTank(){
     // FILL TANK
-    drawwater();
+    drawWater();
     if (mouseIsPressed && state == 'water' && mouseY >= 200){
-      drawwater();
+      drawWater();
       if (waterLevel<=500){
         waterLevel +=1
       }
@@ -89,6 +89,8 @@ class Game{
     displayEnvironmentalStats()
     displayButtons()
     displayTankWalls()
+
+    commonFish1.draw();
   }
 }
 class Fish{
@@ -115,9 +117,8 @@ class Fish{
     if(this.type === "commonFish"){
       image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
     }
-    var xMovement = map( noise(this.xNoiseOffset), 0, 1, -1, 1 );
-    var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 10);
-
+    var xMovement = map( noise(this.xNoiseOffset), 0, 1, -3, 3 );
+    var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
 
     this.x += xMovement;
     this.y += yMovement;
@@ -159,13 +160,13 @@ function setup() {
   }
   var sandObject = {
     name: "sand",
-    image: sandImage, 
+    image: sandImage,
     cost: .10,
     locked: false
   }
   var rockObject = {
     name: "rock",
-    image: rockImage, 
+    image: rockImage,
     cost: 2.50,
     locked: false
   }
@@ -318,7 +319,7 @@ function mousePressed(){
     balance-=2.50
     if (grassLevel <=3){
       grassLevel +=1
-      
+
     }
   }
 }
@@ -391,7 +392,7 @@ class Button{
 
       }
 
-    
+
   }
 
 }
