@@ -57,8 +57,6 @@ class Game{
 
 
 
-
-
     // ADD SAND
     if (mouseIsPressed && state=='sand' && mouseY >= 200 && buttonArray[1].locked == false){
       var tempSand = new Sand(mouseX, mouseY)
@@ -89,7 +87,6 @@ class Game{
     displayEnvironmentalStats()
     displayButtons()
     displayTankWalls()
-
     commonFish1.draw();
   }
 }
@@ -143,6 +140,7 @@ function preload(){
 }
 
 
+
 function setup() {
   canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('#container');
@@ -151,37 +149,14 @@ function setup() {
   game = new Game();
   commonFish1 = new Fish("commonFish");
   noiseDetail(24);
+
   // objects and array used to hold button info
-  var waterObject = {
-    name: "water",
-    image: waterImage,
-    cost: '0',
-    locked: false
-  }
-  var sandObject = {
-    name: "sand",
-    image: sandImage,
-    cost: .10,
-    locked: false
-  }
-  var rockObject = {
-    name: "rock",
-    image: rockImage,
-    cost: 2.50,
-    locked: false
-  }
-  var grassObject = {
-    name: "grass",
-    image: grassImage,
-    cost: 2.50,
-    locked: false
-  }
-  var fishObject = {
-    name: "fish",
-    image: fishImage,
-    cost: 10,
-    locked: true
-  }
+
+  var waterObject = new Button('waterObj', 'water', waterImage, 0, false)
+  var sandObject = new Button('sandObject', 'sand', sandImage, .10, false)
+  var rockObject = new Button('rockObject', 'rock', rockImage, 2.50, false)
+  var grassObject = new Button('grassObject', 'grass', grassImage, 2.50, false)
+  var fishObject = new Button('fishObject', 'fish', fishImage, 10, true)
   buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject]
 }
 
@@ -351,7 +326,7 @@ function drawWater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
 
 
 
-class Button{
+class ToolBar{
   constructor(x, y){
     this.x = x
     this.y = y
@@ -359,7 +334,7 @@ class Button{
     this.buttonY = 50
   }
 
-  drawButton(buttonArray, mouseX, mouseY){
+  draw(buttonArray, mouseX, mouseY){
       for (var i=0; i<buttonArray.length; i++){
         noFill()
         strokeWeight(1)
@@ -377,29 +352,40 @@ class Button{
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
           return buttonArray[i].name
         }
-
-
           // disable fish until environment is set up
-      if (waterLevelMapped && sandLevelMapped && rockLevelMapped && grassLevelMapped == 100){
-        buttonArray[4].locked = false
+        if (waterLevelMapped && sandLevelMapped && rockLevelMapped && grassLevelMapped == 100){
+          buttonArray[4].locked = false
+        }
+
+        if (balance < buttonArray[i].cost){
+          buttonArray[i].locked = true
+        }
       }
-
-      if (balance < buttonArray[i].cost){
-        buttonArray[i].locked = true
-      }
-
-
-      }
-
-
   }
 
 }
 
 function displayButtons(){
-    var buttonClass = new Button(mouseX, mouseY)
-    tempState = buttonClass.drawButton(buttonArray, mouseX, mouseY)
+    var toolBar = new ToolBar(mouseX, mouseY)
+    tempState = toolBar.draw(buttonArray, mouseX, mouseY)
     if (tempState){
       state = tempState
     }
+}
+
+
+class Button{
+  constructor(objectName, name, image, cost, locked){
+    this.objectName = objectName
+    this.name = name
+    this.image = image
+    this.cost = cost
+    this.locked = locked
+    return this.objectName = {
+      name: this.name,
+      image: this.image,
+      cost: this.cost,
+      locked: this.locked
+    }
+  }
 }
