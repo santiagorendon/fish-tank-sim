@@ -57,8 +57,6 @@ class Game{
 
 
 
-
-
     // ADD SAND
     if (mouseIsPressed && state=='sand' && mouseY >= 200 && buttonArray[1].locked == false){
       var tempSand = new Sand(mouseX, mouseY)
@@ -143,6 +141,7 @@ function preload(){
 }
 
 
+
 function setup() {
   canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('#container');
@@ -151,37 +150,14 @@ function setup() {
   game = new Game();
   commonFish1 = new Fish("commonFish");
   noiseDetail(24);
+
   // objects and array used to hold button info
-  var waterObject = {
-    name: "water",
-    image: waterImage,
-    cost: '0',
-    locked: false
-  }
-  var sandObject = {
-    name: "sand",
-    image: sandImage,
-    cost: .10,
-    locked: false
-  }
-  var rockObject = {
-    name: "rock",
-    image: rockImage,
-    cost: 2.50,
-    locked: false
-  }
-  var grassObject = {
-    name: "grass",
-    image: grassImage,
-    cost: 2.50,
-    locked: false
-  }
-  var fishObject = {
-    name: "fish",
-    image: fishImage,
-    cost: 10,
-    locked: true
-  }
+
+  var waterObject = new createButton('waterObj', 'water', waterImage, 0, false)
+  var sandObject = new createButton('sandObject', 'sand', sandImage, .10, false)
+  var rockObject = new createButton('rockObject', 'rock', rockImage, 2.50, false)
+  var grassObject = new createButton('grassObject', 'grass', grassImage, 2.50, false)
+  var fishObject = new createButton('fishObject', 'fish', fishImage, 10, true)
   buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject]
 }
 
@@ -402,4 +378,21 @@ function displayButtons(){
     if (tempState){
       state = tempState
     }
+}
+
+
+class createButton{
+  constructor(objectName, name, image, cost, locked){
+    this.objectName = objectName
+    this.name = name
+    this.image = image
+    this.cost = cost
+    this.locked = locked
+    return this.objectName = {
+      name: this.name,
+      image: this.image,
+      cost: this.cost,
+      locked: this.locked
+    }
+  }
 }
