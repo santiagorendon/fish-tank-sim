@@ -6,6 +6,8 @@ var grassAray = []
 var state, tempState
 var canvas;
 
+var waterLevelMapped, grassLevelMapped, rockLevelMapped, sandLevelMapped
+
 var yoff = 0;
 var level1=700;
 var level2=800;
@@ -15,6 +17,8 @@ var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
 var buttonArray
+
+var balance = 150
 
 
 function preload(){
@@ -36,21 +40,35 @@ function setup() {
   // objects and array used to hold button info
   var waterObject = {
     name: "water",
-    image: waterImage
+    image: waterImage,
+    cost: 0,
+    locked: false
   }
   var sandObject = {
     name: "sand",
-    image: sandImage
+    image: sandImage, 
+    cost: .10,
+    locked: false
   }
   var rockObject = {
     name: "rock",
-    image: rockImage
+    image: rockImage, 
+    cost: 2.50,
+    locked: false
   }
   var grassObject = {
     name: "grass",
-    image: grassImage
+    image: grassImage,
+    cost: 2.50,
+    locked: false
   }
-  buttonArray = [waterObject, sandObject, rockObject, grassObject]
+  var fishObject = {
+    name: "fish",
+    image: fishImage,
+    cost: 10,
+    locked: true
+  }
+  buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject]
 }
 
 function draw() {
@@ -79,9 +97,11 @@ function draw() {
 
 
   // ADD SAND
-  if (mouseIsPressed && state=='sand' && mouseY >= 200){
+  if (mouseIsPressed && state=='sand' && mouseY >= 200 && buttonArray[1].locked == false){
     var tempSand = new Sand(mouseX, mouseY)
     sandArray.push(tempSand)
+    balance-=.01
+
     if(sandLevel<=200){
       sandLevel +=1
     }
@@ -144,7 +164,6 @@ class Sand {
         this.y += this.ySpeed
       }
       ellipse(this.x, this.y, this.radius, this.radius)
-
   }
 }
 
@@ -202,34 +221,40 @@ function displayTankWalls() {
 // ENVIRONMENTAL STATS
 function displayEnvironmentalStats(){
   fill(0)
-  var waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
+   waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
   text("Water level: " + waterLevelMapped + "%", width-120, 20 )
 
-  var sandLevelMapped = int(map(sandLevel, 0, 200, 1, 100))
+   sandLevelMapped = int(map(sandLevel, 0, 200, 1, 100))
   text("Sand level: " + sandLevelMapped + "%", width-120, 60 )
 
-  var rockLevelMapped = int(map(rockLevel, 0, 4, 1, 100))
+   rockLevelMapped = int(map(rockLevel, 0, 4, 1, 100))
   text("Rock level: " + rockLevelMapped + "%", width-120, 100 )
 
-  var grassLevelMapped = int(map(grassLevel, 0, 4, 1, 100))
+   grassLevelMapped = int(map(grassLevel, 0, 4, 1, 100))
   text("Grass level: " + grassLevelMapped + "%", width-120, 140 )
+
+  balance = constrain(balance, 0, 1000000)
+  text("Balance: $" + round(balance, 2), 50, 30 )
 }
 
 
 // display rocks and grass
 function mousePressed(){
-  if (state == 'rock'&& mouseY >= 200){
+  if (state == 'rock'&& mouseY >= 200 && buttonArray[2].locked == false){
     var tempRock = new Rock(mouseX, mouseY)
     rockArray.push(tempRock)
+    balance-=2.50
     if (rockLevel <=3){
       rockLevel +=1
     }
   }
-  else if (state == 'grass' && mouseY >= 200){
+  else if (state == 'grass' && mouseY >= 200 && buttonArray[3].locked == false){
     var tempGrass = new Grass(mouseX, mouseY)
     grassAray.push(tempGrass)
+    balance-=2.50
     if (grassLevel <=3){
       grassLevel +=1
+      
     }
   }
 }
@@ -272,6 +297,10 @@ class Button{
         stroke(0)
         rect(this.buttonX, this.buttonY, 50, 50)
         image(buttonArray[i].image, this.buttonX+25, this.buttonY+25, 25, 25)
+        if (buttonArray[i].locked){
+          line(this.buttonX, this.buttonY, this.buttonX+50, this.buttonY+50)
+          line(this.buttonX+50, this.buttonY, this.buttonX, this.buttonY+50)
+        }
         noStroke()
         fill(0)
         text(buttonArray[i].name, this.buttonX, this.buttonY+75)
@@ -279,7 +308,21 @@ class Button{
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
           return buttonArray[i].name
         }
+
+
+          // disable fish until environment is set up
+      if (waterLevelMapped && sandLevelMapped && rockLevelMapped && grassLevelMapped == 100){
+        buttonArray[4].locked = false
       }
+
+      if (balance < buttonArray[i].cost){
+        buttonArray[i].locked = true
+      }
+
+
+      }
+
+    
   }
 
 }
