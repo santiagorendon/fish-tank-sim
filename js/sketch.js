@@ -20,14 +20,23 @@ var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
 var buttonArray
-var balance = 150
 
 class Game{
   constructor(){
     // this.scene = 'tank';
     this.scene = 'tank';
     /* stats */
-    this.stats = {background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.95)',x: 770, y: 5, w: 225, h: 300};
+    this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
+    //fish holder
+    this.fishArr = [];
+    this.balance = 150;
+  }
+  drawBalance(){
+    this.balance = constrain(this.balance, 0, 1000000);
+    fill(0,0,0);
+    textSize(20);
+    textAlign(CENTER, TOP);
+    text("Balance: $" + round(this.balance, 2), 90, 25 );
   }
   drawStore(){
     backgroundFill(214, 253, 255);
@@ -37,6 +46,11 @@ class Game{
     textFont(fishFont);
     textAlign(CENTER, TOP);
     text('STORE', canvasWidth/2, 10)
+  }
+  drawFish(){
+    for(let i=0; i < this.fishArr.length; i++){
+      this.fishArr[i].draw();
+    }
   }
   drawTank(){
     // FILL TANK
@@ -63,7 +77,7 @@ class Game{
     if (mouseIsPressed && state=='sand' && mouseY >= 200 && buttonArray[1].locked == false){
       var tempSand = new Sand(mouseX, mouseY)
       sandArray.push(tempSand)
-      balance-=.01
+      game.balance-=.01
 
       if(sandLevel<=200){
         sandLevel +=1
@@ -85,17 +99,71 @@ class Game{
 
     // DISPLAY STATS, BUTTONS, AND TANK WALLS
     //displayEnvironmentalStats()
+    this.drawBalance();
     displayButtons()
     displayTankWalls()
-    commonFish1.draw();
-    commonFish1.drawStats();
+    this.drawFish();
+    if(game.stats.displayIndex != -1){
+      game.fishArr[game.stats.displayIndex].drawStats();
+    }
   }
 }
 
+
+function crackLegendaryEgg(){
+  rarity = Math.floor(random(85, 100));
+  if(offSpringRarity >= 95){
+    return ['S', rarity];
+  }
+  return ['A', rarity];
+}
+
+function crackRareEgg(){
+  rarity = Math.floor(random(50, 85));
+  if(offSpringRarity >= 70){
+    return ['B', rarity];
+  }
+  return ['C', rarity];
+}
+
+function crackCommonEgg(){
+  rarity = Math.floor(random(0, 50));
+  if(offSpringRarity >= 25){
+    return ['D', rarity];
+  }
+  return ['F', rarity];
+}
+
+function breedFish(rarity1, rarity2){
+  rarity3 = random(0, 100);
+  offSpringRarity = Math.ceil((rarity3+rarity2+rarity3)/3);
+  if(offSpringRarity >= 95){
+    return ['S', offSpringRarity];
+  }
+  else if(offSpringRarity >= 85){
+    return ['A', offSpringRarity];
+  }
+  else if(offSpringRarity >= 70){
+    return ['B', offSpringRarity];
+  }
+  else if(offSpringRarity >= 50){
+    return ['C', offSpringRarity];
+  }
+  else if(offSpringRarity >= 25){
+    return ['D', offSpringRarity];
+  }
+  return ['F', offSpringRarity];
+}
+
 class Fish{
-  constructor(type, rarity){
+  constructor(type, rarity, index){
+    this.index = index;
     this.type = type;
+    //stats
     this.rarity = rarity;
+    this.health = 100;
+    this.price = 15;
+
     this.width = 100;
     this.height = 100;
     this.x = 500;
@@ -122,44 +190,111 @@ class Fish{
 
     this.x += xMovement;
     this.y += yMovement;
+
     this.x = constrain(this.x, this.width, width-this.width)
     this.y = constrain(this.y, this.height, height-this.height)
 
     // update our noise offset values
     this.xNoiseOffset += 0.01;
     this.yNoiseOffset += 0.01;
+    this.isClicked();
+  }
+  isClicked(){
+    let higherThanFish = mouseY < this.y-37;
+    let lowerThanFish = mouseY > this.y+this.height-70;
+    let leftOfFish = mouseX < this.x-30;
+    let rightOfFish = mouseX > this.x+this.width-63;
+    let isHit = (!higherThanFish && !lowerThanFish && !leftOfFish && !rightOfFish)
+    if(mouseIsPressed && isHit){
+      console.log('hit');
+      game.stats.displayIndex = this.index;
+    }
   }
   drawStats(){
     fill(game.stats.background);
     strokeWeight(1);
     rect(game.stats.x ,game.stats.y ,game.stats.w ,game.stats.h );
-    //stats color
-
+    //close button
+    image(closeImg, game.stats.x+game.stats.w-12, game.stats.y+15, 20, 20);
     //draw label
-    fill(0)
+    fill(0);
     textAlign(CENTER, TOP);
     textFont(fishFont);
     textSize(30);
     text(this.type, (game.stats.x+game.stats.x+game.stats.w)/2 ,game.stats.y+35)
+
     //draw icons
+    textSize(20);
+    image(heartImg, game.stats.x+40, game.stats.y+102, 100, 100);
     fill(game.stats.bar);
+    let healthW = map(this.health, 0, 100, 0, 135);
+    rect(game.stats.x+65, game.stats.y+88, healthW, 25);
+    fill(0, 0, 0);
+    text(`(${this.health}/100)`, game.stats.x+129, game.stats.y+91);
 
-    image(rarityImg, game.stats.x+40, game.stats.y+100, 100, 100);
-    rect(game.stats.x+65, game.stats.y+88, 135, 25)
+    image(rarityImg, game.stats.x+40, game.stats.y+155, 100, 100);
+    fill(game.stats.bar);
+    let rarityW = map(this.rarity, 0, 100, 0, 135);
+    rect(game.stats.x+65, game.stats.y+145, rarityW, 25);
+    fill(0, 0, 0);
+    text(`(${this.rarity}/100)`, game.stats.x+129, game.stats.y+148);
 
+    image(cashImg, game.stats.x+40, game.stats.y+210, 70, 70);
+    //rect(game.stats.x+65, game.stats.y+202, 135, 25);
+    text(`$ ${this.price}.00`, game.stats.x+129, game.stats.y+201);
+
+    image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
+
+    //add event listeners
+    this.isClosed();
+    this.isSold();
+  }
+  isSold(){
+    let higherThanSell = mouseY < game.stats.y+280 -35;
+    let lowerThanSell = mouseY > game.stats.y+280 +150 -125;
+    let leftOfSell = mouseX < (game.stats.x+game.stats.x+game.stats.w)/2+10  -25;
+    let rightOfSell = mouseX > (game.stats.x+game.stats.x+game.stats.w)/2+10+150 -132;
+    let isHit = (!higherThanSell && !lowerThanSell && !leftOfSell && !rightOfSell);
+    if(mouseIsPressed && isHit){
+      //increment price
+      game.balance += this.price;
+      //remove fish
+      game.fishArr.splice(this.index, 1);
+      //remove stats display
+      game.stats.displayIndex = -1;
+    }
+  }
+  isClosed(){ //check if close button pressed
+    let higherThanClose = mouseY < game.stats.y+15-20;
+    let lowerThanClose = mouseY > game.stats.y+15+11;
+    let leftOfClose = mouseX < game.stats.x+game.stats.w-20;
+    let rightOfClose = mouseX > game.stats.x+game.stats.w-12+9;
+    let isHit = (!higherThanClose && !lowerThanClose && !leftOfClose && !rightOfClose)
+    if(mouseIsPressed && isHit){
+      game.stats.displayIndex = -1;
+    }
   }
 }
 
 function preload(){
+  //font
   fishFont = loadFont('font/FISH.TTF');
+  // fish stats images
   rarityImg = loadImage('images/rarity.png');
+  heartImg = loadImage('images/heart.png');
+  cashImg = loadImage('images/cash.png');
+  sellImg = loadImage('images/sell.png');
+  closeImg = loadImage('images/close.png');
+  //fish images
   commonFishImgArr = [loadImage('images/commonFish1.png'), loadImage('images/commonFish2.png')]
-  rockImage = loadImage('images/rock.png')
   fishImage = loadImage('images/fish.png')
+  //objects
+  rockImage = loadImage('images/rock.png')
   waterImage = loadImage('images/water.png')
-  waterSound = loadSound("sounds/bubbles.mp3")
   grassImage = loadImage('images/grass.png')
-  sandImage = loadImage('images/sand.png')
+  sandImage = loadImage('images/sand.png');
+  //sounds
+  waterSound = loadSound("sounds/bubbles.mp3")
 }
 
 
@@ -170,7 +305,7 @@ function setup() {
   canvas.style('width', '100%');
   canvas.style('height', '100%');
   game = new Game();
-  commonFish1 = new Fish("Gold Fish", 10);
+  game.fishArr.push(new Fish("Gold Fish", 10, 0));
   noiseDetail(24);
 
   // objects and array used to hold button info
@@ -293,11 +428,8 @@ function displayEnvironmentalStats(){
    rockLevelMapped = int(map(rockLevel, 0, 4, 1, 100))
   text("Rock level: " + rockLevelMapped + "%", width-120, 100 )
 
-   grassLevelMapped = int(map(grassLevel, 0, 4, 1, 100))
-  text("Grass level: " + grassLevelMapped + "%", width-120, 140 )
-
-  balance = constrain(balance, 0, 1000000)
-  text("Balance: $" + round(balance, 2), 50, 30 )
+   grassLevelMapped = int(map(grassLevel, 0, 4, 1, 100));
+  text("Grass level: " + grassLevelMapped + "%", width-120, 140 );
 }
 
 
@@ -306,7 +438,7 @@ function mousePressed(){
   if (state == 'rock'&& mouseY >= 200 && buttonArray[2].locked == false){
     var tempRock = new Rock(mouseX, mouseY)
     rockArray.push(tempRock)
-    balance-=2.50
+    game.balance-=2.50
     if (rockLevel <=3){
       rockLevel +=1
     }
@@ -314,7 +446,7 @@ function mousePressed(){
   else if (state == 'grass' && mouseY >= 200 && buttonArray[3].locked == false){
     var tempGrass = new Grass(mouseX, mouseY)
     grassAray.push(tempGrass)
-    balance-=2.50
+    game.balance-=2.50
     if (grassLevel <=3){
       grassLevel +=1
 
@@ -345,10 +477,6 @@ function drawWater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
   endShape(CLOSE);
 }
 
-
-
-
-
 class ToolBar{
   constructor(x, y){
     this.x = x
@@ -371,7 +499,7 @@ class ToolBar{
         noStroke()
         fill(0)
         textSize(15);
-        textAlign(LEFT, TOP)
+        textAlign(LEFT, TOP);
         text(buttonArray[i].name , this.buttonX, this.buttonY+55)
         this.buttonX += 50
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
@@ -382,7 +510,7 @@ class ToolBar{
           buttonArray[4].locked = false
         }
 
-        if (balance < buttonArray[i].cost){
+        if (game.balance < buttonArray[i].cost){
           buttonArray[i].locked = true
         }
       }
