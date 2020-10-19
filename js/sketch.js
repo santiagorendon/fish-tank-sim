@@ -1,4 +1,4 @@
-var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage, sellSound
+var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage, sellSound, foodImage, toiletImage, flushSound
 var sandArray = []
 var waterArray = []
 var rockArray = []
@@ -156,6 +156,17 @@ function breedFish(rarity1, rarity2){
   return ['F', offSpringRarity];
 }
 
+// class Toilet{
+//   constructor(x, y){
+//     this.x = x
+//     this.y = y
+//   }
+//   flushFish(fish){
+//     if (dist(this.x, this.y, fish.x, fish.y ) <= 100){
+//       game.fishArr.splice(this.index, 1);
+//     }
+//   }
+// }
 class Fish{
   constructor(type, rarity, index){
     this.index = index;
@@ -178,26 +189,46 @@ class Fish{
     this.yNoiseOffset = random(1000,2000);
   }
   draw(){
-    this.frameCount += 1;
-    if(this.frameCount >= this.frameDelay){
-      this.frame = (this.frame+1)%this.frameNum //num between 0 and 1;
-      this.frameCount = 0;
-    }
     if(this.type === "Gold Fish"){
       image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
     }
-    var xMovement = map( noise(this.xNoiseOffset), 0, 1, -3, 3 );
-    var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
 
-    this.x += xMovement;
-    this.y += yMovement;
+    // fish only moves if it's alive
+    if (this.health >= 1){
+      this.frameCount += 1;
+      if(this.frameCount >= this.frameDelay){
+        this.frame = (this.frame+1)%this.frameNum //num between 0 and 1;
+        this.frameCount = 0;
+      }
 
-    this.x = constrain(this.x, this.width, width-this.width)
-    this.y = constrain(this.y, this.height, height-this.height)
+      var xMovement = map( noise(this.xNoiseOffset), 0, 1, -3, 3 );
+      var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
 
-    // update our noise offset values
-    this.xNoiseOffset += 0.01;
-    this.yNoiseOffset += 0.01;
+      this.x += xMovement;
+      this.y += yMovement;
+
+      this.x = constrain(this.x, this.width, width-this.width)
+      this.y = constrain(this.y, this.height, height-this.height)
+
+      this.xNoiseOffset += 0.01;
+      this.yNoiseOffset += 0.01;
+    }
+
+    // fish sinks to bottom of tank when it dies
+    else {
+      if (this.y<= height-20){
+        this.y += 1
+      }
+
+    }
+
+    // fish progressively loses health
+    this.health = constrain(this.health, 0, 100)
+    this.health -=1
+    this.health = round(this.health, 2)
+
+
+
     this.isClicked();
   }
   isClicked(){
@@ -244,10 +275,12 @@ class Fish{
     text(`$ ${this.price}.00`, game.stats.x+129, game.stats.y+201);
 
     image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
+    ellipse((game.stats.x+game.stats.x+game.stats.w)/2-80, game.stats.y+280, 60, 60);
 
     //add event listeners
     this.isClosed();
     this.isSold();
+    this.isFlushed();
   }
   isSold(){
     let higherThanSell = mouseY < game.stats.y+280 -35;
@@ -279,6 +312,21 @@ class Fish{
       game.stats.displayIndex = -1;
     }
   }
+
+  isFlushed(){ //check if toilet circle pressed
+    if(mouseIsPressed && dist(mouseX, mouseY,  ((game.stats.x+game.stats.x+game.stats.w)/2-80), game.stats.y+280) <= 50){
+      // remove stats display
+      game.stats.displayIndex = -1;
+      //remove fish
+      game.fishArr.splice(this.index, 1);
+      //remove stats display
+      game.stats.displayIndex = -1;
+      // play noise
+      if (! flushSound.isPlaying() ) { // .isPlaying() returns a boolean
+        flushSound.play();
+      }
+    }
+  }
 }
 
 function preload(){
@@ -298,9 +346,12 @@ function preload(){
   waterImage = loadImage('images/water.png')
   grassImage = loadImage('images/grass.png')
   sandImage = loadImage('images/sand.png');
+  fishFoodImage = loadImage('images/fishfood.png')
+  toiletImage = loadImage('images/toilet.png')
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3")
   sellSound = loadSound("sounds/sell.mp3")
+  flushSound = loadSound("sounds/flush.mp3")
 }
 
 
@@ -321,7 +372,8 @@ function setup() {
   var rockObject = new Button('rockObject', 'rock', rockImage, 2.50, false)
   var grassObject = new Button('grassObject', 'grass', grassImage, 2.50, false)
   var fishObject = new Button('fishObject', 'fish', fishImage, 10, true)
-  buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject]
+  var fishFoodObject = new Button('fishFoodObject', 'food', fishFoodImage, 1, false)
+  buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject, fishFoodObject]
 }
 
 function draw() {
