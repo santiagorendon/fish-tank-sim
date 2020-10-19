@@ -26,6 +26,8 @@ class Game{
   constructor(){
     // this.scene = 'tank';
     this.scene = 'tank';
+    /* stats */
+    this.stats = {background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.95)',x: 770, y: 5, w: 225, h: 300};
   }
   drawStore(){
     backgroundFill(214, 253, 255);
@@ -67,8 +69,6 @@ class Game{
         sandLevel +=1
       }
     }
-
-
     // DISPLAY CLASSES
     for (var i = sandArray.length-1; i >= 0; i--) {
       sandArray[i].display()
@@ -84,15 +84,18 @@ class Game{
     }
 
     // DISPLAY STATS, BUTTONS, AND TANK WALLS
-    displayEnvironmentalStats()
+    //displayEnvironmentalStats()
     displayButtons()
     displayTankWalls()
     commonFish1.draw();
+    commonFish1.drawStats();
   }
 }
+
 class Fish{
-  constructor(type){
+  constructor(type, rarity){
     this.type = type;
+    this.rarity = rarity;
     this.width = 100;
     this.height = 100;
     this.x = 500;
@@ -111,7 +114,7 @@ class Fish{
       this.frame = (this.frame+1)%this.frameNum //num between 0 and 1;
       this.frameCount = 0;
     }
-    if(this.type === "commonFish"){
+    if(this.type === "Gold Fish"){
       image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
     }
     var xMovement = map( noise(this.xNoiseOffset), 0, 1, -3, 3 );
@@ -126,10 +129,30 @@ class Fish{
     this.xNoiseOffset += 0.01;
     this.yNoiseOffset += 0.01;
   }
+  drawStats(){
+    fill(game.stats.background);
+    strokeWeight(1);
+    rect(game.stats.x ,game.stats.y ,game.stats.w ,game.stats.h );
+    //stats color
+
+    //draw label
+    fill(0)
+    textAlign(CENTER, TOP);
+    textFont(fishFont);
+    textSize(30);
+    text(this.type, (game.stats.x+game.stats.x+game.stats.w)/2 ,game.stats.y+35)
+    //draw icons
+    fill(game.stats.bar);
+
+    image(rarityImg, game.stats.x+40, game.stats.y+100, 100, 100);
+    rect(game.stats.x+65, game.stats.y+88, 135, 25)
+
+  }
 }
 
 function preload(){
   fishFont = loadFont('font/FISH.TTF');
+  rarityImg = loadImage('images/rarity.png');
   commonFishImgArr = [loadImage('images/commonFish1.png'), loadImage('images/commonFish2.png')]
   rockImage = loadImage('images/rock.png')
   fishImage = loadImage('images/fish.png')
@@ -147,7 +170,7 @@ function setup() {
   canvas.style('width', '100%');
   canvas.style('height', '100%');
   game = new Game();
-  commonFish1 = new Fish("commonFish");
+  commonFish1 = new Fish("Gold Fish", 10);
   noiseDetail(24);
 
   // objects and array used to hold button info
@@ -347,7 +370,9 @@ class ToolBar{
         }
         noStroke()
         fill(0)
-        text(buttonArray[i].name , this.buttonX, this.buttonY+75)
+        textSize(15);
+        textAlign(LEFT, TOP)
+        text(buttonArray[i].name , this.buttonX, this.buttonY+55)
         this.buttonX += 50
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
           return buttonArray[i].name
@@ -362,7 +387,6 @@ class ToolBar{
         }
       }
   }
-
 }
 
 function displayButtons(){
