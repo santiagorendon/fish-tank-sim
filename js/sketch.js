@@ -1,4 +1,4 @@
-var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage
+var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage, sellSound
 var sandArray = []
 var waterArray = []
 var rockArray = []
@@ -262,6 +262,11 @@ class Fish{
       game.fishArr.splice(this.index, 1);
       //remove stats display
       game.stats.displayIndex = -1;
+      // play noise
+      if (! sellSound.isPlaying() ) { // .isPlaying() returns a boolean
+        sellSound.play();
+      }
+
     }
   }
   isClosed(){ //check if close button pressed
@@ -295,6 +300,7 @@ function preload(){
   sandImage = loadImage('images/sand.png');
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3")
+  sellSound = loadSound("sounds/sell.mp3")
 }
 
 
