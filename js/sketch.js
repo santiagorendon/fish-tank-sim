@@ -34,6 +34,7 @@ class Game{
   drawBalance(){
     this.balance = constrain(this.balance, 0, 1000000);
     fill(0,0,0);
+    textFont(fishFont);
     textSize(20);
     textAlign(CENTER, TOP);
     text("Balance: $" + round(this.balance, 2), 90, 25 );
@@ -206,7 +207,6 @@ class Fish{
     let rightOfFish = mouseX > this.x+this.width-63;
     let isHit = (!higherThanFish && !lowerThanFish && !leftOfFish && !rightOfFish)
     if(mouseIsPressed && isHit){
-      console.log('hit');
       game.stats.displayIndex = this.index;
     }
   }
