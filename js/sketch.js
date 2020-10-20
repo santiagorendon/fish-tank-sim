@@ -201,8 +201,8 @@ class Fish{
     this.alive = true
     this.width = 100;
     this.height = 100;
-    this.x = 500;
-    this.y = 500;
+    this.x = random(0, width)
+    this.y = random(0, height)
     this.frameDelay = 25;
     this.frameCount = 0;
     this.frame = 0;
@@ -408,7 +408,7 @@ function setup() {
   var sandObject = new Button('sandObject', 'sand', sandImage, .10, false)
   var rockObject = new Button('rockObject', 'rock', rockImage, 2.50, false)
   var grassObject = new Button('grassObject', 'grass', grassImage, 2.50, false)
-  var fishObject = new Button('fishObject', 'fish', fishImage, 10, true)
+  var fishObject = new Button('fishObject', 'fish', fishImage, 10, false) // CURRENTLY FALSE, BUT MAKE IT TRUE FOR REAL GAME PLAY
   var fishFoodObject = new Button('fishFoodObject', 'food', fishFoodImage, 1, false)
   buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject, fishFoodObject]
 }
