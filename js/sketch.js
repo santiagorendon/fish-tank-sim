@@ -32,12 +32,11 @@ class Game{
     this.balance = 150;
   }
   drawBalance(){
-    this.balance = constrain(this.balance, 0, 1000000);
     fill(0,0,0);
     textFont(fishFont);
     textSize(20);
-    textAlign(CENTER, TOP);
-    text("Balance: $" + round(this.balance, 2), 90, 25 );
+    textAlign(LEFT, TOP);
+    text("Balance: $" + round(this.balance,2), 48, 25 );
   }
   drawStore(){
     backgroundFill(214, 253, 255);
@@ -79,7 +78,6 @@ class Game{
       var tempSand = new Sand(mouseX, mouseY)
       sandArray.push(tempSand)
       game.balance-=.01
-
       if(sandLevel<=200){
         sandLevel +=1
       }
@@ -174,8 +172,10 @@ class Fish{
     //stats
     this.rarity = rarity;
     this.health = 100;
+    this.startingPrice = 15;
     this.price = 15;
-
+    this.age = 0;
+    this.alive = true
     this.width = 100;
     this.height = 100;
     this.x = 500;
@@ -193,39 +193,53 @@ class Fish{
       image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
     }
 
+    // fish price varies depending on health
+    this.price = round(((this.health/100) * this.startingPrice), 2)
+    this.price = constrain(this.price, 0, 100000)
+
+
+    // fish progressively loses health
+    this.health = constrain(this.health, 1, 100)
+    this.health -=.01
+    this.health = round(this.health, 2)
+
+    // fish progressively ages
+    this.age += .0001
+
+
+
+    // fish starved or grew too old?
+    if (this.health <= 1 || this.age >= 10){
+      this.alive = false
+    }
+
     // fish only moves if it's alive
-    if (this.health >= 1){
+    if (this.alive){
       this.frameCount += 1;
       if(this.frameCount >= this.frameDelay){
         this.frame = (this.frame+1)%this.frameNum //num between 0 and 1;
         this.frameCount = 0;
       }
-
       var xMovement = map( noise(this.xNoiseOffset), 0, 1, -3, 3 );
       var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
-
       this.x += xMovement;
       this.y += yMovement;
-
       this.x = constrain(this.x, this.width, width-this.width)
       this.y = constrain(this.y, this.height, height-this.height)
-
       this.xNoiseOffset += 0.01;
       this.yNoiseOffset += 0.01;
     }
 
     // fish sinks to bottom of tank when it dies
     else {
+      this.health = 0
+      this.price = 0
       if (this.y<= height-20){
         this.y += 1
       }
 
     }
 
-    // fish progressively loses health
-    this.health = constrain(this.health, 0, 100)
-    this.health -=1
-    this.health = round(this.health, 2)
 
 
 
@@ -272,7 +286,7 @@ class Fish{
 
     image(cashImg, game.stats.x+40, game.stats.y+210, 70, 70);
     //rect(game.stats.x+65, game.stats.y+202, 135, 25);
-    text(`$ ${this.price}.00`, game.stats.x+129, game.stats.y+201);
+    text(`$ ${this.price}`, game.stats.x+129, game.stats.y+201);
 
     image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
     ellipse((game.stats.x+game.stats.x+game.stats.w)/2-80, game.stats.y+280, 60, 60);
