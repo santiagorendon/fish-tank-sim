@@ -91,6 +91,9 @@ class Game{
       game.balance-=.0001
     }
 
+
+
+
     // DISPLAY CLASSES
     for (var i = sandArray.length-1; i >= 0; i--) {
       sandArray[i].display()
@@ -117,7 +120,7 @@ class Game{
     }
 
     // DISPLAY STATS, BUTTONS, AND TANK WALLS
-    //displayEnvironmentalStats()
+    displayEnvironmentalStats()
     this.drawBalance();
     displayButtons()
     displayTankWalls()
@@ -396,7 +399,7 @@ function setup() {
   canvas.style('width', '100%');
   canvas.style('height', '100%');
   game = new Game();
-  game.fishArr.push(new Fish("Gold Fish", 10, 0));
+  // game.fishArr.push(new Fish("Gold Fish", 10, 0));
   noiseDetail(24);
 
   // objects and array used to hold button info
@@ -597,6 +600,11 @@ function mousePressed(){
 
     }
   }
+  // ADD FISH
+  else if (mouseIsPressed && state=='fish' && mouseY >= 200 && buttonArray[4].locked == false){
+    game.fishArr.push(new Fish("Gold Fish", 10, 0));
+    game.balance-= game.fishArr[game.fishArr.length - 1].price
+  }
 }
 
 function backgroundFill(r, g, b){
@@ -651,7 +659,7 @@ class ToolBar{
           return buttonArray[i].name
         }
           // disable fish until environment is set up
-        if (waterLevelMapped && sandLevelMapped && rockLevelMapped && grassLevelMapped == 100){
+        if (waterLevelMapped == 100 && sandLevelMapped == 100 && rockLevelMapped == 100 && grassLevelMapped == 100){
           buttonArray[4].locked = false
         }
 
