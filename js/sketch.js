@@ -1,8 +1,9 @@
-var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage, sellSound
+var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage, sellSound, foodImage, toiletImage, flushSound
 var sandArray = []
 var waterArray = []
 var rockArray = []
-var grassAray = []
+var grassArray = []
+var foodArray = []
 var state, tempState
 var canvas;
 
@@ -32,12 +33,11 @@ class Game{
     this.balance = 150;
   }
   drawBalance(){
-    this.balance = constrain(this.balance, 0, 1000000);
     fill(0,0,0);
     textFont(fishFont);
     textSize(20);
-    textAlign(CENTER, TOP);
-    text("Balance: $" + round(this.balance, 2), 90, 25 );
+    textAlign(LEFT, TOP);
+    text("Balance: $" + round(this.balance,2), 48, 25 );
   }
   drawStore(){
     backgroundFill(214, 253, 255);
@@ -79,11 +79,21 @@ class Game{
       var tempSand = new Sand(mouseX, mouseY)
       sandArray.push(tempSand)
       game.balance-=.01
-
       if(sandLevel<=200){
         sandLevel +=1
       }
     }
+
+    // ADD FISH FOOD
+    if (mouseIsPressed && state=='food' && mouseY >= 200 && buttonArray[5].locked == false){
+      var tempFood = new Food(mouseX, mouseY)
+      foodArray.push(tempFood)
+      game.balance-=.0001
+    }
+
+
+
+
     // DISPLAY CLASSES
     for (var i = sandArray.length-1; i >= 0; i--) {
       sandArray[i].display()
@@ -92,14 +102,25 @@ class Game{
       rockArray[i].display()
     }
     for (var i = waterArray.length-1; i >= 0; i--) {
-      waterArray[i].display()
+      let check = waterArray[i].display()
+      if (check == 'gone'){
+        waterArray.splice(i, 1)
+        i-=1
+      }
     }
-    for (var i = grassAray.length-1; i >= 0; i--) {
-      grassAray[i].display()
+    for (var i = grassArray.length-1; i >= 0; i--) {
+      grassArray[i].display()
+    }
+    for (var i = foodArray.length-1; i >= 0; i--) {
+      let check = foodArray[i].display(game.fishArr)
+      if (check == 'gone'){
+        foodArray.splice(i, 1)
+        i-=1
+      }
     }
 
     // DISPLAY STATS, BUTTONS, AND TANK WALLS
-    //displayEnvironmentalStats()
+    displayEnvironmentalStats()
     this.drawBalance();
     displayButtons()
     displayTankWalls()
@@ -156,6 +177,17 @@ function breedFish(rarity1, rarity2){
   return ['F', offSpringRarity];
 }
 
+// class Toilet{
+//   constructor(x, y){
+//     this.x = x
+//     this.y = y
+//   }
+//   flushFish(fish){
+//     if (dist(this.x, this.y, fish.x, fish.y ) <= 100){
+//       game.fishArr.splice(this.index, 1);
+//     }
+//   }
+// }
 class Fish{
   constructor(type, rarity, index){
     this.index = index;
@@ -163,12 +195,14 @@ class Fish{
     //stats
     this.rarity = rarity;
     this.health = 100;
+    this.startingPrice = 15;
     this.price = 15;
-
+    this.age = 0;
+    this.alive = true
     this.width = 100;
     this.height = 100;
-    this.x = 500;
-    this.y = 500;
+    this.x = random(0, width)
+    this.y = random(0, height)
     this.frameDelay = 25;
     this.frameCount = 0;
     this.frame = 0;
@@ -178,26 +212,60 @@ class Fish{
     this.yNoiseOffset = random(1000,2000);
   }
   draw(){
-    this.frameCount += 1;
-    if(this.frameCount >= this.frameDelay){
-      this.frame = (this.frame+1)%this.frameNum //num between 0 and 1;
-      this.frameCount = 0;
-    }
     if(this.type === "Gold Fish"){
       image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
     }
-    var xMovement = map( noise(this.xNoiseOffset), 0, 1, -3, 3 );
-    var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
 
-    this.x += xMovement;
-    this.y += yMovement;
+    // fish price varies depending on health
+    this.price = round(((this.health/100) * this.startingPrice), 2)
+    this.price = constrain(this.price, 0, 100000)
 
-    this.x = constrain(this.x, this.width, width-this.width)
-    this.y = constrain(this.y, this.height, height-this.height)
 
-    // update our noise offset values
-    this.xNoiseOffset += 0.01;
-    this.yNoiseOffset += 0.01;
+    // fish progressively loses health
+    this.health = constrain(this.health, 1, 100)
+    this.health -=.01
+    this.health = round(this.health, 2)
+
+    // fish progressively ages
+    this.age += .0001
+
+
+
+    // fish starved or grew too old?
+    if (this.health <= 1 || this.age >= 10){
+      this.alive = false
+    }
+
+    // fish only moves if it's alive
+    if (this.alive){
+      this.frameCount += 1;
+      if(this.frameCount >= this.frameDelay){
+        this.frame = (this.frame+1)%this.frameNum //num between 0 and 1;
+        this.frameCount = 0;
+      }
+      var xMovement = map( noise(this.xNoiseOffset), 0, 1, -3, 3 );
+      var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
+      this.x += xMovement;
+      this.y += yMovement;
+      this.x = constrain(this.x, this.width, width-this.width)
+      this.y = constrain(this.y, this.height, height)
+      this.xNoiseOffset += 0.01;
+      this.yNoiseOffset += 0.01;
+    }
+
+    // fish sinks to bottom of tank when it dies
+    else {
+      this.health = 0
+      this.price = 0
+      if (this.y<= height-20){
+        this.y += 1
+      }
+
+    }
+
+
+
+
     this.isClicked();
   }
   isClicked(){
@@ -241,13 +309,15 @@ class Fish{
 
     image(cashImg, game.stats.x+40, game.stats.y+210, 70, 70);
     //rect(game.stats.x+65, game.stats.y+202, 135, 25);
-    text(`$ ${this.price}.00`, game.stats.x+129, game.stats.y+201);
+    text(`$ ${this.price}`, game.stats.x+129, game.stats.y+201);
 
     image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
+    ellipse((game.stats.x+game.stats.x+game.stats.w)/2-80, game.stats.y+280, 60, 60);
 
     //add event listeners
     this.isClosed();
     this.isSold();
+    this.isFlushed();
   }
   isSold(){
     let higherThanSell = mouseY < game.stats.y+280 -35;
@@ -279,6 +349,21 @@ class Fish{
       game.stats.displayIndex = -1;
     }
   }
+
+  isFlushed(){ //check if toilet circle pressed
+    if(mouseIsPressed && dist(mouseX, mouseY,  ((game.stats.x+game.stats.x+game.stats.w)/2-80), game.stats.y+280) <= 50){
+      // remove stats display
+      game.stats.displayIndex = -1;
+      //remove fish
+      game.fishArr.splice(this.index, 1);
+      //remove stats display
+      game.stats.displayIndex = -1;
+      // play noise
+      if (! flushSound.isPlaying() ) { // .isPlaying() returns a boolean
+        flushSound.play();
+      }
+    }
+  }
 }
 
 function preload(){
@@ -298,9 +383,12 @@ function preload(){
   waterImage = loadImage('images/water.png')
   grassImage = loadImage('images/grass.png')
   sandImage = loadImage('images/sand.png');
+  fishFoodImage = loadImage('images/fishfood.png')
+  toiletImage = loadImage('images/toilet.png')
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3")
   sellSound = loadSound("sounds/sell.mp3")
+  flushSound = loadSound("sounds/flush.mp3")
 }
 
 
@@ -311,7 +399,7 @@ function setup() {
   canvas.style('width', '100%');
   canvas.style('height', '100%');
   game = new Game();
-  game.fishArr.push(new Fish("Gold Fish", 10, 0));
+  // game.fishArr.push(new Fish("Gold Fish", 10, 0));
   noiseDetail(24);
 
   // objects and array used to hold button info
@@ -320,8 +408,9 @@ function setup() {
   var sandObject = new Button('sandObject', 'sand', sandImage, .10, false)
   var rockObject = new Button('rockObject', 'rock', rockImage, 2.50, false)
   var grassObject = new Button('grassObject', 'grass', grassImage, 2.50, false)
-  var fishObject = new Button('fishObject', 'fish', fishImage, 10, true)
-  buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject]
+  var fishObject = new Button('fishObject', 'fish', fishImage, 10, false) // CURRENTLY FALSE, BUT MAKE IT TRUE FOR REAL GAME PLAY
+  var fishFoodObject = new Button('fishFoodObject', 'food', fishFoodImage, 1, false)
+  buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject, fishFoodObject]
 }
 
 function draw() {
@@ -411,6 +500,59 @@ class Water {
   }
 }
 
+class Food {
+    constructor(x, y){
+      this.x = x
+      this.y = y
+      this.xSpeed = random(-1, 1)
+      this.ySpeed = 2
+      this.alpha = 255
+      this.radius = random(.5, 3)
+      this.arrayOfFish = game.fishArr
+    }
+    display(fishArr){
+      noStroke()
+      fill(139,69,19,this.alpha);
+      if (this.y <= height-10){ // food floats to bottom of tank
+        this.y += this.ySpeed
+        this.x += this.xSpeed
+      }
+      ellipse(this.x, this.y, this.radius, this.radius)
+      this.alpha -=.1 // food gets absorbed by the water
+      // fish moves closer to the fish food if it's hungry
+      for (var i=0; i<fishArr.length; i++){
+        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) >= 1 && fishArr[i].health <= 90 && fishArr.length >= 1){
+          if (fishArr[i].x < this.x){
+            fishArr[i].x += .1
+          }
+          else {
+            fishArr[i].x -= .1
+          }
+          if (fishArr[i].y < this.y){
+            fishArr[i].y += .1
+          }
+          else {
+            fishArr[i].y -= .1
+          }
+        }
+        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) < 1){
+          fishArr[i].health +=2
+          return 'gone'
+        }
+      }
+
+      if (this.alpha < 0){
+          return 'gone'
+      }
+      else {
+          return 'ok'
+      }
+
+
+
+    }
+  }
+
 
 // TANK WALLS
 function displayTankWalls() {
@@ -451,12 +593,17 @@ function mousePressed(){
   }
   else if (state == 'grass' && mouseY >= 200 && buttonArray[3].locked == false){
     var tempGrass = new Grass(mouseX, mouseY)
-    grassAray.push(tempGrass)
+    grassArray.push(tempGrass)
     game.balance-=2.50
     if (grassLevel <=3){
       grassLevel +=1
 
     }
+  }
+  // ADD FISH
+  else if (mouseIsPressed && state=='fish' && mouseY >= 200 && buttonArray[4].locked == false){
+    game.fishArr.push(new Fish("Gold Fish", 10, 0));
+    game.balance-= game.fishArr[game.fishArr.length - 1].price
   }
 }
 
@@ -512,7 +659,7 @@ class ToolBar{
           return buttonArray[i].name
         }
           // disable fish until environment is set up
-        if (waterLevelMapped && sandLevelMapped && rockLevelMapped && grassLevelMapped == 100){
+        if (waterLevelMapped == 100 && sandLevelMapped == 100 && rockLevelMapped == 100 && grassLevelMapped == 100){
           buttonArray[4].locked = false
         }
 
