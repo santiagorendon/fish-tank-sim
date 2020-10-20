@@ -2,7 +2,8 @@ var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImag
 var sandArray = []
 var waterArray = []
 var rockArray = []
-var grassAray = []
+var grassArray = []
+var foodArray = []
 var state, tempState
 var canvas;
 
@@ -82,6 +83,14 @@ class Game{
         sandLevel +=1
       }
     }
+
+    // ADD FISH FOOD
+    if (mouseIsPressed && state=='food' && mouseY >= 200 && buttonArray[5].locked == false){
+      var tempFood = new Food(mouseX, mouseY)
+      foodArray.push(tempFood)
+      game.balance-=.0001
+    }
+
     // DISPLAY CLASSES
     for (var i = sandArray.length-1; i >= 0; i--) {
       sandArray[i].display()
@@ -90,10 +99,21 @@ class Game{
       rockArray[i].display()
     }
     for (var i = waterArray.length-1; i >= 0; i--) {
-      waterArray[i].display()
+      let check = waterArray[i].display()
+      if (check == 'gone'){
+        waterArray.splice(i, 1)
+        i-=1
+      }
     }
-    for (var i = grassAray.length-1; i >= 0; i--) {
-      grassAray[i].display()
+    for (var i = grassArray.length-1; i >= 0; i--) {
+      grassArray[i].display()
+    }
+    for (var i = foodArray.length-1; i >= 0; i--) {
+      let check = foodArray[i].display(game.fishArr)
+      if (check == 'gone'){
+        foodArray.splice(i, 1)
+        i-=1
+      }
     }
 
     // DISPLAY STATS, BUTTONS, AND TANK WALLS
@@ -225,7 +245,7 @@ class Fish{
       this.x += xMovement;
       this.y += yMovement;
       this.x = constrain(this.x, this.width, width-this.width)
-      this.y = constrain(this.y, this.height, height-this.height)
+      this.y = constrain(this.y, this.height, height)
       this.xNoiseOffset += 0.01;
       this.yNoiseOffset += 0.01;
     }
@@ -477,6 +497,59 @@ class Water {
   }
 }
 
+class Food {
+    constructor(x, y){
+      this.x = x
+      this.y = y
+      this.xSpeed = random(-1, 1)
+      this.ySpeed = 2
+      this.alpha = 255
+      this.radius = random(.5, 3)
+      this.arrayOfFish = game.fishArr
+    }
+    display(fishArr){
+      noStroke()
+      fill(139,69,19,this.alpha);
+      if (this.y <= height-10){ // food floats to bottom of tank
+        this.y += this.ySpeed
+        this.x += this.xSpeed
+      }
+      ellipse(this.x, this.y, this.radius, this.radius)
+      this.alpha -=.1 // food gets absorbed by the water
+      // fish moves closer to the fish food if it's hungry
+      for (var i=0; i<fishArr.length; i++){
+        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) >= 1 && fishArr[i].health <= 90 && fishArr.length >= 1){
+          if (fishArr[i].x < this.x){
+            fishArr[i].x += .1
+          }
+          else {
+            fishArr[i].x -= .1
+          }
+          if (fishArr[i].y < this.y){
+            fishArr[i].y += .1
+          }
+          else {
+            fishArr[i].y -= .1
+          }
+        }
+        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) < 1){
+          fishArr[i].health +=2
+          return 'gone'
+        }
+      }
+
+      if (this.alpha < 0){
+          return 'gone'
+      }
+      else {
+          return 'ok'
+      }
+
+
+
+    }
+  }
+
 
 // TANK WALLS
 function displayTankWalls() {
@@ -517,7 +590,7 @@ function mousePressed(){
   }
   else if (state == 'grass' && mouseY >= 200 && buttonArray[3].locked == false){
     var tempGrass = new Grass(mouseX, mouseY)
-    grassAray.push(tempGrass)
+    grassArray.push(tempGrass)
     game.balance-=2.50
     if (grassLevel <=3){
       grassLevel +=1
