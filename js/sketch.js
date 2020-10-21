@@ -523,7 +523,7 @@ class Food {
       this.alpha -=.1 // food gets absorbed by the water
       // fish moves closer to the fish food if it's hungry
       for (var i=0; i<fishArr.length; i++){
-        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) >= 1 && fishArr[i].health <= 90 && fishArr.length >= 1){
+        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) >= 1 && fishArr[i].health <= 90 && fishArr.length >= 1 && fishArr[i].health >= 1){
           if (fishArr[i].x < this.x){
             fishArr[i].x += .01
           }
