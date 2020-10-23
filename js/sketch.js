@@ -1,4 +1,4 @@
-var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage, sellSound, foodImage, toiletImage, flushSound
+var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage, sellSound, foodImage, toiletImage, flushSound, cursorImage
 var sandArray = []
 var waterArray = []
 var rockArray = []
@@ -385,6 +385,7 @@ function preload(){
   sandImage = loadImage('images/sand.png');
   fishFoodImage = loadImage('images/fishfood.png')
   toiletImage = loadImage('images/toilet.png')
+  cursorImage = loadImage('images/cursor.png')
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3")
   sellSound = loadSound("sounds/sell.mp3")
@@ -410,7 +411,8 @@ function setup() {
   var grassObject = new Button('grassObject', 'grass', grassImage, 2.50, false)
   var fishObject = new Button('fishObject', 'fish', fishImage, 10, false) // CURRENTLY FALSE, BUT MAKE IT TRUE FOR REAL GAME PLAY
   var fishFoodObject = new Button('fishFoodObject', 'food', fishFoodImage, 1, false)
-  buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject, fishFoodObject]
+  var cursorObject = new Button('cursorObject', 'cursor', cursorImage, 0, false)
+  buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject, fishFoodObject, cursorObject]
 }
 
 function draw() {
@@ -521,18 +523,18 @@ class Food {
       this.alpha -=.1 // food gets absorbed by the water
       // fish moves closer to the fish food if it's hungry
       for (var i=0; i<fishArr.length; i++){
-        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) >= 1 && fishArr[i].health <= 90 && fishArr.length >= 1){
+        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) >= 1 && fishArr[i].health <= 90 && fishArr.length >= 1 && fishArr[i].health >= 1){
           if (fishArr[i].x < this.x){
-            fishArr[i].x += .1
+            fishArr[i].x += .01
           }
           else {
-            fishArr[i].x -= .1
+            fishArr[i].x -= .01
           }
           if (fishArr[i].y < this.y){
-            fishArr[i].y += .1
+            fishArr[i].y += .01
           }
           else {
-            fishArr[i].y -= .1
+            fishArr[i].y -= .01
           }
         }
         if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) < 1){
