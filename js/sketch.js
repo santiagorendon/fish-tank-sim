@@ -30,7 +30,7 @@ var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
 var buttonArray
-var fishBeingHit = [0];
+var fishBeingHit = [];
 const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
 class Game{
@@ -56,6 +56,9 @@ class Game{
     this.counter = 0;
     this.buyDelay = 11;
     this.cursor = waterImage;
+    //flush
+    this.flushCounter = 0;
+    this.flushDelay =11;
   }
   drawBalance(){
     fill(0,0,0);
@@ -135,11 +138,11 @@ class Game{
   }
   drawFish(){
     for(let i=0; i < this.fishArr.length; i++){
-      // this.fishArr[i].index = i;
       this.fishArr[i].draw();
     }
   }
   drawTank(){
+    game.flushCounter += 1;//counts between flushes
     // FILL TANK
     drawWater();
     if (mouseIsPressed && state == 'water' && mouseY >= 200){
@@ -178,8 +181,26 @@ class Game{
         fishBeingHit[i] = 0;
       }
     }
+    // if(mouseIsPressed && ){
+    //
+    // }
+    let fishIsHit = (fishBeingHit.indexOf(1) !== -1);
+    let fishHitIndex = fishBeingHit.indexOf(1);
+    if(mouseIsPressed && fishIsHit){ //if fish is clicked
+      //if cursor is selector or food
+      if((game.cursor === cursorImage || game.cursor === fishFoodImage)){
+        game.stats.displayIndex = fishHitIndex; //display stats
+      }
+      //if cursor is toilet
+      else if(state === 'toilet'){
+        if(game.flushCounter  >= this.flushDelay){//prevent overlapping fish from being flushed
+          game.fishArr[fishHitIndex].flush(fishHitIndex); //flush fish
+          game.flushCounter = 0;
+        }
+      }
+    }
     //make sure the player is not hovering over the fish when they feed them
-    if((fishBeingHit.reduce(reducer) <= 0) && mouseIsPressed && state=='food' && mouseY >= 200){
+    if(!fishIsHit && mouseIsPressed && state=='food' && mouseY >= 200){
       var tempFood = new Food(mouseX, mouseY)
       fishFoodObject.quantity-=0.1;
       foodArray.push(tempFood)
@@ -269,20 +290,8 @@ function breedFish(rarity1, rarity2){
   return ['F', offSpringRarity];
 }
 
-// class Toilet{
-//   constructor(x, y){
-//     this.x = x
-//     this.y = y
-//   }
-//   flushFish(fish){
-//     if (dist(this.x, this.y, fish.x, fish.y ) <= 100){
-//       game.fishArr.splice(this.index, 1);
-//     }
-//   }
-// }
 class Fish{
-  constructor(type, rarity, hitBox, index){
-    this.index = index;
+  constructor(type, rarity, hitBox){
     this.type = type;
     //stats
     this.rarity = rarity;
@@ -303,12 +312,8 @@ class Fish{
     // create a "noise offset" to keep track of our position in Perlin Noise space
     this.xNoiseOffset = random(0,1000);
     this.yNoiseOffset = random(1000,2000);
-    //flush vars
-    this.flushCounter = 0;
-    this.flushDelay = 11;
   }
   draw(){
-    this.flushCounter += 1;
     // strokeWeight(1);
     // fill('white')
     // ellipse(this.x, this.y, this.hitBox, this.hitBox)
@@ -358,29 +363,8 @@ class Fish{
       if (this.y<= height-20){
         this.y += 1
       }
-
     }
-    this.isClicked();
-  }
-  isClicked(){
-    let higherThanFish = mouseY < this.y-37;
-    let lowerThanFish = mouseY > this.y+this.height-70;
-    let leftOfFish = mouseX < this.x-30;
-    let rightOfFish = mouseX > this.x+this.width-63;
-    let isHit = (!higherThanFish && !lowerThanFish && !leftOfFish && !rightOfFish)
-    if(mouseIsPressed && isHit && (game.cursor === cursorImage || game.cursor === fishFoodImage)){
-      game.stats.displayIndex = this.index;
-      return true;
-    }
-    else if(mouseIsPressed && isHit && (state === 'toilet')){
-      console.log(isHit);
-      if(this.flushCounter >= this.flushDelay){ //prevent flush spamming
-        this.flush();
-        this.flushCounter = 0;
-      }
-
-    }
-    return false;
+    //this.isClicked();
   }
   drawStats(){
     fill(game.stats.background);
@@ -432,11 +416,8 @@ class Fish{
       //increment price
       game.balance += this.price;
       //remove fish
-      game.fishArr.splice(this.index, 1);
-      //reindex
-      for(let i=0; i < game.fishArr.length; i++){
-        game.fishArr[i].index = i;
-      }
+      game.fishArr.splice(game.stats.displayIndex, 1);
+      fishBeingHit.splice(game.stats.displayIndex, 1);
       //remove stats display
       game.stats.displayIndex = -1;
       // play noise
@@ -457,15 +438,12 @@ class Fish{
     }
   }
 
-  flush(){ //check if toilet circle pressed
+  flush(index){ //check if toilet circle pressed
     // remove stats display
     game.stats.displayIndex = -1;
     //remove fish
-    game.fishArr.splice(this.index, 1);
-    //reindex
-    for(let i=0; i < game.fishArr.length; i++){
-      game.fishArr[i].index = i;
-    }
+    game.fishArr.splice(index, 1);
+    fishBeingHit.splice(index, 1);
     // play noise
     if (! flushSound.isPlaying() ) {
       flushSound.play();
@@ -527,13 +505,8 @@ function setup() {
 
 
                   ]
-    game = new Game(storeItems);
-  // game.fishArr.push(new Fish("Gold Fish", 10, 0));
+  game = new Game(storeItems);
   noiseDetail(24);
-
-  // objects and array used to hold button info
-
-
 }
 
 function draw() {
@@ -733,7 +706,7 @@ function mousePressed(){
   // ADD FISH
   else if (mouseIsPressed && state=='fish' && mouseY >= 200){
     fishBeingHit.push(0);
-    game.fishArr.push(new Fish("Gold Fish", 10, 60, game.fishArr.length));
+    game.fishArr.push(new Fish("Gold Fish", 10, 60));
   }
 }
 
