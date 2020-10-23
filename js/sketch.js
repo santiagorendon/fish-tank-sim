@@ -15,6 +15,7 @@ var fishObject;
 var fishFoodObject;
 var cursorObject;
 var shopObject;
+var toiletObject;
 
 var waterLevelMapped, grassLevelMapped, rockLevelMapped, sandLevelMapped
 
@@ -96,9 +97,8 @@ class Game{
       fill(0,0,0);
       textSize(25);
       text(`$${this.storeItems[i].price}`, this.storeItemX-5, this.storeItemY+80);
-      text(this.storeItems[i].name, this.storeItemX, this.storeItemY-80)
-
-      this.isStoreItemClicked(this.storeItemX, this.storeItemY, this.storeItems[i].price);
+      text(this.storeItems[i].name, this.storeItemX, this.storeItemY-80);
+      this.isStoreItemClicked(this.storeItems[i].name, this.storeItemX, this.storeItemY, this.storeItems[i].price, this.storeItems[i].obj);
 
       this.storeItemX += this.storeItemSize + this.storeItemGap;
     }
@@ -113,9 +113,15 @@ class Game{
     // image(this.storeItems[0].img, this.storeItemOrigX, this.storeItemY+230+210, this.storeItemSize, this.storeItemSize);
     // text(`$${15}`, this.storeItemX-5, this.storeItemY+210+210+110);
   }
-  isStoreItemClicked(x, y, price, i){
+  isStoreItemClicked(name, x, y, price, obj){
     let isHit = (dist(mouseX, mouseY, x, y) <= (this.storeItemSize/2))
     if((this.balance >= price) && (mouseIsPressed) && (this.counter >= this.buyDelay) && (isHit)){
+      if(name === 'Toilet'){//if toilet is added add it to index 2
+        buttonArray.splice(2, 0, obj);
+      }
+      else{
+        buttonArray.push(obj)
+      }
       this.balance -= price;
       this.counter = 0;
     }
@@ -148,8 +154,6 @@ class Game{
       var drop = new Water(mouseX, mouseY);
       waterArray.push(drop)
     }
-
-
 
     // ADD SAND
     if (mouseIsPressed && state=='sand' && mouseY >= 200){
@@ -472,29 +476,33 @@ function setup() {
   canvas.parent('#container');
   canvas.style('width', '100%');
   canvas.style('height', '100%');
-  let storeItems = [{name:'Common Food', img: fishFoodImage, price: '15'},
-                    {name:'Toilet',img: toiletImage, price: '15'},
-                    {name:'Grass',img: grassImage, price: '15'},
-                    {name:'Rock',img: rockImage, price: '15'},
-                    {name:'Sand',img: sandImage, price: '15'},
-
-
-                  ]
-  game = new Game(storeItems);
-  // game.fishArr.push(new Fish("Gold Fish", 10, 0));
-  noiseDetail(24);
-
-  // objects and array used to hold button info
 
   waterObject = new Button('water', waterImage, 100, 100)
   sandObject = new Button('sand', sandImage, 100, 100)
+  toiletObject = new Button('toilet', toiletImage, 100, 100)
   rockObject = new Button('rock', rockImage, 3, 3)
   grassObject = new Button('grass', grassImage, 3, 3)
   fishObject = new Button('fish', fishImage, 4, 4)
   fishFoodObject = new Button('food', fishFoodImage, 50, 50)
   cursorObject = new Button('cursor', cursorImage, 1000)
   shopObject = new Button('shop', shopImage, 1000)
-  buttonArray = [cursorObject, shopObject, waterObject, sandObject, rockObject, grassObject, fishObject, fishFoodObject]
+  buttonArray = [cursorObject, shopObject, waterObject, fishObject]
+
+  let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '15'},
+                    {name:'Toilet', obj: toiletObject, img: toiletImage, price: '15'},
+                    {name:'Grass', obj: grassObject, img: grassImage, price: '15'},
+                    {name:'Rock', obj: rockObject, img: rockImage, price: '15'},
+                    {name:'Sand', obj: sandObject, img: sandImage, price: '15'},
+
+
+                  ]
+    game = new Game(storeItems);
+  // game.fishArr.push(new Fish("Gold Fish", 10, 0));
+  noiseDetail(24);
+
+  // objects and array used to hold button info
+
+
 }
 
 function draw() {
@@ -741,7 +749,7 @@ class ToolBar{
         fill(0)
         textSize(15);
         textAlign(CENTER, TOP);
-        if(buttonArray[i].name != 'cursor' && buttonArray[i].name != 'shop'){
+        if(buttonArray[i].name !== 'cursor' && buttonArray[i].name !== 'shop' && buttonArray[i].name !== 'toilet'){
           text(`${int(buttonArray[i].quantity)}/${buttonArray[i].max}` , (this.buttonX+25), this.buttonY+55)
         }
         else{
