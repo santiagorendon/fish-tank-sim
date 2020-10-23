@@ -332,7 +332,7 @@ class Fish{
     this.health = round(this.health, 2)
 
     // fish progressively ages
-    this.age += .0001
+    //this.age += .0001
 
     // fish starved or grew too old?
     if (this.health <= 1 || this.age >= 10){
