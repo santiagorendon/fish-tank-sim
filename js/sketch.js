@@ -133,7 +133,7 @@ class Game{
   }
   drawFish(){
     for(let i=0; i < this.fishArr.length; i++){
-      this.fishArr[i].index = i;
+      // this.fishArr[i].index = i;
       this.fishArr[i].draw();
     }
   }
@@ -414,6 +414,10 @@ class Fish{
       game.balance += this.price;
       //remove fish
       game.fishArr.splice(this.index, 1);
+      //reindex
+      for(let i=0; i < game.fishArr.length; i++){
+        game.fishArr[i].index = i;
+      }
       //remove stats display
       game.stats.displayIndex = -1;
       // play noise
@@ -440,9 +444,9 @@ class Fish{
     //remove fish
     game.fishArr.splice(this.index, 1);
     //reindex
-    // for(let i=0; i < game.fishArr.length; i++){
-    //   game.fishArr[i].index = i;
-    // }
+    for(let i=0; i < game.fishArr.length; i++){
+      game.fishArr[i].index = i;
+    }
     // play noise
     if (! flushSound.isPlaying() ) {
       flushSound.play();
@@ -704,7 +708,7 @@ function mousePressed(){
   }
   // ADD FISH
   else if (mouseIsPressed && state=='fish' && mouseY >= 200){
-    game.fishArr.push(new Fish("Gold Fish", 10, game.fishArr.length-1));
+    game.fishArr.push(new Fish("Gold Fish", 10, game.fishArr.length));
   }
 }
 
