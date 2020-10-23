@@ -30,6 +30,8 @@ var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
 var buttonArray
+var fishBeingHit = [0];
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
 class Game{
   constructor(storeItems=[]){
@@ -166,12 +168,23 @@ class Game{
       }
     }
 
-    // ADD FISH FOOD
-    if (mouseIsPressed && state=='food' && mouseY >= 200){
+    // check if any fish is being selected
+    for(let i=0; i < game.fishArr.length;i++){
+      let isHit = dist(mouseX, mouseY, game.fishArr[i].x, game.fishArr[i].y) <= (game.fishArr[i].hitBox/2)
+      if(isHit){
+        fishBeingHit[i] = 1;
+      }
+      else{
+        fishBeingHit[i] = 0;
+      }
+    }
+    //make sure the player is not hovering over the fish when they feed them
+    if((fishBeingHit.reduce(reducer) <= 0) && mouseIsPressed && state=='food' && mouseY >= 200){
       var tempFood = new Food(mouseX, mouseY)
       fishFoodObject.quantity-=0.1;
       foodArray.push(tempFood)
     }
+
 
     // DISPLAY CLASSES
     for (var i = sandArray.length-1; i >= 0; i--) {
@@ -204,7 +217,7 @@ class Game{
     displayButtons()
     displayTankWalls()
     this.drawFish();
-    if(game.stats.displayIndex != -1 && game.cursor === cursorImage && (game.scene !== 'store')){
+    if(game.stats.displayIndex != -1 && (game.cursor === cursorImage || game.cursor === fishFoodImage) && (game.scene !== 'store')){
       game.fishArr[game.stats.displayIndex].drawStats();
     }
   }
@@ -268,7 +281,7 @@ function breedFish(rarity1, rarity2){
 //   }
 // }
 class Fish{
-  constructor(type, rarity, index){
+  constructor(type, rarity, hitBox, index){
     this.index = index;
     this.type = type;
     //stats
@@ -277,9 +290,10 @@ class Fish{
     // this.startingPrice = 15;
     this.price = 15;
     this.age = 0;
-    this.alive = true
+    this.alive = true;
     this.width = 100;
     this.height = 100;
+    this.hitBox = hitBox;
     this.x = random(0, width)
     this.y = random(0, height)
     this.frameDelay = 25;
@@ -295,6 +309,9 @@ class Fish{
   }
   draw(){
     this.flushCounter += 1;
+    // strokeWeight(1);
+    // fill('white')
+    // ellipse(this.x, this.y, this.hitBox, this.hitBox)
     if(this.type === "Gold Fish"){
       image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
     }
@@ -351,8 +368,9 @@ class Fish{
     let leftOfFish = mouseX < this.x-30;
     let rightOfFish = mouseX > this.x+this.width-63;
     let isHit = (!higherThanFish && !lowerThanFish && !leftOfFish && !rightOfFish)
-    if(mouseIsPressed && isHit && game.cursor === cursorImage){
+    if(mouseIsPressed && isHit && (game.cursor === cursorImage || game.cursor === fishFoodImage)){
       game.stats.displayIndex = this.index;
+      return true;
     }
     else if(mouseIsPressed && isHit && (state === 'toilet')){
       console.log(isHit);
@@ -362,6 +380,7 @@ class Fish{
       }
 
     }
+    return false;
   }
   drawStats(){
     fill(game.stats.background);
@@ -607,14 +626,16 @@ class Water {
 }
 
 class Food {
-    constructor(x, y){
+    constructor(x, y, healthIncrease=2){
       this.x = x
       this.y = y
-      this.xSpeed = random(-1, 1)
+      this.xSpeed = random(-0.5, 0.5)
       this.ySpeed = 2
       this.alpha = 255
       this.radius = random(.5, 3)
       this.arrayOfFish = game.fishArr
+      this.disolveSpeed = 4;
+      this.healthIncrease = healthIncrease;
     }
     display(fishArr){
       noStroke()
@@ -624,38 +645,41 @@ class Food {
         this.x += this.xSpeed
       }
       ellipse(this.x, this.y, this.radius, this.radius)
-      this.alpha -=.1 // food gets absorbed by the water
-      // fish moves closer to the fish food if it's hungry
+      this.alpha -=this.disolveSpeed // food gets absorbed by the water
       for (var i=0; i<fishArr.length; i++){
-        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) >= 1 && fishArr[i].health <= 90 && fishArr.length >= 1 && fishArr[i].health >= 1){
-          if (fishArr[i].x < this.x){
-            fishArr[i].x += .01
-          }
-          else {
-            fishArr[i].x -= .01
-          }
-          if (fishArr[i].y < this.y){
-            fishArr[i].y += .01
-          }
-          else {
-            fishArr[i].y -= .01
-          }
-        }
-        if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) < 1){
-          fishArr[i].health +=2
-          return 'gone'
+        if(dist(this.x, this.y, fishArr[i].x, fishArr[i].y) < (fishArr[i].hitBox/2)){
+          fishArr[i].health +=this.healthIncrease;
+          game.stats.displayIndex = i;
+          return 'gone';
         }
       }
+
+      // fish moves closer to the fish food if it's hungry
+      // for (var i=0; i<fishArr.length; i++){
+      //   if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) >= 1 && fishArr[i].health <= 90 && fishArr.length >= 1 && fishArr[i].health >= 1){
+      //     if (fishArr[i].x < this.x){
+      //       fishArr[i].x += .01
+      //     }
+      //     else {
+      //       fishArr[i].x -= .01
+      //     }
+      //     if (fishArr[i].y < this.y){
+      //       fishArr[i].y += .01
+      //     }
+      //     else {
+      //       fishArr[i].y -= .01
+      //     }
+      //   }
+      //   if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) < 1){
+      //     fishArr[i].health +=2
+      //     return 'gone'
+      //   }
+      // }
 
       if (this.alpha < 0){
           return 'gone'
       }
-      else {
-          return 'ok'
-      }
-
-
-
+      return 'ok'
     }
   }
 
@@ -708,7 +732,8 @@ function mousePressed(){
   }
   // ADD FISH
   else if (mouseIsPressed && state=='fish' && mouseY >= 200){
-    game.fishArr.push(new Fish("Gold Fish", 10, game.fishArr.length));
+    fishBeingHit.push(0);
+    game.fishArr.push(new Fish("Gold Fish", 10, 60, game.fishArr.length));
   }
 }
 
