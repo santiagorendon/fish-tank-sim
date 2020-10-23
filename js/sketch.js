@@ -36,12 +36,11 @@ const reducer = (accumulator, currentValue) => accumulator + currentValue;
 class Game{
   constructor(storeItems=[]){
     this.scene = 'tank';
-    //this.scene = 'store';
     /* stats */
     this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
     //fish holder
     this.fishArr = [];
-    this.balance = 150;
+    this.balance = 1500;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -89,6 +88,15 @@ class Game{
   }
   drawStoreItems(){
     for(let i=0;i<this.storeItems.length;i++){
+      // do not sell items if they have more tthan 1000
+      if(game.storeItems[i].name !== 'Toilet'){
+        if(this.storeItems[i].obj.quantity >= 1000){
+          game.storeItems[i].soldOut = true;
+        }
+        else{
+          game.storeItems[i].soldOut = false;
+        }
+      }
       if( (i %5) === 0 && (i!=0)){
         this.storeItemX = this.storeItemOrigX;
         this.storeItemY += this.storeItemSize+110;
@@ -101,10 +109,20 @@ class Game{
       textAlign(CENTER, CENTER);
       fill(0,0,0);
       textSize(25);
-      text(`$${this.storeItems[i].price}`, this.storeItemX-5, this.storeItemY+80);
-      text(this.storeItems[i].name, this.storeItemX, this.storeItemY-80);
-      this.isStoreItemClicked(this.storeItems[i].name, this.storeItemX, this.storeItemY, this.storeItems[i].price, this.storeItems[i].obj);
 
+      text(this.storeItems[i].name, this.storeItemX, this.storeItemY-80);
+      if(this.storeItems[i].soldOut){
+        text('Sold Out', this.storeItemX-5, this.storeItemY+80);
+        strokeWeight(5);
+        line(this.storeItemX-(this.storeItemSize/2), this.storeItemY-(this.storeItemSize/2), this.storeItemX+(this.storeItemSize/2), this.storeItemY+(this.storeItemSize/2));
+        line(this.storeItemX+(this.storeItemSize/2), this.storeItemY-(this.storeItemSize/2), this.storeItemX-(this.storeItemSize/2), this.storeItemY+(this.storeItemSize/2));
+        strokeWeight(1);
+      }
+      else{
+        text(`$${this.storeItems[i].price}`, this.storeItemX-5, this.storeItemY+80);
+        //add event listener if not sold out
+        this.isStoreItemClicked(i);
+      }
       this.storeItemX += this.storeItemSize + this.storeItemGap;
     }
     this.storeItemX = this.storeItemOrigX;
@@ -118,14 +136,26 @@ class Game{
     // image(this.storeItems[0].img, this.storeItemOrigX, this.storeItemY+230+210, this.storeItemSize, this.storeItemSize);
     // text(`$${15}`, this.storeItemX-5, this.storeItemY+210+210+110);
   }
-  isStoreItemClicked(name, x, y, price, obj){
-    let isHit = (dist(mouseX, mouseY, x, y) <= (this.storeItemSize/2))
+  isStoreItemClicked(index){
+    let name = game.storeItems[index].name;
+    let obj = game.storeItems[index].obj;
+    let price = game.storeItems[index].price;
+    let isHit = (dist(mouseX, mouseY, this.storeItemX, this.storeItemY) <= (this.storeItemSize/2))
     if((this.balance >= price) && (mouseIsPressed) && (this.counter >= this.buyDelay) && (isHit)){
+      let alreadyOwned = buttonArray.indexOf(obj) !== -1;
       if(name === 'Toilet'){//if toilet is added add it to index 2
         buttonArray.splice(2, 0, obj);
+        game.storeItems[index].soldOut = true;
       }
-      else{
-        buttonArray.push(obj)
+      else{ //if any item is added besides toilet
+        if(alreadyOwned){
+          obj.quantity = obj.quantity + obj.originalMax;
+          obj.max = obj.quantity;
+        }
+        else{
+          obj.quantity = obj.max;
+          buttonArray.push(obj)
+        }
       }
       this.balance -= price;
       this.counter = 0;
@@ -152,9 +182,9 @@ class Game{
       }
       if (level2>50){
         if (! waterSound.isPlaying() ) { // .isPlaying() returns a boolean
-        waterSound.play();
+          waterSound.play();
+        }
       }
-    }
       level1 -= 1.5;
       level2 -= 1.5;
       var drop = new Water(mouseX, mouseY);
@@ -181,9 +211,6 @@ class Game{
         fishBeingHit[i] = 0;
       }
     }
-    // if(mouseIsPressed && ){
-    //
-    // }
     let fishIsHit = (fishBeingHit.indexOf(1) !== -1);
     let fishHitIndex = fishBeingHit.indexOf(1);
     if(mouseIsPressed && fishIsHit){ //if fish is clicked
@@ -497,13 +524,11 @@ function setup() {
   shopObject = new Button('shop', shopImage, 1000)
   buttonArray = [cursorObject, shopObject, waterObject, fishObject]
 
-  let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '15'},
-                    {name:'Toilet', obj: toiletObject, img: toiletImage, price: '15'},
-                    {name:'Grass', obj: grassObject, img: grassImage, price: '15'},
-                    {name:'Rock', obj: rockObject, img: rockImage, price: '15'},
-                    {name:'Sand', obj: sandObject, img: sandImage, price: '15'},
-
-
+  let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '15', soldOut: false},
+                    {name:'Toilet', obj: toiletObject, img: toiletImage, price: '15', soldOut: false},
+                    {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
+                    {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
+                    {name:'Sand', obj: sandObject, img: sandImage, price: '15', soldOut: false}
                   ]
   game = new Game(storeItems);
   noiseDetail(24);
@@ -743,7 +768,7 @@ class ToolBar{
 
   draw(buttonArray, mouseX, mouseY){
       for (var i=0; i<buttonArray.length; i++){
-        if(buttonArray[i].quantity <= 0){
+        if(buttonArray[i].quantity < 1){ //if tool runs out of uses
           game.cursor = cursorImage;
           state = 'cursor';
           buttonArray.splice(i, 1);
@@ -760,7 +785,7 @@ class ToolBar{
         textSize(15);
         textAlign(CENTER, TOP);
         if(buttonArray[i].name !== 'cursor' && buttonArray[i].name !== 'shop' && buttonArray[i].name !== 'toilet'){
-          text(`${int(buttonArray[i].quantity)}/${buttonArray[i].max}` , (this.buttonX+25), this.buttonY+55)
+          text(`${int(buttonArray[i].quantity)}/${int(buttonArray[i].max)}` , (this.buttonX+25), this.buttonY+55)
         }
         else{
           text(buttonArray[i].name , (this.buttonX+25), this.buttonY+55)
@@ -795,5 +820,6 @@ class Button{
     this.image = image;
     this.quantity = quantity;
     this.max = max;
+    this.originalMax = max;
   }
 }
