@@ -7,6 +7,14 @@ var foodArray = []
 var state, tempState
 var canvas;
 
+var waterObject;
+var sandObject;
+var rockObject;
+var grassObject;
+var fishObject;
+var fishFoodObject;
+var cursorObject;
+var shopObject;
 
 var waterLevelMapped, grassLevelMapped, rockLevelMapped, sandLevelMapped
 
@@ -23,14 +31,28 @@ var grassLevel = 0
 var buttonArray
 
 class Game{
-  constructor(){
-    // this.scene = 'tank';
+  constructor(storeItems=[]){
     this.scene = 'tank';
+    //this.scene = 'store';
     /* stats */
     this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
     //fish holder
     this.fishArr = [];
     this.balance = 150;
+    //store vars
+    this.storeItems = storeItems;
+    this.storeCloseX = canvasWidth-50;
+    this.storeCloseY = 50;
+    this.storeCloseD = 70;
+    this.storeItemGap = 65;
+    this.storeItemOrigX = 85+this.storeItemGap;
+    this.storeItemOrigY = 200;
+    this.storeItemX = this.storeItemOrigX;
+    this.storeItemY = this.storeItemOrigY;
+    this.storeItemSize = 110;
+    this.counter = 0;
+    this.buyDelay = 11;
+    this.cursor = waterImage;
   }
   drawBalance(){
     fill(0,0,0);
@@ -40,13 +62,68 @@ class Game{
     text("Balance: $" + round(this.balance,2), 48, 25 );
   }
   drawStore(){
+    strokeWeight(1);
+    this.counter += 1;
     backgroundFill(214, 253, 255);
     fill(0, 0, 0);
     textAlign(LEFT, TOP)
    .textSize(80);
     textFont(fishFont);
     textAlign(CENTER, TOP);
-    text('STORE', canvasWidth/2, 10)
+    text('STORE', canvasWidth/2, 10);
+    textAlign(LEFT, TOP);
+    // textSize(40);
+    text(`$${this.balance}`, 60, 10);
+    //fill(255,255,255)
+    // ellipse(canvasWidth-50, 50, 70, 70);
+    image(closeImg, this.storeCloseX, this.storeCloseY, this.storeCloseD, this.storeCloseD);
+
+    this.drawStoreItems();
+    this.isStoreClosed();
+  }
+  drawStoreItems(){
+    for(let i=0;i<this.storeItems.length;i++){
+      if( (i %5) === 0 && (i!=0)){
+        this.storeItemX = this.storeItemOrigX;
+        this.storeItemY += this.storeItemSize+110;
+      }
+
+      fill(255,255,255)
+      //ellipse(this.storeItemX, this.storeItemY, this.storeItemSize, this.storeItemSize);
+      image(this.storeItems[i].img, this.storeItemX, this.storeItemY, this.storeItemSize, this.storeItemSize);
+
+      textAlign(CENTER, CENTER);
+      fill(0,0,0);
+      textSize(25);
+      text(`$${this.storeItems[i].price}`, this.storeItemX-5, this.storeItemY+80);
+      text(this.storeItems[i].name, this.storeItemX, this.storeItemY-80)
+
+      this.isStoreItemClicked(this.storeItemX, this.storeItemY, this.storeItems[i].price);
+
+      this.storeItemX += this.storeItemSize + this.storeItemGap;
+    }
+    this.storeItemX = this.storeItemOrigX;
+    this.storeItemY = this.storeItemOrigY;
+
+    // //ellipse(this.storeItemOrigX, this.storeItemY+210, this.storeItemSize, this.storeItemSize);
+    // image(this.storeItems[0].img, this.storeItemOrigX, this.storeItemY+230, this.storeItemSize, this.storeItemSize);
+    // text(`$${15}`, this.storeItemX-5, this.storeItemY+210+110);
+    //
+    // //ellipse(this.storeItemOrigX, this.storeItemY+210+210, this.storeItemSize, this.storeItemSize);
+    // image(this.storeItems[0].img, this.storeItemOrigX, this.storeItemY+230+210, this.storeItemSize, this.storeItemSize);
+    // text(`$${15}`, this.storeItemX-5, this.storeItemY+210+210+110);
+  }
+  isStoreItemClicked(x, y, price, i){
+    let isHit = (dist(mouseX, mouseY, x, y) <= (this.storeItemSize/2))
+    if((this.balance >= price) && (mouseIsPressed) && (this.counter >= this.buyDelay) && (isHit)){
+      this.balance -= price;
+      this.counter = 0;
+    }
+  }
+  isStoreClosed(){
+    if((dist(mouseX, mouseY, this.storeCloseX, this.storeCloseY) <= this.storeCloseD/2) && mouseIsPressed){
+      this.scene = 'tank';
+    }
   }
   drawFish(){
     for(let i=0; i < this.fishArr.length; i++){
@@ -75,24 +152,21 @@ class Game{
 
 
     // ADD SAND
-    if (mouseIsPressed && state=='sand' && mouseY >= 200 && buttonArray[1].locked == false){
+    if (mouseIsPressed && state=='sand' && mouseY >= 200){
       var tempSand = new Sand(mouseX, mouseY)
+      sandObject.quantity-=0.1;
       sandArray.push(tempSand)
-      game.balance-=.01
       if(sandLevel<=200){
         sandLevel +=1
       }
     }
 
     // ADD FISH FOOD
-    if (mouseIsPressed && state=='food' && mouseY >= 200 && buttonArray[5].locked == false){
+    if (mouseIsPressed && state=='food' && mouseY >= 200){
       var tempFood = new Food(mouseX, mouseY)
+      fishFoodObject.quantity-=0.1;
       foodArray.push(tempFood)
-      game.balance-=.0001
     }
-
-
-
 
     // DISPLAY CLASSES
     for (var i = sandArray.length-1; i >= 0; i--) {
@@ -120,12 +194,12 @@ class Game{
     }
 
     // DISPLAY STATS, BUTTONS, AND TANK WALLS
-    displayEnvironmentalStats()
+    //displayEnvironmentalStats()
     this.drawBalance();
     displayButtons()
     displayTankWalls()
     this.drawFish();
-    if(game.stats.displayIndex != -1){
+    if(game.stats.displayIndex != -1 && game.cursor === cursorImage && (game.scene !== 'store')){
       game.fishArr[game.stats.displayIndex].drawStats();
     }
   }
@@ -195,7 +269,7 @@ class Fish{
     //stats
     this.rarity = rarity;
     this.health = 100;
-    this.startingPrice = 15;
+    // this.startingPrice = 15;
     this.price = 15;
     this.age = 0;
     this.alive = true
@@ -217,7 +291,7 @@ class Fish{
     }
 
     // fish price varies depending on health
-    this.price = round(((this.health/100) * this.startingPrice), 2)
+    // this.price = round(((this.health/100) * this.startingPrice), 2)
     this.price = constrain(this.price, 0, 100000)
 
 
@@ -298,7 +372,7 @@ class Fish{
     let healthW = map(this.health, 0, 100, 0, 135);
     rect(game.stats.x+65, game.stats.y+88, healthW, 25);
     fill(0, 0, 0);
-    text(`(${this.health}/100)`, game.stats.x+129, game.stats.y+91);
+    text(`(${int(this.health)}/100)`, game.stats.x+129, game.stats.y+91);
 
     image(rarityImg, game.stats.x+40, game.stats.y+155, 100, 100);
     fill(game.stats.bar);
@@ -309,10 +383,10 @@ class Fish{
 
     image(cashImg, game.stats.x+40, game.stats.y+210, 70, 70);
     //rect(game.stats.x+65, game.stats.y+202, 135, 25);
-    text(`$ ${this.price}`, game.stats.x+129, game.stats.y+201);
+    text(`${this.price}`, game.stats.x+129, game.stats.y+201);
 
     image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
-    ellipse((game.stats.x+game.stats.x+game.stats.w)/2-80, game.stats.y+280, 60, 60);
+    // ellipse((game.stats.x+game.stats.x+game.stats.w)/2-80, game.stats.y+280, 60, 60);
 
     //add event listeners
     this.isClosed();
@@ -356,8 +430,6 @@ class Fish{
       game.stats.displayIndex = -1;
       //remove fish
       game.fishArr.splice(this.index, 1);
-      //remove stats display
-      game.stats.displayIndex = -1;
       // play noise
       if (! flushSound.isPlaying() ) { // .isPlaying() returns a boolean
         flushSound.play();
@@ -386,6 +458,7 @@ function preload(){
   fishFoodImage = loadImage('images/fishfood.png')
   toiletImage = loadImage('images/toilet.png')
   cursorImage = loadImage('images/cursor.png')
+  shopImage = loadImage('images/shop.png')
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3")
   sellSound = loadSound("sounds/sell.mp3")
@@ -399,20 +472,29 @@ function setup() {
   canvas.parent('#container');
   canvas.style('width', '100%');
   canvas.style('height', '100%');
-  game = new Game();
+  let storeItems = [{name:'Common Food', img: fishFoodImage, price: '15'},
+                    {name:'Toilet',img: toiletImage, price: '15'},
+                    {name:'Grass',img: grassImage, price: '15'},
+                    {name:'Rock',img: rockImage, price: '15'},
+                    {name:'Sand',img: sandImage, price: '15'},
+
+
+                  ]
+  game = new Game(storeItems);
   // game.fishArr.push(new Fish("Gold Fish", 10, 0));
   noiseDetail(24);
 
   // objects and array used to hold button info
 
-  var waterObject = new Button('waterObj', 'water', waterImage, 0, false)
-  var sandObject = new Button('sandObject', 'sand', sandImage, .10, false)
-  var rockObject = new Button('rockObject', 'rock', rockImage, 2.50, false)
-  var grassObject = new Button('grassObject', 'grass', grassImage, 2.50, false)
-  var fishObject = new Button('fishObject', 'fish', fishImage, 10, false) // CURRENTLY FALSE, BUT MAKE IT TRUE FOR REAL GAME PLAY
-  var fishFoodObject = new Button('fishFoodObject', 'food', fishFoodImage, 1, false)
-  var cursorObject = new Button('cursorObject', 'cursor', cursorImage, 0, false)
-  buttonArray = [waterObject, sandObject, rockObject, grassObject, fishObject, fishFoodObject, cursorObject]
+  waterObject = new Button('water', waterImage, 100, 100)
+  sandObject = new Button('sand', sandImage, 100, 100)
+  rockObject = new Button('rock', rockImage, 3, 3)
+  grassObject = new Button('grass', grassImage, 3, 3)
+  fishObject = new Button('fish', fishImage, 4, 4)
+  fishFoodObject = new Button('food', fishFoodImage, 50, 50)
+  cursorObject = new Button('cursor', cursorImage, 1000)
+  shopObject = new Button('shop', shopImage, 1000)
+  buttonArray = [cursorObject, shopObject, waterObject, sandObject, rockObject, grassObject, fishObject, fishFoodObject]
 }
 
 function draw() {
@@ -423,6 +505,8 @@ function draw() {
   else if(game.scene === "store"){
       game.drawStore();
   }
+  noCursor();
+  image(game.cursor, mouseX, mouseY, 20, 20);
 }
 
 
@@ -433,7 +517,7 @@ class Rock {
     this.y = y
   }
   display(){
-    image(rockImage, this.x, this.y, 200, 100)
+    image(rockImage, this.x, this.y, 100, 100)
     if (this.y < (height-50)){
       this.y += 1
     }
@@ -585,27 +669,26 @@ function displayEnvironmentalStats(){
 
 // display rocks and grass
 function mousePressed(){
-  if (state == 'rock'&& mouseY >= 200 && buttonArray[2].locked == false){
+  if (state == 'rock'&& mouseY >= 200){
     var tempRock = new Rock(mouseX, mouseY)
+    rockObject.quantity -= 1;
     rockArray.push(tempRock)
-    game.balance-=2.50
     if (rockLevel <=3){
       rockLevel +=1
     }
   }
-  else if (state == 'grass' && mouseY >= 200 && buttonArray[3].locked == false){
+  else if (state == 'grass' && mouseY >= 200){
     var tempGrass = new Grass(mouseX, mouseY)
+    grassObject.quantity -= 1;
     grassArray.push(tempGrass)
-    game.balance-=2.50
     if (grassLevel <=3){
       grassLevel +=1
 
     }
   }
   // ADD FISH
-  else if (mouseIsPressed && state=='fish' && mouseY >= 200 && buttonArray[4].locked == false){
+  else if (mouseIsPressed && state=='fish' && mouseY >= 200){
     game.fishArr.push(new Fish("Gold Fish", 10, 0));
-    game.balance-= game.fishArr[game.fishArr.length - 1].price
   }
 }
 
@@ -642,31 +725,38 @@ class ToolBar{
 
   draw(buttonArray, mouseX, mouseY){
       for (var i=0; i<buttonArray.length; i++){
+        if(buttonArray[i].quantity <= 0){
+          game.cursor = cursorImage;
+          state = 'cursor';
+          buttonArray.splice(i, 1);
+          return;
+        }
         noFill()
         strokeWeight(1)
         stroke(0)
         rect(this.buttonX, this.buttonY, 50, 50)
         image(buttonArray[i].image, this.buttonX+25, this.buttonY+25, 25, 25)
-        if (buttonArray[i].locked){
-          line(this.buttonX, this.buttonY, this.buttonX+50, this.buttonY+50)
-          line(this.buttonX+50, this.buttonY, this.buttonX, this.buttonY+50)
-        }
+
         noStroke()
         fill(0)
         textSize(15);
-        textAlign(LEFT, TOP);
-        text(buttonArray[i].name , this.buttonX, this.buttonY+55)
-        this.buttonX += 50
-        if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
-          return buttonArray[i].name
+        textAlign(CENTER, TOP);
+        if(buttonArray[i].name != 'cursor' && buttonArray[i].name != 'shop'){
+          text(`${int(buttonArray[i].quantity)}/${buttonArray[i].max}` , (this.buttonX+25), this.buttonY+55)
         }
-          // disable fish until environment is set up
-        if (waterLevelMapped == 100 && sandLevelMapped == 100 && rockLevelMapped == 100 && grassLevelMapped == 100){
-          buttonArray[4].locked = false
+        else{
+          text(buttonArray[i].name , (this.buttonX+25), this.buttonY+55)
         }
 
-        if (game.balance < buttonArray[i].cost){
-          buttonArray[i].locked = true
+        this.buttonX += 50
+        if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
+          if(buttonArray[i].name === 'shop'){
+            game.cursor = cursorImage;
+            game.scene='store';
+            return 'cursor';
+          }
+          game.cursor = buttonArray[i].image;
+          return buttonArray[i].name
         }
       }
   }
@@ -674,7 +764,7 @@ class ToolBar{
 
 function displayButtons(){
     var toolBar = new ToolBar(mouseX, mouseY)
-    tempState = toolBar.draw(buttonArray, mouseX, mouseY)
+    tempState = toolBar.draw(buttonArray, mouseX, mouseY);
     if (tempState){
       state = tempState
     }
@@ -682,17 +772,10 @@ function displayButtons(){
 
 
 class Button{
-  constructor(objectName, name, image, cost, locked){
-    this.objectName = objectName
-    this.name = name
-    this.image = image
-    this.cost = cost
-    this.locked = locked
-    return this.objectName = {
-      name: this.name,
-      image: this.image,
-      cost: this.cost,
-      locked: this.locked
-    }
+  constructor(name, image, quantity=0, max=0){
+    this.name = name;
+    this.image = image;
+    this.quantity = quantity;
+    this.max = max;
   }
 }
