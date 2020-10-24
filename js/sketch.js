@@ -12,6 +12,8 @@ var sandObject;
 var rockObject;
 var grassObject;
 var commonEggObject;
+var rareEggObject;
+var legendaryEggObject;
 var fishFoodObject;
 var cursorObject;
 var shopObject;
@@ -490,6 +492,7 @@ function preload(){
   //fish images
   commonFishImgArr = [loadImage('images/commonFish1.png'), loadImage('images/commonFish2.png')]
   commonEggImage = loadImage('images/commonEgg.png');
+  rareEggImage = loadImage('images/rareEgg.png');
   legendaryEggImage = loadImage('images/legendaryEgg.png');
   //objects
   rockImage = loadImage('images/rock.png')
@@ -528,6 +531,7 @@ function setup() {
   rockObject = new Button('rock', rockImage, 3, 3)
   grassObject = new Button('grass', grassImage, 3, 3)
   commonEggObject = new Button('commonEgg', commonEggImage, 1, 1)
+  rareEggObject = new Button('rareEgg', rareEggImage, 1, 1)
   legendaryEggObject = new Button('legendaryEgg', legendaryEggImage, 1, 1)
   fishFoodObject = new Button('food', fishFoodImage, 50, 50)
   cursorObject = new Button('cursor', cursorImage, 1000)
@@ -540,6 +544,7 @@ function setup() {
                     {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
                     {name:'Sand', obj: sandObject, img: sandImage, price: '15', soldOut: false},
                     {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '15', soldOut: false},
+                    {name:'Rare Egg', obj: rareEggObject, img: rareEggImage, price: '15', soldOut: false},
                     {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '15', soldOut: false}
 
                   ]
@@ -749,6 +754,12 @@ function mousePressed(){
     game.fishArr.push(new Fish("Gold Fish", rarity, 60));
   }
   // ADD FISH
+  else if (mouseIsPressed && state=='rareEgg' && mouseY >= 200){
+    fishBeingHit.push(0);
+    let newFish = crackRareEgg();
+    let rarity = newFish[1];
+    game.fishArr.push(new Fish("Gold Fish", rarity, 60));
+  }
   else if (mouseIsPressed && state=='legendaryEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackLegendaryEgg();
