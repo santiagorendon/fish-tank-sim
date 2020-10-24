@@ -11,7 +11,7 @@ var waterObject;
 var sandObject;
 var rockObject;
 var grassObject;
-var fishObject;
+var commonEggObject;
 var fishFoodObject;
 var cursorObject;
 var shopObject;
@@ -40,7 +40,7 @@ class Game{
     this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
     //fish holder
     this.fishArr = [];
-    this.balance = 1500;
+    this.balance = 150;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -273,27 +273,27 @@ class Game{
 
 
 function crackLegendaryEgg(){
-  rarity = Math.floor(random(85, 100));
+  let offSpringRarity = Math.floor(random(85, 100));
   if(offSpringRarity >= 95){
-    return ['S', rarity];
+    return ['S', offSpringRarity];
   }
-  return ['A', rarity];
+  return ['A', offSpringRarity];
 }
 
 function crackRareEgg(){
-  rarity = Math.floor(random(50, 85));
+  let offSpringRarity = Math.floor(random(50, 85));
   if(offSpringRarity >= 70){
-    return ['B', rarity];
+    return ['B', offSpringRarity];
   }
-  return ['C', rarity];
+  return ['C', offSpringRarity];
 }
 
 function crackCommonEgg(){
-  rarity = Math.floor(random(0, 50));
+  let offSpringRarity = Math.floor(random(0, 50));
   if(offSpringRarity >= 25){
-    return ['D', rarity];
+    return ['D',offSpringRarity];
   }
-  return ['F', rarity];
+  return ['F', offSpringRarity];
 }
 
 function breedFish(rarity1, rarity2){
@@ -489,7 +489,8 @@ function preload(){
   closeImg = loadImage('images/close.png');
   //fish images
   commonFishImgArr = [loadImage('images/commonFish1.png'), loadImage('images/commonFish2.png')]
-  fishImage = loadImage('images/fish.png')
+  commonEggImage = loadImage('images/commonEgg.png');
+  legendaryEggImage = loadImage('images/legendaryEgg.png');
   //objects
   rockImage = loadImage('images/rock.png')
   waterImage = loadImage('images/water.png')
@@ -508,27 +509,39 @@ function preload(){
 
 
 function setup() {
+  state = 'water'
   canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('#container');
   canvas.style('width', '100%');
   canvas.style('height', '100%');
+
+  // theCanvas = document.querySelector('canvas');
+  //smooth out the image
+  // context = theCanvas.getContext('2d');
+  // context.webkitImageSmoothingEnabled = false;
+  // context.mozImageSmoothingEnabled = false;
+  // context.imageSmoothingEnabled = false;
 
   waterObject = new Button('water', waterImage, 100, 100)
   sandObject = new Button('sand', sandImage, 100, 100)
   toiletObject = new Button('toilet', toiletImage, 100, 100)
   rockObject = new Button('rock', rockImage, 3, 3)
   grassObject = new Button('grass', grassImage, 3, 3)
-  fishObject = new Button('fish', fishImage, 4, 4)
+  commonEggObject = new Button('commonEgg', commonEggImage, 1, 1)
+  legendaryEggObject = new Button('legendaryEgg', legendaryEggImage, 1, 1)
   fishFoodObject = new Button('food', fishFoodImage, 50, 50)
   cursorObject = new Button('cursor', cursorImage, 1000)
   shopObject = new Button('shop', shopImage, 1000)
-  buttonArray = [cursorObject, shopObject, waterObject, fishObject]
+  buttonArray = [cursorObject, shopObject, waterObject, commonEggObject]
 
   let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '15', soldOut: false},
                     {name:'Toilet', obj: toiletObject, img: toiletImage, price: '15', soldOut: false},
                     {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
                     {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
-                    {name:'Sand', obj: sandObject, img: sandImage, price: '15', soldOut: false}
+                    {name:'Sand', obj: sandObject, img: sandImage, price: '15', soldOut: false},
+                    {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '15', soldOut: false},
+                    {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '15', soldOut: false}
+
                   ]
   game = new Game(storeItems);
   noiseDetail(24);
@@ -729,9 +742,18 @@ function mousePressed(){
     }
   }
   // ADD FISH
-  else if (mouseIsPressed && state=='fish' && mouseY >= 200){
+  else if (mouseIsPressed && state=='commonEgg' && mouseY >= 200){
     fishBeingHit.push(0);
-    game.fishArr.push(new Fish("Gold Fish", 10, 60));
+    let newFish = crackCommonEgg();
+    let rarity = newFish[1];
+    game.fishArr.push(new Fish("Gold Fish", rarity, 60));
+  }
+  // ADD FISH
+  else if (mouseIsPressed && state=='legendaryEgg' && mouseY >= 200){
+    fishBeingHit.push(0);
+    let newFish = crackLegendaryEgg();
+    let rarity = newFish[1];
+    game.fishArr.push(new Fish("Gold Fish", rarity, 60));
   }
 }
 
@@ -760,10 +782,11 @@ function drawWater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
 
 class ToolBar{
   constructor(x, y){
-    this.x = x
-    this.y = y
-    this.buttonX = 50
-    this.buttonY = 50
+    this.x = x;
+    this.y = y;
+    this.buttonX = 50;
+    this.buttonY = 50;
+    this.highlightColor = 'rgba(255, 152, 100, 0.8)'
   }
 
   draw(buttonArray, mouseX, mouseY){
@@ -777,8 +800,12 @@ class ToolBar{
         noFill()
         strokeWeight(1)
         stroke(0)
-        rect(this.buttonX, this.buttonY, 50, 50)
-        image(buttonArray[i].image, this.buttonX+25, this.buttonY+25, 25, 25)
+        //if tool is currently selected
+        if(buttonArray[i].name === state){
+          fill(this.highlightColor);
+          rect(this.buttonX, this.buttonY, 50, 50);
+        }
+        image(buttonArray[i].image, this.buttonX+25, this.buttonY+25, 30, 30)
 
         noStroke()
         fill(0)
