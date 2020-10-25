@@ -806,7 +806,7 @@ function mousePressed(){
     fishBeingHit.push(0);
     let newFish = crackRareEgg();
     let rarity = newFish[1];
-    game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 6, 20, 60));
+    game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
   }
   else if (mouseIsPressed && state=='legendaryEgg' && mouseY >= 200){
     fishBeingHit.push(0);
