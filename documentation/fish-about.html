@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>Blog - Fish Tank</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- script
+    ================================================== -->
+    <script src="js/modernizr.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+
+</head>
+
+<body class="ss-bg-white">
+
+    <!-- preloader
+    ================================================== -->
+    <div id="preloader">
+        <div id="loader" class="dots-fade">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="top" class="s-wrap site-wrapper">
+
+
+        <!-- site content
+        ================================================== -->
+        <div class="s-content content">
+            <main class="row content__page">
+
+                <article class="column large-full entry format-standard">
+
+                    <div class="media-wrap entry__media">
+                        <div class="entry__post-thumb">
+
+                                         <img src="images/legendaryFish.png" alt="">
+                        </div>
+                    </div>
+
+                    <div class="content__page-header entry__header">
+                        <h1 class="display-1 entry__title">
+                        Fish Tank Simulator
+                        </h1>
+                        <ul class="entry__header-meta">
+                            <li class="author">By <a href="#0">Santiago Rendon and Akiva Thalheim </a></li>
+                            <li class="date">November 4, 2020</li>
+                            <li class="cat-links">
+                                <a href="#0">Programming</a><a href="#0">Gaming</a>
+                            </li>
+                        </ul>
+                    </div> <!-- end entry__header -->
+
+                    <div class="entry__content">
+
+                        <p class="lead drop-cap">
+                        Me and my partner created a Fish Tank Simulator Game for the web using P5.js, Jquery, and Vanilla Javascript.
+                        The goal was to make a customizable enviornment where you could keep digital fish, feed them to keep them healthy,
+                        sell them to get cool items, and breed them to grow your collection.
+                        All the source code can be found on <a href="https://github.com/santiagorendon/fish-tank-sim">Github.</a>
+                        </p>
+
+                        <p>
+                        Below is a playable version of the game. If you want to play it full size click <a href="../index.html">here.</a>
+                        </p>
+
+                        <p>
+                          <iframe id="sketch1" src="../index.html" scrolling="no"></iframe>
+
+                        </p>
+
+                        <h2>How to Play</h2>
+                          <h4>Controls</h4>
+                            <p>Simply, click on an icon from the toolbar to select that tool and refer below to read about what it does.</p>
+
+                                <h4>Functional Tools</h4>
+                                  <p>Here is a list of tools that can be used to interact with the fish and the enviornment.</p>
+                                  <div class="table-responsive">
+                                      <table>
+                                              <thead>
+                                              <tr>
+                                                  <th>Icon</th>
+                                                  <th>Name</th>
+                                                  <th>Cost</th>
+                                                  <th>Description</th>
+                                                  <!-- <th>Location</th> -->
+                                              </tr>
+                                              </thead>
+                                              <tbody>
+                                              <tr>
+                                                  <td><img class="toolIcons" src="../images/cursor.png"></td>
+                                                  <td>Cursor</td>
+                                                  <td>Free</td>
+                                                  <td>Can select different fish to view stats.</td>
+                                                  <!-- <td>Konoha</td> -->
+                                              </tr>
+                                              <tr>
+                                                  <td><img class="toolIcons" src="../images/shop.png"></td>
+                                                  <td>Shop</td>
+                                                  <td>Free</td>
+                                                  <td>Click this to access the in game store.</td>
+                                                  <!-- <td>Konoha</td> -->
+                                              </tr>
+                                              <tr>
+                                                  <td><img class="toolIcons" src="../images/toilet.png"></td>
+                                                  <td>Toilet</td>
+                                                  <td>$15</td>
+                                                  <td>Click on any fish to remove it from your tank.</td>
+                                                  <!-- <td>Konoha</td> -->
+                                              </tr>
+                                              <tr>
+                                                <td><img class="toolIcons" src="../images/fishFood/fishfood.png"></td>
+                                                <td>Common Food</td>
+                                                <td>$15</td>
+                                                <td>Drops flakes to heal fish by 2 HP.</td>
+                                                  <!-- <td>Konoha</td> -->
+                                              </tr>
+                                              <tr>
+                                                <td><img class="toolIcons" src="../images/fishFood/rareFishfood.png"></td>
+                                                <td>Rare Food</td>
+                                                <td>$15</td>
+                                                <td>Drops flakes to heal fish by 4 HP.</td>
+                                                  <!-- <td>Konoha</td> -->
+                                              </tr>
+                                              <tr>
+                                                <td><img class="toolIcons" src="../images/fishFood/legendaryFishfood.png"></td>
+                                                <td>Legendary Food</td>
+                                                <td>$15</td>
+                                                <td>Drops flakes to heal fish by 8 HP.</td>
+                                                  <!-- <td>Konoha</td> -->
+                                              </tr>
+                                              <tr>
+                                                <td><img class="toolIcons" src="../images/commonEgg.png"></td>
+                                                <td>Common Egg</td>
+                                                <td>$15</td>
+                                                <td>Click anywhere on the tank to spawn a common fish.</td>
+                                              </tr>
+                                              <tr>
+                                                <td><img class="toolIcons" src="../images/rareEgg.png"></td>
+                                                <td>Rare Egg</td>
+                                                <td>$15</td>
+                                                <td>Click anywhere on the tank to spawn a rare fish.</td>
+                                              </tr>
+                                              <tr>
+                                                  <td><img class="toolIcons" src="../images/legendaryEgg.png"></td>
+                                                  <td>Legendary Egg</td>
+                                                  <td>$15</td>
+                                                  <td>Click anywhere on the tank to spawn a legendary fish.</td>
+                                                  <!-- <td>Konoha</td> -->
+                                              </tr>
+                                              </tbody>
+                                      </table>
+                                  </div>
+                                  <h4>Cosmetic Tools</h4>
+                                    <p>Here is a list of tools that can be used to enhance and customize the look of the environment.</p>
+                                    <div class="table-responsive">
+                                        <table>
+                                                <thead>
+                                                <tr>
+                                                    <th>Icon</th>
+                                                    <th>Name</th>
+                                                    <th>Cost</th>
+                                                    <th>Description</th>
+                                                    <!-- <th>Location</th> -->
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td><img class="toolIcons" src="../images/sand.png"></td>
+                                                    <td>Sand</td>
+                                                    <td>$15</td>
+                                                    <td>Drops sand particles onto the fish Tank.</td>
+                                                    <!-- <td>Konoha</td> -->
+                                                </tr>
+                                                <tr>
+                                                    <td><img class="toolIcons" src="../images/rock.png"></td>
+                                                    <td>Rock</td>
+                                                    <td>$15</td>
+                                                    <td>Use to place rocks on the enviornment.</td>
+                                                    <!-- <td>Konoha</td> -->
+                                                </tr>
+                                                <tr>
+
+                                                    <td><img class="toolIcons" src="../images/grass.png"></td>
+                                                    <td>Grass</td>
+                                                    <td>$15</td>
+                                                    <td>Use to place grass on the enviornment.</td>
+                                                    <!-- <td>Konoha</td> -->
+                                                </tr>
+                                                </tbody>
+                                        </table>
+                                    </div>
+
+
+                          <h4>Gameplay</h4>
+                            <p>
+                              During the game the player can spawn in different fish and breed them to spawn more fish.
+                              Then to make money the player can start selling some of their fish, and with the money they can
+                              buy cosmetics to customize the tank or save up to buy rare and legendary fish eggs.
+                            </p>
+                        <h2>Fish</h2>
+                        <h4>Rarity</h4>
+                          <p>The game is set up to have 6 different kinds of fish that go from tiers S to F.
+                            The rarity of the fish determine the tier the fish will be in and each tier
+                            of fish has a different look.
+
+                          S tier has a rarity range of 95-100, A tier has a rarity range of 85-94,
+                          B tier has a rarity range of 70-84, C tier has a rarity range of 50-69,
+                          D tier has a rarity range of 25-49, and finally F tier has a rarity range of 0-24.
+                        <h4>Breeding</h4>
+                          <p>
+                            The player can breed fish by selecting two parents which will then produce an offspring.
+                            The offsprings rarity range will depend on both of their parent's rarity as well as a 'random' factor.
+                            The forumla for calculating an offsprings rarity is:
+                            <code>(parent1+parent2+parent3)/3</code>. Where parent3 is a random number between 0-100, and parent1 and parent2
+                            are the selected parents of the fish.
+                          </p>
+                        </p>
+                        <h4>Fish Types</h4>
+                        <table>
+                                <thead>
+                                <tr>
+                                    <th>Icon</th>
+                                    <th>Name</th>
+                                    <th>Tier</th>
+                                    <th>Rarity Range</th>
+                                    <!-- <th>Location</th> -->
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><img class="fishIcons" src="images/legendaryFish2.png"></td>
+                                    <td>Aqua</td>
+                                    <td>S</td>
+                                    <td>(95-100)</td>
+                                </tr>
+                                <tr>
+                                  <td><img class="fishIcons" src="images/legendaryFish2.png"></td>
+                                  <td>Aqua</td>
+                                  <td>A</td>
+                                  <td>(85-94)</td>
+                                </tr>
+                                <tr>
+                                  <td><img class="fishIcons" src="images/legendaryFish2.png"></td>
+                                  <td>Aqua</td>
+                                  <td>B</td>
+                                  <td>(70-84)</td>
+                                </tr>
+                                <tr>
+                                  <td><img class="fishIcons" src="images/legendaryFish2.png"></td>
+                                  <td>Aqua</td>
+                                  <td>C</td>
+                                  <td>(50-69)</td>
+                                </tr>
+                                <tr>
+                                  <td><img class="fishIcons" src="images/legendaryFish2.png"></td>
+                                  <td>Aqua</td>
+                                  <td>D</td>
+                                  <td>(25-49)</td>
+                                </tr>
+                                <tr>
+                                  <td><img id="goldFish" class="fishIcons" src="../images/commonFish/commonFish1.png"></td>
+                                  <td>Gold Fish</td>
+                                  <td>F</td>
+                                  <td>(0-24)</td>
+                                </tr>
+                                </tbody>
+                        </table>
+
+                    </div>
+
+                        <h2>Programming</h2>
+                          <h4>Resources</h4>
+                            <ul>
+                              <li><a href="https://p5js.org/">P5.js</a>- for manipulating and drawing everything on to the HTML5 canvas.</li>
+                              <li><a href="https://jquery.com/">jQuery</a>- for selecting elements from the DOM in order to perform the resizing functionality.</li>
+                              <li><a href="https://freesound.org/">FreeSound</a>- For getting non-copyrighted music files.</li>
+                            </ul>
+                          <h4>Files</h4>
+                            <ul>
+                              <li><u>index.html</u>- holds the html code for the project.</li>
+                              <li><b>images</b>- holds all images for the game.</li>
+                              <li><b>sounds</b>- holds all mp3 files for the game.</li>
+                              <li><b>font</b>- holds all font files for the game.</li>
+                              <li><b>css</b></li>
+                                <ul>
+                                  <li><u>index.css</u>- holds some basic styling rules for the canvas.</li>
+                                </ul>
+                              <li>
+                                <b>js</b>
+                                <ul>
+                                  <li><u>jquery-3.3.1.min.js</u>- holds jquery library.</li>
+                                  <li><u>jquery.documentsize.js</u>- holds the resize canvas logic for the game.</li>
+                                  <li><u>sketch.js</u>- holds the game logic.</li>
+                                </ul>
+                              </li>
+
+                            </ul>
+
+                          <h4>Functionality</h4>
+                            <p>
+                              insert run down of preload setup and draw
+                            </p>
+<pre><code> <!-- needs to be unindented because code will match indentation -->
+  function draw() {
+    imageMode(CENTER)
+    if(game.scene === "tank"){
+        game.drawTank();
+    }
+    else if(game.scene === "store"){
+        game.drawStore();
+    }
+    noCursor();
+    image(game.cursor, mouseX, mouseY, 20, 20);
+  }
+</code></pre>
+
+                        <p>
+                          Talk more about code.
+                        </p>
+                        <blockquote>
+                            <p>
+                              No human being, however great, or powerful, was ever so free as a fish.
+
+                            </p>
+                            <cite>John Ruskin</cite>
+                        </blockquote>
+
+
+                        <p class="entry__tags">
+                            <span>Post Tags</span>
+
+                            <span class="entry__tag-list">
+                                <a href="#0">gaming</a>
+                                <a href="#0">programming</a>
+                                <a href="#0">platformer</a>
+                                <a href="#0">javascript</a>
+                            </span>
+
+                        </p>
+                    </div>
+                    <!-- end entry content -->
+
+
+
+
+
+                </article> <!-- end column large-full entry-->
+
+
+
+
+
+            </main>
+
+        </div> <!-- end s-content -->
+
+
+        <!-- footer
+        ================================================== -->
+        <!-- <footer class="s-footer footer">
+            <div class="row">
+                <div class="column large-full footer__content">
+                    <div class="footer__copyright">
+                      <span>Santiago Rendon</span>
+                      <span>P5 Portfolio</span>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="go-top">
+                <a class="smoothscroll" title="Back to Top" href="#top"></a>
+            </div>
+        </footer>
+
+    </div> <!-- end s-wrap -->
+
+
+    <!-- Java Script
+    ================================================== -->
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/plugins.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
