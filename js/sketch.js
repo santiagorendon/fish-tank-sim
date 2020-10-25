@@ -15,6 +15,8 @@ var commonEggObject;
 var rareEggObject;
 var legendaryEggObject;
 var fishFoodObject;
+var rareFishFoodObject;
+var legendaryFishFoodObject;
 var cursorObject;
 var shopObject;
 var toiletObject;
@@ -205,7 +207,7 @@ class Game{
 
     // check if any fish is being selected
     for(let i=0; i < game.fishArr.length;i++){
-      let isHit = dist(mouseX, mouseY, game.fishArr[i].x, game.fishArr[i].y) <= (game.fishArr[i].hitBox/2)
+      let isHit = dist(mouseX, mouseY, game.fishArr[i].x+game.fishArr[i].hitBoxXOf, game.fishArr[i].y+game.fishArr[i].hitBoxYOf) <= (game.fishArr[i].hitBox/2)
       if(isHit){
         fishBeingHit[i] = 1;
       }
@@ -217,7 +219,7 @@ class Game{
     let fishHitIndex = fishBeingHit.indexOf(1);
     if(mouseIsPressed && fishIsHit){ //if fish is clicked
       //if cursor is selector or food
-      if((game.cursor === cursorImage || game.cursor === fishFoodImage)){
+      if((game.cursor === cursorImage || game.mode === fishFoodImage || game.mode === rareFishFoodImage || game.mode === legendaryFishFoodImage)){
         game.stats.displayIndex = fishHitIndex; //display stats
       }
       //if cursor is toilet
@@ -232,6 +234,16 @@ class Game{
     if(!fishIsHit && mouseIsPressed && state=='food' && mouseY >= 200){
       var tempFood = new Food(mouseX, mouseY)
       fishFoodObject.quantity-=0.1;
+      foodArray.push(tempFood)
+    }
+    if(!fishIsHit && mouseIsPressed && state=='food2' && mouseY >= 200){
+      var tempFood = new Food(mouseX, mouseY, 4)
+      rareFishFoodObject.quantity-=0.1;
+      foodArray.push(tempFood)
+    }
+    if(!fishIsHit && mouseIsPressed && state=='food3' && mouseY >= 200){
+      var tempFood = new Food(mouseX, mouseY, 8)
+      legendaryFishFoodObject.quantity-=0.1;
       foodArray.push(tempFood)
     }
 
@@ -320,7 +332,7 @@ function breedFish(rarity1, rarity2){
 }
 
 class Fish{
-  constructor(type, rarity, hitBox){
+  constructor(type, imageArray, w, h, rarity, frameNum=2, frameDelay=25, hitBox, xOf=0, yOf=0){
     this.type = type;
     //stats
     this.rarity = rarity;
@@ -329,26 +341,38 @@ class Fish{
     this.price = 15;
     this.age = 0;
     this.alive = true;
-    this.width = 100;
-    this.height = 100;
+    this.width = w;
+    this.height = h;
     this.hitBox = hitBox;
+    this.hitBoxXOf = xOf;
+    this.hitBoxYOf = yOf;
     this.x = random(0, width)
     this.y = random(0, height)
-    this.frameDelay = 25;
+    this.frameDelay = frameDelay;
     this.frameCount = 0;
     this.frame = 0;
-    this.frameNum = 2;
+    this.frameNum = frameNum;
     // create a "noise offset" to keep track of our position in Perlin Noise space
     this.xNoiseOffset = random(0,1000);
     this.yNoiseOffset = random(1000,2000);
+    this.xMovement = 0;
+    this.yMovement = 0;
+    this.imageArray = imageArray;
+  }
+  drawHitBox(){
+    strokeWeight(1);
+    fill('rgba(0,255,0,0.1)')
+    ellipse(this.x+this.hitBoxXOf, this.y+this.hitBoxYOf, this.hitBox, this.hitBox)
   }
   draw(){
-    // strokeWeight(1);
-    // fill('white')
-    // ellipse(this.x, this.y, this.hitBox, this.hitBox)
-    if(this.type === "Gold Fish"){
-      image(commonFishImgArr[this.frame], this.x, this.y, this.width, this.height);
+    this.drawHitBox();
+    if(this.xMovement > 0){ //fish moving right
+      image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
     }
+    else{//fish moving left
+      image(this.imageArray[0][this.frame], this.x, this.y, this.width, this.height);
+    }
+
 
     // fish price varies depending on health
     // this.price = round(((this.health/100) * this.startingPrice), 2)
@@ -375,10 +399,10 @@ class Fish{
         this.frame = (this.frame+1)%this.frameNum //num between 0 and 1;
         this.frameCount = 0;
       }
-      var xMovement = map( noise(this.xNoiseOffset), 0, 1, -3, 3 );
-      var yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
-      this.x += xMovement;
-      this.y += yMovement;
+      this.xMovement = map( noise(this.xNoiseOffset), 0, 1, -3, 3 );
+      this.yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
+      this.x += this.xMovement;
+      this.y += this.yMovement;
       this.x = constrain(this.x, this.width, width-this.width)
       this.y = constrain(this.y, this.height, height)
       this.xNoiseOffset += 0.01;
@@ -490,7 +514,24 @@ function preload(){
   sellImg = loadImage('images/sell.png');
   closeImg = loadImage('images/close.png');
   //fish images
-  commonFishImgArr = [loadImage('images/commonFish1.png'), loadImage('images/commonFish2.png')]
+  commonFishImgArr = [[loadImage('images/commonFish/commonFish1.png'), loadImage('images/commonFish/commonFish2.png')], [loadImage('images/commonFish/commonFish3.png'), loadImage('images/commonFish/commonFish4.png')]]
+  legendaryFishImgArr = [[
+    loadImage('images/legendaryFish/legendaryFish1.png'),
+    loadImage('images/legendaryFish/legendaryFish2.png'),
+    loadImage('images/legendaryFish/legendaryFish3.png'),
+    loadImage('images/legendaryFish/legendaryFish4.png'),
+    loadImage('images/legendaryFish/legendaryFish5.png'),
+    loadImage('images/legendaryFish/legendaryFish6.png'),
+  ],
+  [
+    loadImage('images/legendaryFish/legendaryFish7.png'),
+    loadImage('images/legendaryFish/legendaryFish8.png'),
+    loadImage('images/legendaryFish/legendaryFish9.png'),
+    loadImage('images/legendaryFish/legendaryFish10.png'),
+    loadImage('images/legendaryFish/legendaryFish11.png'),
+    loadImage('images/legendaryFish/legendaryFish12.png')
+  ]];
+  //fish eggs
   commonEggImage = loadImage('images/commonEgg.png');
   rareEggImage = loadImage('images/rareEgg.png');
   legendaryEggImage = loadImage('images/legendaryEgg.png');
@@ -499,7 +540,9 @@ function preload(){
   waterImage = loadImage('images/water.png')
   grassImage = loadImage('images/grass.png')
   sandImage = loadImage('images/sand.png');
-  fishFoodImage = loadImage('images/fishfood.png')
+  fishFoodImage = loadImage('images/fishFood/fishfood.png')
+  rareFishFoodImage = loadImage('images/fishFood/rareFishFood.png')
+  legendaryFishFoodImage = loadImage('images/fishFood/legendaryFishFood.png')
   toiletImage = loadImage('images/toilet.png')
   cursorImage = loadImage('images/cursor.png')
   shopImage = loadImage('images/shop.png')
@@ -534,11 +577,16 @@ function setup() {
   rareEggObject = new Button('rareEgg', rareEggImage, 1, 1)
   legendaryEggObject = new Button('legendaryEgg', legendaryEggImage, 1, 1)
   fishFoodObject = new Button('food', fishFoodImage, 50, 50)
+  rareFishFoodObject = new Button('food2', rareFishFoodImage, 50, 50)
+  legendaryFishFoodObject = new Button('food3', legendaryFishFoodImage, 50, 50)
+
   cursorObject = new Button('cursor', cursorImage, 1000)
   shopObject = new Button('shop', shopImage, 1000)
   buttonArray = [cursorObject, shopObject, waterObject, commonEggObject]
 
   let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '15', soldOut: false},
+                    {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '15', soldOut: false},
+                    {name:'Legendary Food', img: legendaryFishFoodImage, obj: legendaryFishFoodObject, price: '15', soldOut: false},
                     {name:'Toilet', obj: toiletObject, img: toiletImage, price: '15', soldOut: false},
                     {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
                     {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
@@ -663,7 +711,7 @@ class Food {
       ellipse(this.x, this.y, this.radius, this.radius)
       this.alpha -=this.disolveSpeed // food gets absorbed by the water
       for (var i=0; i<fishArr.length; i++){
-        if(dist(this.x, this.y, fishArr[i].x, fishArr[i].y) < (fishArr[i].hitBox/2)){
+        if(dist(this.x, this.y, fishArr[i].x+fishArr[i].hitBoxXOf, fishArr[i].y+fishArr[i].hitBoxYOf) < (fishArr[i].hitBox/2)){
           fishArr[i].health +=this.healthIncrease;
           game.stats.displayIndex = i;
           return 'gone';
@@ -743,7 +791,6 @@ function mousePressed(){
     grassArray.push(tempGrass)
     if (grassLevel <=3){
       grassLevel +=1
-
     }
   }
   // ADD FISH
@@ -751,20 +798,21 @@ function mousePressed(){
     fishBeingHit.push(0);
     let newFish = crackCommonEgg();
     let rarity = newFish[1];
-    game.fishArr.push(new Fish("Gold Fish", rarity, 60));
+    //name width height rarity hitbox frames framedelay
+    game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
   }
   // ADD FISH
   else if (mouseIsPressed && state=='rareEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackRareEgg();
     let rarity = newFish[1];
-    game.fishArr.push(new Fish("Gold Fish", rarity, 60));
+    game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 6, 20, 60));
   }
   else if (mouseIsPressed && state=='legendaryEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackLegendaryEgg();
     let rarity = newFish[1];
-    game.fishArr.push(new Fish("Gold Fish", rarity, 60));
+    game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
   }
 }
 
