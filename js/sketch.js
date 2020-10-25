@@ -219,7 +219,7 @@ class Game{
     let fishHitIndex = fishBeingHit.indexOf(1);
     if(mouseIsPressed && fishIsHit){ //if fish is clicked
       //if cursor is selector or food
-      if((game.cursor === cursorImage || game.mode === fishFoodImage || game.mode === rareFishFoodImage || game.mode === legendaryFishFoodImage)){
+      if((game.cursor === cursorImage || game.cursor === fishFoodImage || game.cursor === rareFishFoodImage || game.cursor === legendaryFishFoodImage)){
         game.stats.displayIndex = fishHitIndex; //display stats
       }
       //if cursor is toilet
@@ -279,7 +279,7 @@ class Game{
     displayButtons()
     displayTankWalls()
     this.drawFish();
-    if(game.stats.displayIndex != -1 && (game.cursor === cursorImage || game.cursor === fishFoodImage) && (game.scene !== 'store')){
+    if(game.stats.displayIndex != -1 && (game.cursor === cursorImage || game.cursor === fishFoodImage || game.cursor === rareFishFoodImage || game.cursor === legendaryFishFoodImage) && (game.scene !== 'store')){
       game.fishArr[game.stats.displayIndex].drawStats();
     }
   }
@@ -365,7 +365,7 @@ class Fish{
     ellipse(this.x+this.hitBoxXOf, this.y+this.hitBoxYOf, this.hitBox, this.hitBox)
   }
   draw(){
-    this.drawHitBox();
+    //this.drawHitBox();
     if(this.xMovement > 0){ //fish moving right
       image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
     }

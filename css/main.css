@@ -1,65 +1,32 @@
-/* ===================================================================
- *
- *  Typerite Main Stylesheet
- *  Template Ver. 1.0.0
- *  05-17-2019
- *  ------------------------------------------------------------------
- *
- *  TOC:
- *  # base style overrides
- *      ## links
- *  # typography & general theme styles
- *      ## typography
- *      ## Lists
- *      ## responsive video container
- *      ## floated image
- *      ## tables
- *      ## Spacing
- *  # preloader
- *  # forms
- *      ## Style Placeholder Text
- *      ## Change Autocomplete styles in Chrome
- *  # buttons
- *  # additional components
- *      ## additional typo styles
- *      ## skillbars
- *      ## alert box
- *      ## pagination
- *  # Common and Reusable Styles
- *      ## animation stuff
- *      ## entry media
- *      ## listing header
- *      ## slick slider
- *      ## masonry entries
- *      ## post formats - masonry view
- *  # site header
- *      ## header logo
- *      ## header main navigation
- *      ## menu toggle
- *      ## header social
- *      ## header search trigger
- *      ## header-search
- *      ## close button for search
- *  # site content & footer
- *      ## content
- *      ## footer
- *      ## copyright
- *      ## go to top
- *  # blog styles and blog components
- *      ## entry header meta
- *      ## post tags
- *      ## blog single page navigation
- *      ## related articles
- *      ## comments
- *      ## format gallery
- *
- * =================================================================== */
+/* my custom css */
+#sketch1 {
+        width: 100vw;
+        height: 500px;
+        border: none;
+        overflow: hidden;
+      }
+
+#toolList{
+  list-style: none;
+}
+.toolIcons{
+  margin-top: 0!important;
+  margin-bottom: 0!important;
+  width: 35px;
+  height: auto;
+}
+.fishIcons{
+  margin-top: 0!important;
+  margin-bottom: 0!important;
+  width: 45px;
+  height: auto;
+}
+#goldFish{
+  width: 55px;
+}
+/* end my custom css */
 
 
-/* ===================================================================
- * # base style overrides
- *
- * ------------------------------------------------------------------- */
 html {
   font-size: 10px;
 }
@@ -96,49 +63,6 @@ body.ss-bg-white {
   background: #ffffff;
 }
 
-/* my custom css */
-
-#sketch1 {
-        width: 100vw;
-        height: 500px;
-        border: none;
-        overflow: hidden;
-      }
-#sketch2 {
-        width: 100vw;
-        height: 750px;
-        /* border: none;
-        overflow: hidden; */
-      }
-#waterCanContainer{
-  display: flex;
-  justify-content: center;
-}
-#wateringCan{
-  position: relative;
-  left:-50px;
-  width: 250px;
-  height: auto;
-}
-#toolList{
-  list-style: none;
-}
-.toolIcons{
-  margin-top: 0!important;
-  margin-bottom: 0!important;
-  width: 35px;
-  height: auto;
-}
-.fishIcons{
-  margin-top: 0!important;
-  margin-bottom: 0!important;
-  width: 45px;
-  height: auto;
-}
-#goldFish{
-  width: 55px;
-}
-/* end my custom css */
 /* -------------------------------------------------------------------
  * ## links
  * ------------------------------------------------------------------- */
