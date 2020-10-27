@@ -192,7 +192,7 @@
                                                     <td><img class="toolIcons" src="../images/sand.png"></td>
                                                     <td>Sand</td>
                                                     <td>$15</td>
-                                                    <td>Drops sand particles onto the fish Tank.</td>
+                                                    <td>Drops sand particles onto the fish tank.</td>
                                                     <!-- <td>Konoha</td> -->
                                                 </tr>
                                                 <tr>
@@ -210,6 +210,14 @@
                                                     <td>Use to place grass on the enviornment.</td>
                                                     <!-- <td>Konoha</td> -->
                                                 </tr>
+                                                <tr>
+
+                                                    <td><img class="toolIcons" src="../images/treasure.png"></td>
+                                                    <td>Treasure Chest</td>
+                                                    <td>$15</td>
+                                                    <td>Make your tank look fancy.</td>
+                                                    <!-- <td>Konoha</td> -->
+                                                </tr>
                                                 </tbody>
                                         </table>
                                     </div>
@@ -221,7 +229,64 @@
                               Then to make money the player can start selling some of their fish, and with the money they can
                               buy cosmetics to customize the tank or save up to buy rare and legendary fish eggs.
                             </p>
+
+
+                        <h2>Environment</h2>
+
+                          <h4>Water</h4>
+                          <p>
+                            The most basic component of the fish tank's environment is water, constructed by the
+                            <code>Water</code> class. However, this class just represents the randomly colored and
+                            sized water particles that flow out of your mouse's position and float downwards. The
+                            real magic is in the <code>drawWater()</code> function, which is adapated from
+                            <a href='https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm'> YiyunJia's</a> code.
+                            Using Perlin noise, a visual effect is created where it looks like the water is wavy
+                            and sloshing around in your tank as you fill it up. For added fun, there's also a sound
+                            that gets triggered as you fill the fish tank.
+                          </p>
+
+                          <h4>Sand</h4>
+                          <p>
+                            Sand particles are creating using the <code>Sand</code> class, with new sand being
+                            dropped into the tank and stored in an array when you have that tool selected. Sand
+                            particles are randomly sized and colored, and sink to the bottom of the tank to add
+                            some visual flair to your tank.
+                          </p>
+
+                          <h4>Rock</h4>
+                          <p>
+                            A basic decoration for your tank, you can drop in new <code>Rock</code> images to your tank.
+                            As usual, they float to the bottom, and will be layered on top of the sand you added previously.
+                          </p>
+                          <h4>Grass</h4>
+                          <p>
+                            Another basic decoration for your tank, you can add some greenery to your tank by using the <code>Grass</code>
+                            class. As usual, they float to the bottom, and will be layered on top of the sand you added previously.
+                          </p>
+
+
                         <h2>Fish</h2>
+
+                        <h4>Feeding</h4>
+                        <p>
+                          Fish swim happily around the tank, but while this happens, they constantly get a bit more hungry,
+                          with a <code>this.health -=.01</code> variable descreasing.
+                          Click on a fish to see its stats, including its hunger level.
+                          To feed a fish, you can buy some fish food and drop it over a fish to restore its hunger level,
+                          which uses basic distance collision to detect that the food is touching the fish.
+                        </p>
+                        <h4>Death</h4>
+                        <p>
+                          A fish that you forgot to feed will have its alive variable change to<code>this.alive = false</code>, causing it sink to the bottom of the tank.
+                          You won't be able to sell this fish, and will have to use the toilet tool to flush your dead fish away.
+                        </p>
+                        <h4>Movement</h4>
+                        <p>
+                          If a fish is alive, it can  move around the tank using Perlin noise, so that its movement seems natural.
+                          We used the <code>constrain</code> function to ensure that the fish doesn't hit the edges of the walls.
+                          To make this seem even more realistic, each fish has its own <code>this.hitBox</code> to keep track of
+                          what it can touch.
+                        </p>
                         <h4>Rarity</h4>
                           <p>The game is set up to have 6 different kinds of fish that go from tiers S to F.
                             The rarity of the fish determine the tier the fish will be in and each tier
@@ -305,6 +370,11 @@
                               <li><b>images</b>- holds all images for the game.</li>
                               <li><b>sounds</b>- holds all mp3 files for the game.</li>
                               <li><b>font</b>- holds all font files for the game.</li>
+                              <li><b>documentation</b>- holds all documentation files for the game.</li>
+                                <ul>
+                                  <li><u>css</u>- holds some basic styling rules for the documentation.</li>
+                                  <li><u>images</u>- holds some images for the documentation.</li>
+                                </ul>
                               <li><b>css</b></li>
                                 <ul>
                                   <li><u>index.css</u>- holds some basic styling rules for the canvas.</li>
