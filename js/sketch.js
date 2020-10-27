@@ -612,7 +612,7 @@ class Sand {
       this.xSpeed = random(-1, 1)
       this.ySpeed = 2
       this.alpha = 255
-      this.radius = random(10, 50)
+      this.radius = random(20, 50)
       this.h = 42
       this.s = 100
       this.l = random(70, 80)
