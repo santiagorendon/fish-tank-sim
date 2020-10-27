@@ -1,8 +1,7 @@
 var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage, sellSound, foodImage, toiletImage, flushSound, cursorImage
 var sandArray = []
 var waterArray = []
-var rockArray = []
-var grassArray = []
+var decorationArray = []
 var foodArray = []
 var state, tempState
 var canvas;
@@ -10,6 +9,7 @@ var canvas;
 var waterObject;
 var sandObject;
 var rockObject;
+var treasureObject;
 var grassObject;
 var commonEggObject;
 var rareEggObject;
@@ -20,6 +20,7 @@ var legendaryFishFoodObject;
 var cursorObject;
 var shopObject;
 var toiletObject;
+
 
 var waterLevelMapped, grassLevelMapped, rockLevelMapped, sandLevelMapped
 
@@ -89,7 +90,7 @@ class Game{
   drawStoreItems(){
     for(let i=0;i<this.storeItems.length;i++){
       // do not sell items if they have more tthan 1000
-      if(game.storeItems[i].name !== 'Toilet'){
+      if(game.storeItems[i].name !== 'Toilet' && game.storeItems[i].name !== 'Treasure'){
         if(this.storeItems[i].obj.quantity >= 1000){
           game.storeItems[i].soldOut = true;
         }
@@ -138,7 +139,11 @@ class Game{
         buttonArray.splice(2, 0, obj);
         game.storeItems[index].soldOut = true;
       }
-      else{ //if any item is added besides toilet
+      else if(name === 'Treasure'){//treasures
+        buttonArray.push(obj);
+        game.storeItems[index].soldOut = true;
+      }
+      else{ //if any item is added besides toilet or treasure
         if(alreadyOwned){
           obj.quantity = obj.quantity + obj.originalMax;
           obj.max = obj.quantity;
@@ -239,9 +244,6 @@ class Game{
     for (var i = sandArray.length-1; i >= 0; i--) {
       sandArray[i].display()
     }
-    for (var i = rockArray.length-1; i >= 0; i--) {
-      rockArray[i].display()
-    }
     for (var i = waterArray.length-1; i >= 0; i--) {
       let check = waterArray[i].display()
       if (check == 'gone'){
@@ -249,8 +251,8 @@ class Game{
         i-=1
       }
     }
-    for (var i = grassArray.length-1; i >= 0; i--) {
-      grassArray[i].display()
+    for(var i = 0; i < decorationArray.length; i++) {
+      decorationArray[i].display();
     }
     for (var i = foodArray.length-1; i >= 0; i--) {
       let check = foodArray[i].display(game.fishArr)
@@ -523,6 +525,7 @@ function preload(){
   rockImage = loadImage('images/rock.png')
   waterImage = loadImage('images/water.png')
   grassImage = loadImage('images/grass.png')
+  treasureImage = loadImage('images/treasure.png')
   sandImage = loadImage('images/sand.png');
   fishFoodImage = loadImage('images/fishFood/fishfood.png')
   rareFishFoodImage = loadImage('images/fishFood/rareFishFood.png')
@@ -549,6 +552,7 @@ function setup() {
   toiletObject = new Button('toilet', toiletImage, 100, 100)
   rockObject = new Button('rock', rockImage, 3, 3)
   grassObject = new Button('grass', grassImage, 3, 3)
+  treasureObject = new Button('treasure', treasureImage, 1, 1)
   commonEggObject = new Button('commonEgg', commonEggImage, 1, 1)
   rareEggObject = new Button('rareEgg', rareEggImage, 1, 1)
   legendaryEggObject = new Button('legendaryEgg', legendaryEggImage, 1, 1)
@@ -564,12 +568,13 @@ function setup() {
                     {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '15', soldOut: false},
                     {name:'Legendary Food', img: legendaryFishFoodImage, obj: legendaryFishFoodObject, price: '15', soldOut: false},
                     {name:'Toilet', obj: toiletObject, img: toiletImage, price: '15', soldOut: false},
+                    {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '15', soldOut: false},
+                    {name:'Rare Egg', obj: rareEggObject, img: rareEggImage, price: '15', soldOut: false},
+                    {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '15', soldOut: false},
                     {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
                     {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
                     {name:'Sand', obj: sandObject, img: sandImage, price: '15', soldOut: false},
-                    {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '15', soldOut: false},
-                    {name:'Rare Egg', obj: rareEggObject, img: rareEggImage, price: '15', soldOut: false},
-                    {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '15', soldOut: false}
+                    {name:'Treasure', obj: treasureObject, img: treasureImage, price: '15', soldOut: false}
 
                   ]
   game = new Game(storeItems);
@@ -589,15 +594,16 @@ function draw() {
 }
 
 
-// ROCK CLASS
-class Rock {
-  constructor(x, y){
+class Decoration {
+  constructor(image, x, y, size=100){
     this.x = x
     this.y = y
+    this.size = size;
+    this.image = image;
   }
   display(){
-    image(rockImage, this.x, this.y, 100, 100)
-    if (this.y < (height-50)){
+    image(this.image, this.x, this.y, this.size, this.size)
+    if (this.y < (height-(this.size/2))){
       this.y += 1
     }
   }
@@ -622,20 +628,6 @@ class Sand {
         this.y += this.ySpeed
       }
       ellipse(this.x, this.y, this.radius, this.radius)
-  }
-}
-
-// GRASS CLASS
-class Grass {
-  constructor(x, y){
-    this.x = x
-    this.y = y
-  }
-  display(){
-    image(grassImage, this.x, this.y, 100, 100)
-    if (this.y < (height-50)){
-      this.y += 1
-    }
   }
 }
 
@@ -729,23 +721,11 @@ function displayEnvironmentalStats(){
 }
 
 
-// display rocks and grass
+
 function mousePressed(){
-  if (state == 'rock'&& mouseY >= 200){
-    var tempRock = new Rock(mouseX, mouseY)
-    rockObject.quantity -= 1;
-    rockArray.push(tempRock)
-    if (rockLevel <=3){
-      rockLevel +=1
-    }
-  }
-  else if (state == 'grass' && mouseY >= 200){
-    var tempGrass = new Grass(mouseX, mouseY)
-    grassObject.quantity -= 1;
-    grassArray.push(tempGrass)
-    if (grassLevel <=3){
-      grassLevel +=1
-    }
+  if((state == 'grass' || state == 'rock' || state === 'treasure') && mouseY >= 200){//decoration
+    decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY));
+    window[state+"Object"].quantity -= 1;
   }
   // ADD FISH
   else if (mouseIsPressed && state=='commonEgg' && mouseY >= 200){
@@ -801,7 +781,6 @@ class ToolBar{
     this.buttonY = 50;
     this.highlightColor = 'rgba(255, 152, 100, 0.8)'
   }
-
   draw(buttonArray, mouseX, mouseY){
       for (var i=0; i<buttonArray.length; i++){
         if(buttonArray[i].quantity < 1){ //if tool runs out of uses
@@ -830,7 +809,6 @@ class ToolBar{
         else{
           text(buttonArray[i].name , (this.buttonX+25), this.buttonY+55)
         }
-
         this.buttonX += 50
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
           if(buttonArray[i].name === 'shop'){
