@@ -613,9 +613,9 @@ class Sand {
       this.ySpeed = 2
       this.alpha = 255
       this.radius = random(20, 50)
-      this.h = 42
+      this.h = 36
       this.s = 100
-      this.l = random(70, 80)
+      this.l = random(90, 96)
   }
   display(){
       noStroke()
