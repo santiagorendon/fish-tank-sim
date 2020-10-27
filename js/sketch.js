@@ -35,7 +35,6 @@ var rockLevel = 0
 var grassLevel = 0
 var buttonArray
 var fishBeingHit = [];
-const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
 class Game{
   constructor(storeItems=[]){
@@ -81,10 +80,7 @@ class Game{
     textAlign(CENTER, TOP);
     text('STORE', canvasWidth/2, 10);
     textAlign(LEFT, TOP);
-    // textSize(40);
     text(`$${this.balance}`, 60, 10);
-    //fill(255,255,255)
-    // ellipse(canvasWidth-50, 50, 70, 70);
     image(closeImg, this.storeCloseX, this.storeCloseY, this.storeCloseD, this.storeCloseD);
 
     this.drawStoreItems();
@@ -107,7 +103,6 @@ class Game{
       }
 
       fill(255,255,255)
-      //ellipse(this.storeItemX, this.storeItemY, this.storeItemSize, this.storeItemSize);
       image(this.storeItems[i].img, this.storeItemX, this.storeItemY, this.storeItemSize, this.storeItemSize);
 
       textAlign(CENTER, CENTER);
@@ -131,14 +126,6 @@ class Game{
     }
     this.storeItemX = this.storeItemOrigX;
     this.storeItemY = this.storeItemOrigY;
-
-    // //ellipse(this.storeItemOrigX, this.storeItemY+210, this.storeItemSize, this.storeItemSize);
-    // image(this.storeItems[0].img, this.storeItemOrigX, this.storeItemY+230, this.storeItemSize, this.storeItemSize);
-    // text(`$${15}`, this.storeItemX-5, this.storeItemY+210+110);
-    //
-    // //ellipse(this.storeItemOrigX, this.storeItemY+210+210, this.storeItemSize, this.storeItemSize);
-    // image(this.storeItems[0].img, this.storeItemOrigX, this.storeItemY+230+210, this.storeItemSize, this.storeItemSize);
-    // text(`$${15}`, this.storeItemX-5, this.storeItemY+210+210+110);
   }
   isStoreItemClicked(index){
     let name = game.storeItems[index].name;
@@ -352,7 +339,6 @@ class Fish{
     this.frameCount = 0;
     this.frame = 0;
     this.frameNum = frameNum;
-    // create a "noise offset" to keep track of our position in Perlin Noise space
     this.xNoiseOffset = random(0,1000);
     this.yNoiseOffset = random(1000,2000);
     this.xMovement = 0;
@@ -449,11 +435,9 @@ class Fish{
     text(`(${this.rarity}/100)`, game.stats.x+129, game.stats.y+148);
 
     image(cashImg, game.stats.x+40, game.stats.y+210, 70, 70);
-    //rect(game.stats.x+65, game.stats.y+202, 135, 25);
     text(`${this.price}`, game.stats.x+129, game.stats.y+201);
 
     image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
-    // ellipse((game.stats.x+game.stats.x+game.stats.w)/2-80, game.stats.y+280, 60, 60);
 
     //add event listeners
     this.isClosed();
@@ -560,14 +544,6 @@ function setup() {
   canvas.parent('#container');
   canvas.style('width', '100%');
   canvas.style('height', '100%');
-
-  // theCanvas = document.querySelector('canvas');
-  //smooth out the image
-  // context = theCanvas.getContext('2d');
-  // context.webkitImageSmoothingEnabled = false;
-  // context.mozImageSmoothingEnabled = false;
-  // context.imageSmoothingEnabled = false;
-
   waterObject = new Button('water', waterImage, 100, 100)
   sandObject = new Button('sand', sandImage, 100, 100)
   toiletObject = new Button('toilet', toiletImage, 100, 100)
@@ -717,28 +693,6 @@ class Food {
           return 'gone';
         }
       }
-
-      // fish moves closer to the fish food if it's hungry
-      // for (var i=0; i<fishArr.length; i++){
-      //   if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) >= 1 && fishArr[i].health <= 90 && fishArr.length >= 1 && fishArr[i].health >= 1){
-      //     if (fishArr[i].x < this.x){
-      //       fishArr[i].x += .01
-      //     }
-      //     else {
-      //       fishArr[i].x -= .01
-      //     }
-      //     if (fishArr[i].y < this.y){
-      //       fishArr[i].y += .01
-      //     }
-      //     else {
-      //       fishArr[i].y -= .01
-      //     }
-      //   }
-      //   if (dist(fishArr[i].x, fishArr[i].y, this.x, this.y) < 1){
-      //     fishArr[i].health +=2
-      //     return 'gone'
-      //   }
-      // }
 
       if (this.alpha < 0){
           return 'gone'
