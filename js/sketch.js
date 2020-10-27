@@ -2,6 +2,7 @@ var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImag
 var sandArray = []
 var waterArray = []
 var decorationArray = []
+var coinArray = []
 var foodArray = []
 var state, tempState
 var canvas;
@@ -36,6 +37,7 @@ var rockLevel = 0
 var grassLevel = 0
 var buttonArray
 var fishBeingHit = [];
+var coinArr = [];
 
 class Game{
   constructor(storeItems=[]){
@@ -254,6 +256,9 @@ class Game{
     for(var i = 0; i < decorationArray.length; i++) {
       decorationArray[i].display();
     }
+    for(var i = 0; i < coinArray.length; i++) {
+      coinArray[i].display();
+    }
     for (var i = foodArray.length-1; i >= 0; i--) {
       let check = foodArray[i].display(game.fishArr)
       if (check == 'gone'){
@@ -348,12 +353,13 @@ class Fish{
     this.imageArray = imageArray;
   }
   drawHitBox(){
+    stroke('black')
     strokeWeight(1);
     fill('rgba(0,255,0,0.1)')
     ellipse(this.x+this.hitBoxXOf, this.y+this.hitBoxYOf, this.hitBox, this.hitBox)
   }
   draw(){
-    // this.drawHitBox();
+    //this.drawHitBox();
     if(this.xMovement > 0){ //fish moving right
       image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
     }
@@ -501,6 +507,7 @@ function preload(){
   closeImg = loadImage('images/close.png');
   //fish images
   commonFishImgArr = [[loadImage('images/commonFish/commonFish1.png'), loadImage('images/commonFish/commonFish2.png')], [loadImage('images/commonFish/commonFish3.png'), loadImage('images/commonFish/commonFish4.png')]]
+  pufferFishImgArr = [[loadImage('images/pufferFish/pufferFish1.png'), loadImage('images/pufferFish/pufferFish2.png')], [loadImage('images/pufferFish/pufferFish3.png'), loadImage('images/pufferFish/pufferFish4.png')]]
   legendaryFishImgArr = [[
     loadImage('images/legendaryFish/legendaryFish1.png'),
     loadImage('images/legendaryFish/legendaryFish2.png'),
@@ -533,6 +540,7 @@ function preload(){
   toiletImage = loadImage('images/toilet.png')
   cursorImage = loadImage('images/cursor.png')
   shopImage = loadImage('images/shop.png')
+  coinImg = loadImage('images/coin.png');
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3")
   sellSound = loadSound("sounds/sell.mp3")
@@ -593,6 +601,24 @@ function draw() {
   image(game.cursor, mouseX, mouseY, 20, 20);
 }
 
+class Coin{
+  constructor(x=250, y=250){
+    this.x = x;
+    this.y = y;
+    this.size = 35;
+    this.hitBox = 40;
+  }
+  drawHitBox(){
+    stroke('black')
+    strokeWeight(1);
+    fill('rgba(0,255,0,0.1)')
+    ellipse(this.x, this.y, this.hitBox, this.hitBox);
+  }
+  display(){
+    //this.drawHitBox();
+    image(coinImg, this.x, this.y, this.size, this.size);
+  }
+}
 
 class Decoration {
   constructor(image, x, y, size=100){
@@ -618,16 +644,11 @@ class Sand {
       this.xSpeed = random(-1, 1)
       this.ySpeed = 2
       this.alpha = 255
-      this.radius = random(20, 50)
-      this.h = 36
-      this.s = 100
-      this.l = random(90, 96)
+      this.radius = random(10, 50)
   }
   display(){
       noStroke()
-      colorMode(HSL)
-      fill(this.h,this.s,this.l,this.alpha);
-      colorMode(RGB)
+      fill(255,222,173,this.alpha);
       if (this.y <= height-10){
         this.x += this.xSpeed
         this.y += this.ySpeed
@@ -737,8 +758,15 @@ function mousePressed(){
     fishBeingHit.push(0);
     let newFish = crackCommonEgg();
     let rarity = newFish[1];
-    //name width height rarity hitbox frames framedelay
-    game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
+    let type = newFish[0];
+    if(type === 'D'){
+      game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
+    }
+    else{
+      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    }
+
   }
   // ADD FISH
   else if (mouseIsPressed && state=='rareEgg' && mouseY >= 200){
