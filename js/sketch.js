@@ -7,6 +7,10 @@ var foodArray = []
 var state, tempState
 var canvas;
 
+var counter = 0;
+var maxCounter = 35;
+
+
 var waterObject;
 var sandObject;
 var rockObject;
@@ -397,8 +401,8 @@ class Fish{
       this.yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
       this.x += this.xMovement;
       this.y += this.yMovement;
-      this.x = constrain(this.x, (this.hitBoxXOf+this.width/2), (canvasWidth-(this.hitBoxXOf+this.width/2)))
-      this.y = constrain(this.y, this.height, (canvasHeight-(this.hitBoxYOf+this.height/2)))
+      this.x = constrain(this.x, (this.hitBox/2), (canvasWidth-(this.hitBox/2)) )
+      this.y = constrain(this.y, this.height, (canvasHeight-(this.hitBox/2)) )
       this.xNoiseOffset += 0.01;
       this.yNoiseOffset += 0.01;
     }
@@ -496,55 +500,76 @@ class Fish{
   }
 }
 
+function updateCounter() {
+  // increase our counter
+  counter++;
+  // maxCounter++
+
+  // use the counter to set the style on the '#progress_bar' div
+  var progress_bar = select('#progress_bar');
+  progress_bar.style('width', int(counter/maxCounter*100) + "%");
+}
+
 function preload(){
   //font
-  fishFont = loadFont('font/FISH.TTF');
+  fishFont = loadFont('font/FISH.TTF', updateCounter);
   // fish stats images
-  rarityImg = loadImage('images/rarity.png');
-  heartImg = loadImage('images/heart.png');
-  cashImg = loadImage('images/cash.png');
-  sellImg = loadImage('images/sell.png');
-  closeImg = loadImage('images/close.png');
+  rarityImg = loadImage('images/rarity.png', updateCounter);
+  heartImg = loadImage('images/heart.png', updateCounter);
+  cashImg = loadImage('images/cash.png', updateCounter);
+  sellImg = loadImage('images/sell.png', updateCounter);
+  closeImg = loadImage('images/close.png', updateCounter);
   //fish images
-  commonFishImgArr = [[loadImage('images/commonFish/commonFish1.png'), loadImage('images/commonFish/commonFish2.png')], [loadImage('images/commonFish/commonFish3.png'), loadImage('images/commonFish/commonFish4.png')]]
-  pufferFishImgArr = [[loadImage('images/pufferFish/pufferFish1.png'), loadImage('images/pufferFish/pufferFish2.png')], [loadImage('images/pufferFish/pufferFish3.png'), loadImage('images/pufferFish/pufferFish4.png')]]
-  legendaryFishImgArr = [[
-    loadImage('images/legendaryFish/legendaryFish1.png'),
-    loadImage('images/legendaryFish/legendaryFish2.png'),
-    loadImage('images/legendaryFish/legendaryFish3.png'),
-    loadImage('images/legendaryFish/legendaryFish4.png'),
-    loadImage('images/legendaryFish/legendaryFish5.png'),
-    loadImage('images/legendaryFish/legendaryFish6.png'),
+  commonFishImgArr = [[
+    loadImage('images/commonFish/commonFish1.png', updateCounter),
+    loadImage('images/commonFish/commonFish2.png', updateCounter)],
+    [loadImage('images/commonFish/commonFish3.png', updateCounter),
+    loadImage('images/commonFish/commonFish4.png', updateCounter)]]
+  pufferFishImgArr = [[
+    loadImage('images/pufferFish/pufferFish1.png', updateCounter),
+    loadImage('images/pufferFish/pufferFish2.png', updateCounter)
   ],
   [
-    loadImage('images/legendaryFish/legendaryFish7.png'),
-    loadImage('images/legendaryFish/legendaryFish8.png'),
-    loadImage('images/legendaryFish/legendaryFish9.png'),
-    loadImage('images/legendaryFish/legendaryFish10.png'),
-    loadImage('images/legendaryFish/legendaryFish11.png'),
-    loadImage('images/legendaryFish/legendaryFish12.png')
+    loadImage('images/pufferFish/pufferFish3.png', updateCounter),
+    loadImage('images/pufferFish/pufferFish4.png', updateCounter)]
+  ]
+  legendaryFishImgArr = [[
+    loadImage('images/legendaryFish/legendaryFish1.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish2.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish3.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish4.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish5.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish6.png', updateCounter),
+  ],
+  [
+    loadImage('images/legendaryFish/legendaryFish7.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish8.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish9.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish10.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish11.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish12.png', updateCounter)
   ]];
   //fish eggs
-  commonEggImage = loadImage('images/commonEgg.png');
-  rareEggImage = loadImage('images/rareEgg.png');
-  legendaryEggImage = loadImage('images/legendaryEgg.png');
+  commonEggImage = loadImage('images/commonEgg.png', updateCounter);
+  rareEggImage = loadImage('images/rareEgg.png', updateCounter);
+  legendaryEggImage = loadImage('images/legendaryEgg.png', updateCounter);
   //objects
-  rockImage = loadImage('images/rock.png')
-  waterImage = loadImage('images/water.png')
-  grassImage = loadImage('images/grass.png')
-  treasureImage = loadImage('images/treasure.png')
-  sandImage = loadImage('images/sand.png');
-  fishFoodImage = loadImage('images/fishFood/fishfood.png')
-  rareFishFoodImage = loadImage('images/fishFood/rareFishFood.png')
-  legendaryFishFoodImage = loadImage('images/fishFood/legendaryFishFood.png')
-  toiletImage = loadImage('images/toilet.png')
-  cursorImage = loadImage('images/cursor.png')
-  shopImage = loadImage('images/shop.png')
-  coinImg = loadImage('images/coin.png');
+  rockImage = loadImage('images/rock.png', updateCounter)
+  waterImage = loadImage('images/water.png', updateCounter)
+  grassImage = loadImage('images/grass.png', updateCounter)
+  treasureImage = loadImage('images/treasure.png', updateCounter)
+  sandImage = loadImage('images/sand.png', updateCounter);
+  fishFoodImage = loadImage('images/fishFood/fishfood.png', updateCounter)
+  rareFishFoodImage = loadImage('images/fishFood/rareFishFood.png', updateCounter)
+  legendaryFishFoodImage = loadImage('images/fishFood/legendaryFishFood.png', updateCounter)
+  toiletImage = loadImage('images/toilet.png', updateCounter)
+  cursorImage = loadImage('images/cursor.png', updateCounter)
+  shopImage = loadImage('images/shop.png', updateCounter)
+  coinImg = loadImage('images/coin.png', updateCounter);
   //sounds
-  waterSound = loadSound("sounds/bubbles.mp3")
-  sellSound = loadSound("sounds/sell.mp3")
-  flushSound = loadSound("sounds/flush.mp3")
+  waterSound = loadSound("sounds/bubbles.mp3", updateCounter)
+  sellSound = loadSound("sounds/sell.mp3", updateCounter)
+  flushSound = loadSound("sounds/flush.mp3", updateCounter)
 }
 
 
@@ -644,7 +669,10 @@ class Sand {
       this.xSpeed = random(-1, 1)
       this.ySpeed = 2
       this.alpha = 255
-      this.radius = random(10, 50)
+      this.radius = random(20, 50)
+      this.h = 36
+      this.s = 100
+      this.l = random(90, 95)
   }
   display(){
       noStroke()

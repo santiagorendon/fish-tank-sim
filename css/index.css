@@ -12,3 +12,22 @@ body {
   display: none;
   overflow: hidden!important;
 }
+
+
+#p5_loading {
+   width: 1000px;
+   height: 800px;
+   font-size: 20px;
+   text-align: center;
+   margin: auto;
+   margin-top: 40px;
+ }
+
+ #loading {
+   margin-bottom: 20px;
+ }
+ #progress_bar {
+   background-color: black;
+   height: 24px;
+   width: 0%;
+ }
