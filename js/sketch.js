@@ -411,7 +411,7 @@ class Fish{
     else {
       this.health = 0
       this.price = 0
-      if (this.y<= height-20){
+      if (this.y<= (canvasHeight-(this.hitBox/2))){
         this.y += 1
       }
     }
