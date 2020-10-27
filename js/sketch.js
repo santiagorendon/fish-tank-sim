@@ -618,11 +618,16 @@ class Sand {
       this.xSpeed = random(-1, 1)
       this.ySpeed = 2
       this.alpha = 255
-      this.radius = random(10, 50)
+      this.radius = random(20, 50)
+      this.h = 36
+      this.s = 100
+      this.l = random(90, 96)
   }
   display(){
       noStroke()
-      fill(255,222,173,this.alpha);
+      colorMode(HSL)
+      fill(this.h,this.s,this.l,this.alpha);
+      colorMode(RGB)
       if (this.y <= height-10){
         this.x += this.xSpeed
         this.y += this.ySpeed
