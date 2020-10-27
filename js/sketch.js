@@ -45,7 +45,7 @@ var coinArr = [];
 
 class Game{
   constructor(storeItems=[]){
-    this.scene = 'tank';
+    this.scene = 'menu';
     /* stats */
     this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
     //fish holder
@@ -70,6 +70,7 @@ class Game{
     this.flushDelay =11;
   }
   drawBalance(){
+    noStroke()
     fill(0,0,0);
     textFont(fishFont);
     textSize(20);
@@ -173,7 +174,8 @@ class Game{
       this.fishArr[i].draw();
     }
   }
-  drawTank(){
+
+  drawMainMenu(){
     game.flushCounter += 1;//counts between flushes
     // FILL TANK
     drawWater();
@@ -192,7 +194,22 @@ class Game{
       var drop = new Water(mouseX, mouseY);
       waterArray.push(drop)
     }
+    for (var i = waterArray.length-1; i >= 0; i--) {
+      let check = waterArray[i].display()
+      if (check == 'gone'){
+        waterArray.splice(i, 1)
+        i-=1
+      }}
+      // displayButtons()
+      displayTankWalls()
+      waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
+      if (waterLevelMapped==100){
+        game.scene = 'tank'
+      }
 
+  }
+  drawTank(){
+    background(254,254,255);
     // ADD SAND
     if (mouseIsPressed && state=='sand' && mouseY >= 200){
       var tempSand = new Sand(mouseX, mouseY)
@@ -250,13 +267,8 @@ class Game{
     for (var i = sandArray.length-1; i >= 0; i--) {
       sandArray[i].display()
     }
-    for (var i = waterArray.length-1; i >= 0; i--) {
-      let check = waterArray[i].display()
-      if (check == 'gone'){
-        waterArray.splice(i, 1)
-        i-=1
-      }
-    }
+
+
     for(var i = 0; i < decorationArray.length; i++) {
       decorationArray[i].display();
     }
@@ -449,10 +461,7 @@ class Fish{
     image(cashImg, game.stats.x+40, game.stats.y+210, 70, 70);
     text(`${this.price}`, game.stats.x+129, game.stats.y+201);
 
-    if (this.alive){
-      image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
-
-    }
+    image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
 
     //add event listeners
     this.isClosed();
@@ -464,7 +473,7 @@ class Fish{
     let leftOfSell = mouseX < (game.stats.x+game.stats.x+game.stats.w)/2+10  -25;
     let rightOfSell = mouseX > (game.stats.x+game.stats.x+game.stats.w)/2+10+150 -132;
     let isHit = (!higherThanSell && !lowerThanSell && !leftOfSell && !rightOfSell);
-    if(mouseIsPressed && isHit && this.alive){
+    if(mouseIsPressed && isHit){
       //increment price
       game.balance += this.price;
       //remove fish
@@ -624,6 +633,9 @@ function draw() {
   }
   else if(game.scene === "store"){
       game.drawStore();
+  }
+  else if (game.scene === "menu"){
+    game.drawMainMenu();
   }
   noCursor();
   image(game.cursor, mouseX, mouseY, 20, 20);
