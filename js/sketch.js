@@ -353,7 +353,7 @@ class Fish{
     ellipse(this.x+this.hitBoxXOf, this.y+this.hitBoxYOf, this.hitBox, this.hitBox)
   }
   draw(){
-    //this.drawHitBox();
+    // this.drawHitBox();
     if(this.xMovement > 0){ //fish moving right
       image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
     }
@@ -391,8 +391,8 @@ class Fish{
       this.yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
       this.x += this.xMovement;
       this.y += this.yMovement;
-      this.x = constrain(this.x, this.width, width-this.width)
-      this.y = constrain(this.y, this.height, height)
+      this.x = constrain(this.x, (this.hitBoxXOf+this.width/2), (canvasWidth-(this.hitBoxXOf+this.width/2)))
+      this.y = constrain(this.y, this.height, (canvasHeight-(this.hitBoxYOf+this.height/2)))
       this.xNoiseOffset += 0.01;
       this.yNoiseOffset += 0.01;
     }
@@ -602,7 +602,7 @@ class Decoration {
     this.image = image;
   }
   display(){
-    image(this.image, this.x, this.y, this.size, this.size)
+    image(this.image, this.x, this.y, this.size, this.size);
     if (this.y < (height-(this.size/2))){
       this.y += 1
     }
@@ -798,7 +798,6 @@ class ToolBar{
           rect(this.buttonX, this.buttonY, 50, 50);
         }
         image(buttonArray[i].image, this.buttonX+25, this.buttonY+25, 30, 30)
-
         noStroke()
         fill(0)
         textSize(15);
@@ -817,7 +816,7 @@ class ToolBar{
             return 'cursor';
           }
           game.cursor = buttonArray[i].image;
-          return buttonArray[i].name
+            state = buttonArray[i].name
         }
       }
   }
@@ -825,10 +824,7 @@ class ToolBar{
 
 function displayButtons(){
     var toolBar = new ToolBar(mouseX, mouseY)
-    tempState = toolBar.draw(buttonArray, mouseX, mouseY);
-    if (tempState){
-      state = tempState
-    }
+    toolBar.draw(buttonArray, mouseX, mouseY);
 }
 
 class Button{
