@@ -597,7 +597,7 @@ class Rock {
   }
   display(){
     image(rockImage, this.x, this.y, 100, 100)
-    if (this.y < (height-50)){
+    if (this.y < (height-25)){
       this.y += 1
     }
   }
