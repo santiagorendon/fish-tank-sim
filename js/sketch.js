@@ -351,7 +351,7 @@ class Fish{
     ellipse(this.x+this.hitBoxXOf, this.y+this.hitBoxYOf, this.hitBox, this.hitBox)
   }
   draw(){
-    // this.drawHitBox();
+    this.drawHitBox();
     if(this.xMovement > 0){ //fish moving right
       image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
     }
@@ -389,8 +389,8 @@ class Fish{
       this.yMovement = map( noise(this.yNoiseOffset), 0, 1, -1, 1);
       this.x += this.xMovement;
       this.y += this.yMovement;
-      this.x = constrain(this.x, (this.hitBoxXOf+this.width/2), (canvasWidth-(this.hitBoxXOf+this.width/2)))
-      this.y = constrain(this.y, this.height, (canvasHeight-(this.hitBoxYOf+this.height/2)))
+      this.x = constrain(this.x, (this.hitBox/2), (canvasWidth-(this.hitBox/2)) )
+      this.y = constrain(this.y, this.height, (canvasHeight-(this.hitBox/2)) )
       this.xNoiseOffset += 0.01;
       this.yNoiseOffset += 0.01;
     }
@@ -615,7 +615,7 @@ class Sand {
       this.radius = random(20, 50)
       this.h = 36
       this.s = 100
-      this.l = random(90, 96)
+      this.l = random(90, 95)
   }
   display(){
       noStroke()
