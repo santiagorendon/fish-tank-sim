@@ -165,6 +165,7 @@ class Game{
   }
   isStoreClosed(){
     if((dist(mouseX, mouseY, this.storeCloseX, this.storeCloseY) <= this.storeCloseD/2) && mouseIsPressed){
+      state = 'cursor';
       this.scene = 'tank';
     }
   }
@@ -262,6 +263,10 @@ class Game{
     }
     for(var i = 0; i < coinArray.length; i++) {
       coinArray[i].display();
+      if(coinArray[i].age >= coinArray[i].lifeSpan){
+        coinArray.splice(i, 1)
+        i -= 1;
+      }
     }
     for (var i = foodArray.length-1; i >= 0; i--) {
       let check = foodArray[i].display(game.fishArr)
@@ -561,6 +566,7 @@ function preload(){
   waterImage = loadImage('images/water.png', updateCounter)
   grassImage = loadImage('images/grass.png', updateCounter)
   treasureImage = loadImage('images/treasure.png', updateCounter)
+  barrelImage = loadImage('images/barrel.png', updateCounter);
   sandImage = loadImage('images/sand.png', updateCounter);
   fishFoodImage = loadImage('images/fishFood/fishfood.png', updateCounter)
   rareFishFoodImage = loadImage('images/fishFood/rareFishFood.png', updateCounter)
@@ -571,8 +577,11 @@ function preload(){
   coinImg = loadImage('images/coin.png', updateCounter);
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3", updateCounter)
+  waterSound.setVolume(0.3);
   sellSound = loadSound("sounds/sell.mp3", updateCounter)
   flushSound = loadSound("sounds/flush.mp3", updateCounter)
+  coinSound = loadSound("sounds/coin.wav", updateCounter)
+  coinSound.setVolume(0.2);
 }
 
 
@@ -589,6 +598,7 @@ function setup() {
   rockObject = new Button('rock', rockImage, 3, 3)
   grassObject = new Button('grass', grassImage, 3, 3)
   treasureObject = new Button('treasure', treasureImage, 1, 1)
+  barrelObject = new Button('barrel', barrelImage, 1, 1, 85)
   commonEggObject = new Button('commonEgg', commonEggImage, 1, 1)
   rareEggObject = new Button('rareEgg', rareEggImage, 1, 1)
   legendaryEggObject = new Button('legendaryEgg', legendaryEggImage, 1, 1)
@@ -610,8 +620,8 @@ function setup() {
                     {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
                     {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
                     {name:'Sand', obj: sandObject, img: sandImage, price: '15', soldOut: false},
+                    {name:'Barrel', obj: barrelObject, img: barrelImage, price: '15', soldOut: false},
                     {name:'Treasure', obj: treasureObject, img: treasureImage, price: '15', soldOut: false}
-
                   ]
   game = new Game(storeItems);
   noiseDetail(24);
@@ -635,6 +645,10 @@ class Coin{
     this.y = y;
     this.size = 35;
     this.hitBox = 40;
+    this.ySpeed = 0.4;
+    this.age = 0;
+    this.lifeSpan = 250;
+    this.value = 5;
   }
   drawHitBox(){
     stroke('black')
@@ -643,8 +657,20 @@ class Coin{
     ellipse(this.x, this.y, this.hitBox, this.hitBox);
   }
   display(){
+    this.age += 1;
+    if(this.y <= (height-this.size)){
+      this.y += this.ySpeed;
+    }
     //this.drawHitBox();
     image(coinImg, this.x, this.y, this.size, this.size);
+    this.isClicked();
+  }
+  isClicked(){
+    if(mouseIsPressed && dist(mouseX, mouseY, this.x, this.y) < (this.hitBox/2) && game.cursor === cursorImage){
+      this.age = this.lifeSpan;
+      coinSound.play()
+      game.balance += 5;
+    }
   }
 }
 
@@ -654,8 +680,17 @@ class Decoration {
     this.y = y
     this.size = size;
     this.image = image;
+    this.counter = 0;
+    this.coinDelay = 350;
   }
   display(){
+    if(this.image === treasureImage){
+      this.counter += 1;
+      if(this.counter >= this.coinDelay){
+        coinArray.push(new Coin(this.x-15, this.y-15));
+        this.counter = 0;
+      }
+    }
     image(this.image, this.x, this.y, this.size, this.size);
     if (this.y < (height-(this.size/2))){
       this.y += 1
@@ -780,8 +815,8 @@ function displayEnvironmentalStats(){
 
 
 function mousePressed(){
-  if((state == 'grass' || state == 'rock' || state === 'treasure') && mouseY >= 200){//decoration
-    decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY));
+  if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel') && mouseY >= 200){//decoration
+    decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size));
     window[state+"Object"].quantity -= 1;
   }
   // ADD FISH
@@ -892,11 +927,12 @@ function displayButtons(){
 }
 
 class Button{
-  constructor(name, image, quantity=0, max=0){
+  constructor(name, image, quantity=0, max=0, size=100){
     this.name = name;
     this.image = image;
     this.quantity = quantity;
     this.max = max;
     this.originalMax = max;
+    this.size=size;
   }
 }
