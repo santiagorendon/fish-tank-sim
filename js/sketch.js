@@ -831,7 +831,6 @@ function displayButtons(){
     }
 }
 
-
 class Button{
   constructor(name, image, quantity=0, max=0){
     this.name = name;
