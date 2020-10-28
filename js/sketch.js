@@ -248,6 +248,7 @@ class Game{
   drawTank(){
     game.flushCounter += 1;
     backgroundFill(100,200,255);
+    drawFloor();
     // ADD SAND
     if (mouseIsPressed && state=='sand' && mouseY >= 200){
       var tempSand = new Sand(mouseX, mouseY)
@@ -640,6 +641,7 @@ function preload(){
   grassImage = loadImage('images/grass.png', updateCounter)
   treasureImage = loadImage('images/treasure.png', updateCounter)
   barrelImage = loadImage('images/barrel.png', updateCounter);
+  logSignImage = loadImage('images/logSign.png', updateCounter);
   sandImage = loadImage('images/sand.png', updateCounter);
   fishFoodImage = loadImage('images/fishFood/fishfood.png', updateCounter)
   rareFishFoodImage = loadImage('images/fishFood/rareFishFood.png', updateCounter)
@@ -672,6 +674,7 @@ function setup() {
   grassObject = new Button('grass', grassImage, 3, 3, 70, -10);
   treasureObject = new Button('treasure', treasureImage, 1, 1, 100, 3)
   barrelObject = new Button('barrel', barrelImage, 1, 1, 85, -10)
+  logSignObject = new Button('logSign', logSignImage, 1, 1, 120, -20)
   commonEggObject = new Button('commonEgg', commonEggImage, 1, 1)
   rareEggObject = new Button('rareEgg', rareEggImage, 1, 1)
   legendaryEggObject = new Button('legendaryEgg', legendaryEggImage, 1, 1)
@@ -687,14 +690,15 @@ function setup() {
                     {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '15', soldOut: false},
                     {name:'Legendary Food', img: legendaryFishFoodImage, obj: legendaryFishFoodObject, price: '15', soldOut: false},
                     {name:'Toilet', obj: toiletObject, img: toiletImage, price: '15', soldOut: false},
+                    {name:'Treasure', obj: treasureObject, img: treasureImage, price: '15', soldOut: false},
                     {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '15', soldOut: false},
                     {name:'Rare Egg', obj: rareEggObject, img: rareEggImage, price: '15', soldOut: false},
                     {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '15', soldOut: false},
                     {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
                     {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
                     {name:'Sand', obj: sandObject, img: sandImage, price: '15', soldOut: false},
-                    {name:'Barrel', obj: barrelObject, img: barrelImage, price: '15', soldOut: false},
-                    {name:'Treasure', obj: treasureObject, img: treasureImage, price: '15', soldOut: false}
+                    {name:'Log Sign', obj: logSignObject, img: logSignImage, price: '15', soldOut: false},
+                    {name:'Barrel', obj: barrelObject, img: barrelImage, price: '15', soldOut: false}
                   ]
   game = new Game(storeItems);
   noiseDetail(24);
@@ -893,7 +897,7 @@ function displayEnvironmentalStats(){
 
 
 function mousePressed(){
-  if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel') && mouseY >= 200){//decoration
+  if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && mouseY >= 200){//decoration
     console.log(window[state+"Object"].yOffset)
     decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size, window[state+"Object"].yOffset));
     window[state+"Object"].quantity -= 1;
@@ -948,7 +952,7 @@ function backgroundFill(r, g, b, a){
 function drawFloor(){
   stroke('black')
   strokeWeight(1);
-  fill('grey')
+  fill('rgba(105,103,100,0.6)')
   rect(0, canvasHeight-38, canvasWidth, canvasHeight);
 }
 
@@ -1009,7 +1013,8 @@ class ToolBar{
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
           if(buttonArray[i].name === 'shop'){
             game.cursor = cursorImage;
-            game.scene='store';
+            state = 'cursor';
+            game.scene = 'store';
             return 'cursor';
           }
           game.cursor = buttonArray[i].image;
