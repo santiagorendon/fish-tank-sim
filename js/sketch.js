@@ -339,6 +339,7 @@ function breedFish(rarity1, rarity2){
 
 class Fish{
   constructor(type, imageArray, w, h, rarity, frameNum=2, frameDelay=25, hitBox, xOf=0, yOf=0){
+    this.frameDirection = 1;
     this.type = type;
     //stats
     this.rarity = rarity;
@@ -371,11 +372,13 @@ class Fish{
     ellipse(this.x+this.hitBoxXOf, this.y+this.hitBoxYOf, this.hitBox, this.hitBox)
   }
   draw(){
-    this.drawHitBox();
+    //this.drawHitBox();
     if(this.xMovement > 0){ //fish moving right
+      console.log(this.frame);
       image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
     }
     else{//fish moving left
+      console.log(this.frame);
       image(this.imageArray[0][this.frame], this.x, this.y, this.width, this.height);
     }
 
