@@ -705,7 +705,8 @@ function setup() {
 }
 
 function draw() {
-  imageMode(CENTER)
+  imageMode(CENTER);
+  //draw game scene
   if(game.scene === "tank"){
       game.drawTank();
   }
@@ -715,6 +716,7 @@ function draw() {
   else if (game.scene === "menu"){
     game.drawMainMenu();
   }
+  //add custom cursor
   noCursor();
   image(game.cursor, mouseX, mouseY, 20, 20);
 }
