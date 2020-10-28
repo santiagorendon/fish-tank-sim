@@ -588,6 +588,19 @@ function preload(){
     loadImage('images/pufferFish/pufferFish4.png', updateCounter)
     ]
   ]
+  angelFishImgArr = [[
+    loadImage('images/angelFish/angelFish1.png', updateCounter),
+    loadImage('images/angelFish/angelFish2.png', updateCounter),
+    loadImage('images/angelFish/angelFish3.png', updateCounter),
+    loadImage('images/angelFish/angelFish4.png', updateCounter)
+    ],
+    [
+    loadImage('images/angelFish/angelFish5.png', updateCounter),
+    loadImage('images/angelFish/angelFish6.png', updateCounter),
+    loadImage('images/angelFish/angelFish7.png', updateCounter),
+    loadImage('images/angelFish/angelFish8.png', updateCounter)
+    ]
+  ]
   sharkImgArr = [[
     loadImage('images/shark/shark1.png', updateCounter),
     loadImage('images/shark/shark2.png', updateCounter),
@@ -889,9 +902,9 @@ function mousePressed(){
   else if (mouseIsPressed && state=='commonEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackCommonEgg();
+    let type = newFish[0];
     let rarity = newFish[1];
     //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
-    let type = newFish[0];
     if(type === 'D'){
       game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
     }
@@ -904,14 +917,20 @@ function mousePressed(){
   else if (mouseIsPressed && state=='rareEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackRareEgg();
+    let type = newFish[0];
     let rarity = newFish[1];
-    game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    if(type === 'C'){
+      game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
+    }
+    else{
+      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    }
   }
   else if (mouseIsPressed && state=='legendaryEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackLegendaryEgg();
-    let rarity = newFish[1];
     let type = newFish[0];
+    let rarity = newFish[1];
     if(type === 'A'){
       game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
     }
@@ -935,7 +954,7 @@ function drawFloor(){
 
 // MAKE THE WATER BOUNCE
 function drawWater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
-  //backgroundFill(254,254,255);
+  backgroundFill(254,254,255);
   fill(100,200,255,200);
   stroke(254,254,255);
   beginShape();  // We are going to draw a polygon out of the wave points
