@@ -175,6 +175,8 @@ class Game{
     }
   }
   drawTank(){
+    backgroundFill(255,255,255);
+    drawFloor();
     game.flushCounter += 1;//counts between flushes
     // FILL TANK
     drawWater();
@@ -193,6 +195,7 @@ class Game{
       var drop = new Water(mouseX, mouseY);
       waterArray.push(drop)
     }
+
 
     // ADD SAND
     if (mouseIsPressed && state=='sand' && mouseY >= 200){
@@ -368,7 +371,7 @@ class Fish{
     ellipse(this.x+this.hitBoxXOf, this.y+this.hitBoxYOf, this.hitBox, this.hitBox)
   }
   draw(){
-    //this.drawHitBox();
+    this.drawHitBox();
     if(this.xMovement > 0){ //fish moving right
       image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
     }
@@ -596,9 +599,9 @@ function setup() {
   sandObject = new Button('sand', sandImage, 100, 100)
   toiletObject = new Button('toilet', toiletImage, 100, 100)
   rockObject = new Button('rock', rockImage, 3, 3)
-  grassObject = new Button('grass', grassImage, 3, 3)
-  treasureObject = new Button('treasure', treasureImage, 1, 1)
-  barrelObject = new Button('barrel', barrelImage, 1, 1, 85)
+  grassObject = new Button('grass', grassImage, 3, 3, 70, -10);
+  treasureObject = new Button('treasure', treasureImage, 1, 1, 100, 3)
+  barrelObject = new Button('barrel', barrelImage, 1, 1, 85, -10)
   commonEggObject = new Button('commonEgg', commonEggImage, 1, 1)
   rareEggObject = new Button('rareEgg', rareEggImage, 1, 1)
   legendaryEggObject = new Button('legendaryEgg', legendaryEggImage, 1, 1)
@@ -675,13 +678,14 @@ class Coin{
 }
 
 class Decoration {
-  constructor(image, x, y, size=100){
+  constructor(image, x, y, size=100, yOffset=0){
     this.x = x
-    this.y = y
+    this.y = y;
     this.size = size;
     this.image = image;
     this.counter = 0;
     this.coinDelay = 350;
+    this.yOffset = yOffset; //how extra far to the bottom
   }
   display(){
     if(this.image === treasureImage){
@@ -692,7 +696,7 @@ class Decoration {
       }
     }
     image(this.image, this.x, this.y, this.size, this.size);
-    if (this.y < (height-(this.size/2))){
+    if (this.y < (height-(this.size/2))+this.yOffset){
       this.y += 1
     }
   }
@@ -707,7 +711,8 @@ class Sand {
       this.xSpeed = random(-1, 1)
       this.ySpeed = 2
       this.alpha = 255
-      this.radius = random(20, 50)
+      // this.radius = random(20, 50)
+      this.radius = 73;
       this.h = 36
       this.s = 100
       this.l = random(90, 95)
@@ -816,7 +821,8 @@ function displayEnvironmentalStats(){
 
 function mousePressed(){
   if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel') && mouseY >= 200){//decoration
-    decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size));
+    console.log(window[state+"Object"].yOffset)
+    decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size, window[state+"Object"].yOffset));
     window[state+"Object"].quantity -= 1;
   }
   // ADD FISH
@@ -854,9 +860,16 @@ function backgroundFill(r, g, b){
   rect(0, 0, canvasWidth, canvasHeight);
 }
 
+function drawFloor(){
+  stroke('black')
+  strokeWeight(1);
+  fill('grey')
+  rect(0, canvasHeight-38, canvasWidth, canvasHeight);
+}
+
 // MAKE THE WATER BOUNCE
 function drawWater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
-  backgroundFill(254,254,255);
+  //backgroundFill(254,254,255);
   fill(100,200,255,200);
   stroke(254,254,255);
   beginShape();  // We are going to draw a polygon out of the wave points
@@ -927,7 +940,8 @@ function displayButtons(){
 }
 
 class Button{
-  constructor(name, image, quantity=0, max=0, size=100){
+  constructor(name, image, quantity=0, max=0, size=100, yOffset=0){
+    this.yOffset = yOffset;
     this.name = name;
     this.image = image;
     this.quantity = quantity;
