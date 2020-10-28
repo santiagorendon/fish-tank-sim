@@ -539,10 +539,24 @@ function preload(){
   pufferFishImgArr = [[
     loadImage('images/pufferFish/pufferFish1.png', updateCounter),
     loadImage('images/pufferFish/pufferFish2.png', updateCounter)
-  ],
-  [
+    ],
+    [
     loadImage('images/pufferFish/pufferFish3.png', updateCounter),
-    loadImage('images/pufferFish/pufferFish4.png', updateCounter)]
+    loadImage('images/pufferFish/pufferFish4.png', updateCounter)
+    ]
+  ]
+  sharkImgArr = [[
+    loadImage('images/shark/shark1.png', updateCounter),
+    loadImage('images/shark/shark2.png', updateCounter),
+    loadImage('images/shark/shark3.png', updateCounter),
+    loadImage('images/shark/shark4.png', updateCounter)
+    ],
+    [
+    loadImage('images/shark/shark5.png', updateCounter),
+    loadImage('images/shark/shark6.png', updateCounter),
+    loadImage('images/shark/shark7.png', updateCounter),
+    loadImage('images/shark/shark8.png', updateCounter)
+    ]
   ]
   legendaryFishImgArr = [[
     loadImage('images/legendaryFish/legendaryFish1.png', updateCounter),
@@ -851,7 +865,13 @@ function mousePressed(){
     fishBeingHit.push(0);
     let newFish = crackLegendaryEgg();
     let rarity = newFish[1];
-    game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+    let type = newFish[0];
+    if(type === 'A'){
+      game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
+    }
+    else{
+      game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+    }
   }
 }
 
