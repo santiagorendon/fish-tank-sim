@@ -68,6 +68,15 @@ class Game{
     //flush
     this.flushCounter = 0;
     this.flushDelay =11;
+    //menu text
+    this.angle = 0;
+    this.rotationSpeed = 0.35;
+    this.rotationMax = 10;
+    this.subtitleColor = [random(0,255),random(0,255),random(0,255)];
+    this.textSize = 32;
+    this.textSizeMin= 30;
+    this.textSizeMax = 35;
+    this.textSizeIncSpeed = 0.1;
   }
   drawBalance(){
     noStroke()
@@ -80,7 +89,7 @@ class Game{
   drawStore(){
     strokeWeight(1);
     this.counter += 1;
-    backgroundFill(214, 253, 255);
+    backgroundFill(214, 253, 255,200);
     fill(0, 0, 0);
     textAlign(LEFT, TOP)
    .textSize(80);
@@ -174,9 +183,32 @@ class Game{
       this.fishArr[i].draw();
     }
   }
-
+  drawMenuText(){
+    textFont(fishFont)
+    strokeWeight(1);
+    textAlign(CENTER, CENTER);
+    fill('black')
+    textSize(75);
+    text('Fish Tank Simulator', canvasWidth/2, canvasHeight/2-40);
+    if(this.textSize >= this.textSizeMax || this.textSizeMin >= this.textSize){
+      this.textSizeIncSpeed = -this.textSizeIncSpeed;
+      this.textCounter = 0;
+    }
+    this.textSize += this.textSizeIncSpeed;
+    textSize(this.textSize);
+    push();
+    translate(canvasWidth/2, canvasHeight/2+100)
+    rotate(radians(this.angle));
+    fill(this.subtitleColor[0], this.subtitleColor[1], this.subtitleColor[2]);
+    text('*Fill Tank to Start Game*', 0, 0);
+    this.angle += this.rotationSpeed;
+    pop();
+    if(this.angle > this.rotationMax || this.angle < -this.rotationMax){
+      this.subtitleColor = [random(0,255),random(0,255),random(0,255)];
+      this.rotationSpeed = -this.rotationSpeed;
+    }
+  }
   drawMainMenu(){
-    game.flushCounter += 1;//counts between flushes
     // FILL TANK
     drawWater();
     if (mouseIsPressed && state == 'water' && mouseY >= 200){
@@ -199,17 +231,22 @@ class Game{
       if (check == 'gone'){
         waterArray.splice(i, 1)
         i-=1
-      }}
-      // displayButtons()
-      displayTankWalls()
-      waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
-      if (waterLevelMapped==100){
-        game.scene = 'tank'
       }
+    }
+    // displayButtons()
+    displayTankWalls()
+    waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
+    if (waterLevelMapped==100){
+      game.state = cursor;
+      game.cursor = cursorImage;
+      game.scene = 'tank'
+    }
+    this.drawMenuText();
 
   }
   drawTank(){
-    background(254,254,255);
+    game.flushCounter += 1;
+    backgroundFill(100,200,255);
     // ADD SAND
     if (mouseIsPressed && state=='sand' && mouseY >= 200){
       var tempSand = new Sand(mouseX, mouseY)
@@ -607,7 +644,7 @@ function setup() {
 
   cursorObject = new Button('cursor', cursorImage, 1000)
   shopObject = new Button('shop', shopImage, 1000)
-  buttonArray = [cursorObject, shopObject, waterObject, commonEggObject]
+  buttonArray = [cursorObject, shopObject, commonEggObject]
 
   let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '15', soldOut: false},
                     {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '15', soldOut: false},
@@ -826,8 +863,8 @@ function mousePressed(){
   }
 }
 
-function backgroundFill(r, g, b){
-  fill(r, g, b);
+function backgroundFill(r, g, b, a){
+  fill(r, g, b, a);
   rect(0, 0, canvasWidth, canvasHeight);
 }
 
