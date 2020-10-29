@@ -1,4 +1,20 @@
 /* my custom css */
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background-color: rgba(0,0,0,.5);
+  -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
+.table-responsive{
+  overflow-y: scroll;
+  height:400px;
+}
+
 #sketch1 {
         width: 100vw;
         height: 500px;

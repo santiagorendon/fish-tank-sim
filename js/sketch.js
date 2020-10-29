@@ -24,6 +24,7 @@ var rareFishFoodObject;
 var legendaryFishFoodObject;
 var cursorObject;
 var shopObject;
+var breedObject;
 var toiletObject;
 
 
@@ -45,9 +46,8 @@ var coinArr = [];
 
 class Game{
   constructor(storeItems=[]){
-    this.scene = 'tank';
-    /* stats */
-    this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
+    this.scene = 'menu';
+    //this.scene = 'tank';
     //fish holder
     this.fishArr = [];
     this.balance = 150;
@@ -66,10 +66,117 @@ class Game{
     this.buyDelay = 11;
     this.cursor = waterImage;
     //flush
-    this.flushCounter = 0;
-    this.flushDelay =11;
+    this.clickCounter = 0;
+    this.clickDelay =11;
+    //menu text
+    this.angle = 0;
+    this.rotationSpeed = 0.35;
+    this.rotationMax = 10;
+    this.subtitleColor = [random(0,255),random(0,255),random(0,255)];
+    this.textSize = 32;
+    this.textSizeMin= 30;
+    this.textSizeMax = 35;
+    this.textSizeIncSpeed = 0.1;
+    /* stats vars*/
+    this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
+    //breed stats vars
+    this.breedStats = {background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)', x: 658, y:5, w: 337, h: 236}
+    this.displayBreed = false;
+    let rarity =80;
+    // this.parent1 = new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60)
+    // this.parent2 = new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85)
+    this.parent1 = 0;
+    this.parent2 = 0;
+    this.lastParent = 0;
+  }
+  drawBreedStats(){
+    textAlign(CENTER, CENTER);
+    let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
+    let middleX = game.breedStats.x+(game.breedStats.w/2);
+    let middleY = (game.breedStats.y+game.breedStats.h)/2;
+    //background
+    fill(game.breedStats.background);
+    strokeWeight(1);
+    rect(game.breedStats.x ,game.breedStats.y ,game.breedStats.w ,game.breedStats.h );
+    //CLOSE Button
+    image(closeImg, game.breedStats.x+game.breedStats.w-12, game.breedStats.y+15, 20, 20);
+    this.breedIsClosed();
+
+    if(alreadyOwned){
+      fill('black')
+      textSize(20);
+      image(mysteryEggImage, middleX, middleY-20, 100, 100);
+      text('Please hatch your current egg\nbefore you breed again.', middleX ,middleY+60)
+      return
+    }
+    fill('black')
+    //draw parent 1
+    if(this.parent1){
+      textSize(30);
+      text(this.parent1.type, (game.breedStats.x+middleX)/2, middleY-75);
+      image(this.parent1.imageArray[1][0], (game.breedStats.x+middleX)/2-this.parent1.hitBoxXOf, middleY-15-this.parent1.hitBoxYOf, this.parent1.width, this.parent1.height);
+      image(rarityImg, (game.breedStats.x+middleX)/2-55, middleY+65, 80, 80);
+      fill(game.breedStats.bar);
+      let parent1RarityW = map(this.parent1.rarity, 0, 100, 0, 92);
+      rect(game.breedStats.x+50, middleY+53, parent1RarityW, 25);
+      fill(255,255,255,0);
+      rect(game.breedStats.x+50, middleY+53, 92, 25);
+      fill(0, 0, 0);
+      textSize(20);
+      text(`(${this.parent1.rarity}/100)`, (game.breedStats.x+middleX)/2+15, middleY+65);
+    }
+    //draw parent 2 and heart
+    if(this.parent2){
+      //breed button
+      textSize(20);
+      text('Breed', middleX ,middleY+20)
+      image(heartImg, middleX+3, middleY, 100, 100);
+      textSize(30);
+      text(this.parent2.type, (middleX+canvasWidth)/2, middleY-75);
+
+      image(this.parent2.imageArray[0][0], (middleX+canvasWidth)/2-this.parent2.hitBoxXOf, middleY-15-this.parent2.hitBoxYOf, this.parent2.width, this.parent2.height);
+      image(rarityImg, (middleX+canvasWidth)/2-55, middleY+65, 80, 80);
+      fill(game.breedStats.bar);
+      let parent2RarityW = map(this.parent2.rarity, 0, 100, 0, 92);
+      rect(middleX+50, middleY+53, parent2RarityW, 25);
+      fill(255,255,255,0);
+      rect(middleX+50, middleY+53, 92, 25);
+      fill(0, 0, 0);
+      textSize(20);
+      text(`(${this.parent2.rarity}/100)`, (middleX+canvasWidth)/2+15, middleY+65);
+    }
+    else{
+      text('Please select\n another parent',  (middleX+canvasWidth)/2, middleY)
+      fill('black');
+      line(middleX, game.breedStats.y,middleX ,game.breedStats.y+game.breedStats.h);
+
+    }
+
+
+    textAlign(CENTER, TOP);
+    this.breedIsPressed(middleX, middleY);
+  }
+  breedIsPressed(middleX, middleY){
+    if(mouseIsPressed && dist(mouseX, mouseY, middleX, middleY-5) <= 20){
+      if(this.parent1.alive && this.parent2.alive){
+        createMysteryEgg(this.parent1.rarity, this.parent1.rarity);
+      }
+      this.parent1 = 0;
+      this.parent2 = 0;
+      this.lastParent = 0;
+      this.displayBreed = false;
+    }
+  }
+  breedIsClosed(){
+    if(mouseIsPressed && dist(mouseX, mouseY, game.breedStats.x+game.breedStats.w-12, game.breedStats.y+15) < 10){
+      this.parent1 = 0;
+      this.parent2 = 0;
+      this.lastParent = 0;
+      this.displayBreed = false;
+    }
   }
   drawBalance(){
+    noStroke()
     fill(0,0,0);
     textFont(fishFont);
     textSize(20);
@@ -79,7 +186,7 @@ class Game{
   drawStore(){
     strokeWeight(1);
     this.counter += 1;
-    backgroundFill(214, 253, 255);
+    backgroundFill(214, 253, 255,200);
     fill(0, 0, 0);
     textAlign(LEFT, TOP)
    .textSize(80);
@@ -165,6 +272,7 @@ class Game{
   }
   isStoreClosed(){
     if((dist(mouseX, mouseY, this.storeCloseX, this.storeCloseY) <= this.storeCloseD/2) && mouseIsPressed){
+      state = 'cursor';
       this.scene = 'tank';
     }
   }
@@ -173,8 +281,32 @@ class Game{
       this.fishArr[i].draw();
     }
   }
-  drawTank(){
-    game.flushCounter += 1;//counts between flushes
+  drawMenuText(){
+    textFont(fishFont)
+    strokeWeight(1);
+    textAlign(CENTER, CENTER);
+    fill('black')
+    textSize(75);
+    text('Fish Tank Simulator', canvasWidth/2, canvasHeight/2-40);
+    if(this.textSize >= this.textSizeMax || this.textSizeMin >= this.textSize){
+      this.textSizeIncSpeed = -this.textSizeIncSpeed;
+      this.textCounter = 0;
+    }
+    this.textSize += this.textSizeIncSpeed;
+    textSize(this.textSize);
+    push();
+    translate(canvasWidth/2, canvasHeight/2+100)
+    rotate(radians(this.angle));
+    fill(this.subtitleColor[0], this.subtitleColor[1], this.subtitleColor[2]);
+    text('*Fill Tank to Start Game*', 0, 0);
+    this.angle += this.rotationSpeed;
+    pop();
+    if(this.angle > this.rotationMax || this.angle < -this.rotationMax){
+      this.subtitleColor = [random(0,255),random(0,255),random(0,255)];
+      this.rotationSpeed = -this.rotationSpeed;
+    }
+  }
+  drawMainMenu(){
     // FILL TANK
     drawWater();
     if (mouseIsPressed && state == 'water' && mouseY >= 200){
@@ -192,7 +324,34 @@ class Game{
       var drop = new Water(mouseX, mouseY);
       waterArray.push(drop)
     }
+    for (var i = waterArray.length-1; i >= 0; i--) {
+      let check = waterArray[i].display()
+      if (check == 'gone'){
+        waterArray.splice(i, 1)
+        i-=1
+      }
+    }
+    // displayButtons()
+    displayTankWalls()
+    waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
+    if (waterLevelMapped==100){
+      game.state = cursor;
+      game.cursor = cursorImage;
+      game.scene = 'tank'
+    }
+    this.drawMenuText();
 
+  }
+  drawTank(){
+    let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
+    if(alreadyOwned){
+      if (frameCount % 60 == 0 && mysteryEggObject.hatchTimer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
+        mysteryEggObject.hatchTimer -= 1;
+      }
+    }
+    game.clickCounter += 1;
+    backgroundFill(100,200,255);
+    drawFloor();
     // ADD SAND
     if (mouseIsPressed && state=='sand' && mouseY >= 200){
       var tempSand = new Sand(mouseX, mouseY)
@@ -220,11 +379,32 @@ class Game{
       if((game.cursor === cursorImage || game.cursor === fishFoodImage || game.cursor === rareFishFoodImage || game.cursor === legendaryFishFoodImage)){
         game.stats.displayIndex = fishHitIndex; //display stats
       }
+      else if(game.cursor === breedImage && game.clickCounter  >= this.clickDelay && game.fishArr[fishHitIndex].alive){
+        this.clickCounter = 0;
+        //only one parent is chosen and u cant choose same parent twice
+        if(game.parent1 !== game.fishArr[fishHitIndex] && (game.parent1 && !game.parent2)){
+          this.lastParent = 2;
+          game.parent2 = game.fishArr[fishHitIndex];
+        }
+        //you cant choose same parent twice both parents chosen or only one chosen
+        else if((game.parent1 !== game.fishArr[fishHitIndex] && game.parent2 !== game.fishArr[fishHitIndex]) && (game.parent1 && game.parent2) || !game.parent1){
+          if(this.lastParent === 0 || this.lastParent === 2){ // no parent chosen yet or last chose parent2
+            this.lastParent = 1;
+            game.parent1 = game.fishArr[fishHitIndex];
+          }
+          else{
+            this.lastParent = 2;
+            game.parent2 = game.fishArr[fishHitIndex];
+          }
+
+        }
+        game.displayBreed = true;
+      }
       //if cursor is toilet
       else if(state === 'toilet'){
-        if(game.flushCounter  >= this.flushDelay){//prevent overlapping fish from being flushed
+        if(game.clickCounter  >= this.clickDelay){//prevent overlapping fish from being flushed
           game.fishArr[fishHitIndex].flush(fishHitIndex); //flush fish
-          game.flushCounter = 0;
+          game.clickCounter = 0;
         }
       }
     }
@@ -250,18 +430,17 @@ class Game{
     for (var i = sandArray.length-1; i >= 0; i--) {
       sandArray[i].display()
     }
-    for (var i = waterArray.length-1; i >= 0; i--) {
-      let check = waterArray[i].display()
-      if (check == 'gone'){
-        waterArray.splice(i, 1)
-        i-=1
-      }
-    }
+
+
     for(var i = 0; i < decorationArray.length; i++) {
       decorationArray[i].display();
     }
     for(var i = 0; i < coinArray.length; i++) {
       coinArray[i].display();
+      if(coinArray[i].age >= coinArray[i].lifeSpan){
+        coinArray.splice(i, 1)
+        i -= 1;
+      }
     }
     for (var i = foodArray.length-1; i >= 0; i--) {
       let check = foodArray[i].display(game.fishArr)
@@ -270,15 +449,17 @@ class Game{
         i-=1
       }
     }
-
     // DISPLAY STATS, BUTTONS, AND TANK WALLS
     //displayEnvironmentalStats()
     this.drawBalance();
     displayButtons()
     displayTankWalls()
     this.drawFish();
-    if(game.stats.displayIndex != -1 && (game.cursor === cursorImage || game.cursor === fishFoodImage || game.cursor === rareFishFoodImage || game.cursor === legendaryFishFoodImage) && (game.scene !== 'store')){
-      game.fishArr[game.stats.displayIndex].drawStats();
+    if(this.displayBreed && this.cursor===breedImage){
+      this.drawBreedStats();
+    }
+    if(this.stats.displayIndex != -1 && (this.cursor === cursorImage || this.cursor === fishFoodImage || this.cursor === rareFishFoodImage || this.cursor === legendaryFishFoodImage) && (this.scene !== 'store')){
+      this.fishArr[this.stats.displayIndex].drawStats();
     }
   }
 }
@@ -306,6 +487,15 @@ function crackCommonEgg(){
     return ['D',offSpringRarity];
   }
   return ['F', offSpringRarity];
+}
+
+function createMysteryEgg(rarity1, rarity2){
+  let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
+  if(!alreadyOwned){
+    mysteryEggObject.setMystery(rarity1, rarity2);
+    mysteryEggObject.quantity = 1;
+    buttonArray.push(mysteryEggObject);
+  }
 }
 
 function breedFish(rarity1, rarity2){
@@ -436,6 +626,8 @@ class Fish{
     fill(game.stats.bar);
     let healthW = map(this.health, 0, 100, 0, 135);
     rect(game.stats.x+65, game.stats.y+88, healthW, 25);
+    fill(255,255,255,0);
+    rect(game.stats.x+65, game.stats.y+88, 135, 25);
     fill(0, 0, 0);
     text(`(${int(this.health)}/100)`, game.stats.x+129, game.stats.y+91);
 
@@ -443,16 +635,15 @@ class Fish{
     fill(game.stats.bar);
     let rarityW = map(this.rarity, 0, 100, 0, 135);
     rect(game.stats.x+65, game.stats.y+145, rarityW, 25);
+    fill(255,255,255,0);
+    rect(game.stats.x+65, game.stats.y+145, 135, 25);
     fill(0, 0, 0);
     text(`(${this.rarity}/100)`, game.stats.x+129, game.stats.y+148);
 
     image(cashImg, game.stats.x+40, game.stats.y+210, 70, 70);
     text(`${this.price}`, game.stats.x+129, game.stats.y+201);
 
-    if (this.alive){
-      image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
-
-    }
+    image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
 
     //add event listeners
     this.isClosed();
@@ -464,7 +655,7 @@ class Fish{
     let leftOfSell = mouseX < (game.stats.x+game.stats.x+game.stats.w)/2+10  -25;
     let rightOfSell = mouseX > (game.stats.x+game.stats.x+game.stats.w)/2+10+150 -132;
     let isHit = (!higherThanSell && !lowerThanSell && !leftOfSell && !rightOfSell);
-    if(mouseIsPressed && isHit && this.alive){
+    if(mouseIsPressed && isHit){
       //increment price
       game.balance += this.price;
       //remove fish
@@ -476,7 +667,6 @@ class Fish{
       if (! sellSound.isPlaying() ) { // .isPlaying() returns a boolean
         sellSound.play();
       }
-
     }
   }
   isClosed(){ //check if close button pressed
@@ -531,10 +721,37 @@ function preload(){
   pufferFishImgArr = [[
     loadImage('images/pufferFish/pufferFish1.png', updateCounter),
     loadImage('images/pufferFish/pufferFish2.png', updateCounter)
-  ],
-  [
+    ],
+    [
     loadImage('images/pufferFish/pufferFish3.png', updateCounter),
-    loadImage('images/pufferFish/pufferFish4.png', updateCounter)]
+    loadImage('images/pufferFish/pufferFish4.png', updateCounter)
+    ]
+  ]
+  angelFishImgArr = [[
+    loadImage('images/angelFish/angelFish1.png', updateCounter),
+    loadImage('images/angelFish/angelFish2.png', updateCounter),
+    loadImage('images/angelFish/angelFish3.png', updateCounter),
+    loadImage('images/angelFish/angelFish4.png', updateCounter)
+    ],
+    [
+    loadImage('images/angelFish/angelFish5.png', updateCounter),
+    loadImage('images/angelFish/angelFish6.png', updateCounter),
+    loadImage('images/angelFish/angelFish7.png', updateCounter),
+    loadImage('images/angelFish/angelFish8.png', updateCounter)
+    ]
+  ]
+  sharkImgArr = [[
+    loadImage('images/shark/shark1.png', updateCounter),
+    loadImage('images/shark/shark2.png', updateCounter),
+    loadImage('images/shark/shark3.png', updateCounter),
+    loadImage('images/shark/shark4.png', updateCounter)
+    ],
+    [
+    loadImage('images/shark/shark5.png', updateCounter),
+    loadImage('images/shark/shark6.png', updateCounter),
+    loadImage('images/shark/shark7.png', updateCounter),
+    loadImage('images/shark/shark8.png', updateCounter)
+    ]
   ]
   legendaryFishImgArr = [[
     loadImage('images/legendaryFish/legendaryFish1.png', updateCounter),
@@ -553,6 +770,7 @@ function preload(){
     loadImage('images/legendaryFish/legendaryFish12.png', updateCounter)
   ]];
   //fish eggs
+  mysteryEggImage = loadImage('images/mysteryEgg.png', updateCounter);
   commonEggImage = loadImage('images/commonEgg.png', updateCounter);
   rareEggImage = loadImage('images/rareEgg.png', updateCounter);
   legendaryEggImage = loadImage('images/legendaryEgg.png', updateCounter);
@@ -561,6 +779,8 @@ function preload(){
   waterImage = loadImage('images/water.png', updateCounter)
   grassImage = loadImage('images/grass.png', updateCounter)
   treasureImage = loadImage('images/treasure.png', updateCounter)
+  barrelImage = loadImage('images/barrel.png', updateCounter);
+  logSignImage = loadImage('images/logSign.png', updateCounter);
   sandImage = loadImage('images/sand.png', updateCounter);
   fishFoodImage = loadImage('images/fishFood/fishfood.png', updateCounter)
   rareFishFoodImage = loadImage('images/fishFood/rareFishFood.png', updateCounter)
@@ -568,11 +788,15 @@ function preload(){
   toiletImage = loadImage('images/toilet.png', updateCounter)
   cursorImage = loadImage('images/cursor.png', updateCounter)
   shopImage = loadImage('images/shop.png', updateCounter)
+  breedImage = loadImage('images/breed.png', updateCounter)
   coinImg = loadImage('images/coin.png', updateCounter);
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3", updateCounter)
+  waterSound.setVolume(0.3);
   sellSound = loadSound("sounds/sell.mp3", updateCounter)
   flushSound = loadSound("sounds/flush.mp3", updateCounter)
+  coinSound = loadSound("sounds/coin.wav", updateCounter)
+  coinSound.setVolume(0.2);
 }
 
 
@@ -587,8 +811,10 @@ function setup() {
   sandObject = new Button('sand', sandImage, 100, 100)
   toiletObject = new Button('toilet', toiletImage, 100, 100)
   rockObject = new Button('rock', rockImage, 3, 3)
-  grassObject = new Button('grass', grassImage, 3, 3)
-  treasureObject = new Button('treasure', treasureImage, 1, 1)
+  grassObject = new Button('grass', grassImage, 3, 3, 70, -10);
+  treasureObject = new Button('treasure', treasureImage, 1, 1, 100, 3)
+  barrelObject = new Button('barrel', barrelImage, 1, 1, 85, -10)
+  logSignObject = new Button('logSign', logSignImage, 1, 1, 120, -20)
   commonEggObject = new Button('commonEgg', commonEggImage, 1, 1)
   rareEggObject = new Button('rareEgg', rareEggImage, 1, 1)
   legendaryEggObject = new Button('legendaryEgg', legendaryEggImage, 1, 1)
@@ -598,33 +824,43 @@ function setup() {
 
   cursorObject = new Button('cursor', cursorImage, 1000)
   shopObject = new Button('shop', shopImage, 1000)
-  buttonArray = [cursorObject, shopObject, waterObject, commonEggObject]
+  breedObject = new Button('breed', breedImage, 1000)
+
+  mysteryEggObject = new Button('mysteryEgg', mysteryEggImage, 1, 1);
+
+  buttonArray = [cursorObject, shopObject, breedObject, commonEggObject]
 
   let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '15', soldOut: false},
                     {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '15', soldOut: false},
                     {name:'Legendary Food', img: legendaryFishFoodImage, obj: legendaryFishFoodObject, price: '15', soldOut: false},
                     {name:'Toilet', obj: toiletObject, img: toiletImage, price: '15', soldOut: false},
+                    {name:'Treasure', obj: treasureObject, img: treasureImage, price: '15', soldOut: false},
                     {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '15', soldOut: false},
                     {name:'Rare Egg', obj: rareEggObject, img: rareEggImage, price: '15', soldOut: false},
                     {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '15', soldOut: false},
                     {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
                     {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
                     {name:'Sand', obj: sandObject, img: sandImage, price: '15', soldOut: false},
-                    {name:'Treasure', obj: treasureObject, img: treasureImage, price: '15', soldOut: false}
-
+                    {name:'Log Sign', obj: logSignObject, img: logSignImage, price: '15', soldOut: false},
+                    {name:'Barrel', obj: barrelObject, img: barrelImage, price: '15', soldOut: false}
                   ]
   game = new Game(storeItems);
   noiseDetail(24);
 }
 
 function draw() {
-  imageMode(CENTER)
+  imageMode(CENTER);
+  //draw game scene
   if(game.scene === "tank"){
       game.drawTank();
   }
   else if(game.scene === "store"){
       game.drawStore();
   }
+  else if (game.scene === "menu"){
+    game.drawMainMenu();
+  }
+  //add custom cursor
   noCursor();
   image(game.cursor, mouseX, mouseY, 20, 20);
 }
@@ -635,6 +871,10 @@ class Coin{
     this.y = y;
     this.size = 35;
     this.hitBox = 40;
+    this.ySpeed = 0.4;
+    this.age = 0;
+    this.lifeSpan = 250;
+    this.value = 5;
   }
   drawHitBox(){
     stroke('black')
@@ -643,21 +883,43 @@ class Coin{
     ellipse(this.x, this.y, this.hitBox, this.hitBox);
   }
   display(){
+    this.age += 1;
+    if(this.y <= (height-this.size)){
+      this.y += this.ySpeed;
+    }
     //this.drawHitBox();
     image(coinImg, this.x, this.y, this.size, this.size);
+    this.isClicked();
+  }
+  isClicked(){
+    if(mouseIsPressed && dist(mouseX, mouseY, this.x, this.y) < (this.hitBox/2) && game.cursor === cursorImage){
+      this.age = this.lifeSpan;
+      coinSound.play()
+      game.balance += 5;
+    }
   }
 }
 
 class Decoration {
-  constructor(image, x, y, size=100){
+  constructor(image, x, y, size=100, yOffset=0){
     this.x = x
-    this.y = y
+    this.y = y;
     this.size = size;
     this.image = image;
+    this.counter = 0;
+    this.coinDelay = 350;
+    this.yOffset = yOffset; //how extra far to the bottom
   }
   display(){
+    if(this.image === treasureImage){
+      this.counter += 1;
+      if(this.counter >= this.coinDelay){
+        coinArray.push(new Coin(this.x-15, this.y-15));
+        this.counter = 0;
+      }
+    }
     image(this.image, this.x, this.y, this.size, this.size);
-    if (this.y < (height-(this.size/2))){
+    if (this.y < (height-(this.size/2))+this.yOffset){
       this.y += 1
     }
   }
@@ -672,7 +934,8 @@ class Sand {
       this.xSpeed = random(-1, 1)
       this.ySpeed = 2
       this.alpha = 255
-      this.radius = random(20, 50)
+      // this.radius = random(20, 50)
+      this.radius = 73;
       this.h = 36
       this.s = 100
       this.l = random(90, 95)
@@ -780,43 +1043,75 @@ function displayEnvironmentalStats(){
 
 
 function mousePressed(){
-  if((state == 'grass' || state == 'rock' || state === 'treasure') && mouseY >= 200){//decoration
-    decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY));
+  if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && mouseY >= 200){//decoration
+    decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size, window[state+"Object"].yOffset));
     window[state+"Object"].quantity -= 1;
   }
   // ADD FISH
-  else if (mouseIsPressed && state=='commonEgg' && mouseY >= 200){
+  if (mouseIsPressed && state == 'mysteryEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackCommonEgg();
+    let type = newFish[0];
     let rarity = newFish[1];
     //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
-    let type = newFish[0];
     if(type === 'D'){
       game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
     }
     else{
       game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
     }
-
+    mysteryEggObject.quantity -= 1
+  }
+  else if (mouseIsPressed && state=='commonEgg' && mouseY >= 200){
+    fishBeingHit.push(0);
+    let newFish = crackCommonEgg();
+    let type = newFish[0];
+    let rarity = newFish[1];
+    //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
+    if(type === 'D'){
+      game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
+    }
+    else{
+      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    }
   }
   // ADD FISH
   else if (mouseIsPressed && state=='rareEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackRareEgg();
+    let type = newFish[0];
     let rarity = newFish[1];
-    game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    if(type === 'C'){
+      game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
+    }
+    else{
+      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    }
   }
   else if (mouseIsPressed && state=='legendaryEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackLegendaryEgg();
+    let type = newFish[0];
     let rarity = newFish[1];
-    game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+    if(type === 'A'){
+      game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
+    }
+    else{
+      game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+    }
   }
 }
 
-function backgroundFill(r, g, b){
-  fill(r, g, b);
+function backgroundFill(r, g, b, a){
+  fill(r, g, b, a);
   rect(0, 0, canvasWidth, canvasHeight);
+}
+
+function drawFloor(){
+  stroke('black')
+  strokeWeight(1);
+  fill('rgba(105,103,100,0.6)')
+  rect(0, canvasHeight-38, canvasWidth, canvasHeight);
 }
 
 // MAKE THE WATER BOUNCE
@@ -866,21 +1161,42 @@ class ToolBar{
         fill(0)
         textSize(15);
         textAlign(CENTER, TOP);
-        if(buttonArray[i].name !== 'cursor' && buttonArray[i].name !== 'shop' && buttonArray[i].name !== 'toilet'){
-          text(`${int(buttonArray[i].quantity)}/${int(buttonArray[i].max)}` , (this.buttonX+25), this.buttonY+55)
+        if(buttonArray[i].name === 'cursor' || buttonArray[i].name === 'shop' || buttonArray[i].name === 'breed' || buttonArray[i].name === 'toilet'){
+          text(buttonArray[i].name , (this.buttonX+25), this.buttonY+55)
+        }
+        else if(buttonArray[i].name === 'mysteryEgg'){
+          if(buttonArray[i].hatchTimer > 0){
+            text(`${buttonArray[i].hatchTimer}s` , (this.buttonX+25), this.buttonY+55)
+          }
+          else{
+            text(`${int(buttonArray[i].quantity)}/${int(buttonArray[i].max)}` , (this.buttonX+25), this.buttonY+55)
+          }
         }
         else{
-          text(buttonArray[i].name , (this.buttonX+25), this.buttonY+55)
+          text(`${int(buttonArray[i].quantity)}/${int(buttonArray[i].max)}` , (this.buttonX+25), this.buttonY+55)
         }
         this.buttonX += 50
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
           if(buttonArray[i].name === 'shop'){
             game.cursor = cursorImage;
-            game.scene='store';
+            state = 'cursor';
+            game.scene = 'store';
             return 'cursor';
           }
+          else if(buttonArray[i].name === 'mysteryEgg'){ //disable mystery egg if timer is not up
+            if(buttonArray[i].hatchTimer > 0){
+              return;
+            }
+          }
+          //remove displays from saving
+          game.parent1 = 0;
+          game.parent2 = 0;
+          game.lastParent = 0;
+          game.displayBreed = false;
+          game.stats.displayIndex = -1;
+
           game.cursor = buttonArray[i].image;
-            state = buttonArray[i].name
+          state = buttonArray[i].name
         }
       }
   }
@@ -892,11 +1208,18 @@ function displayButtons(){
 }
 
 class Button{
-  constructor(name, image, quantity=0, max=0){
+  constructor(name, image, quantity=0, max=0, size=100, yOffset=0){
+    this.yOffset = yOffset;
     this.name = name;
     this.image = image;
     this.quantity = quantity;
     this.max = max;
     this.originalMax = max;
+    this.size=size;
+  }
+  setMystery(parent1, parent2){ //used for mystery egg
+    this.parent1 = parent1;
+    this.parent2 = parent2;
+    this.hatchTimer = 20;
   }
 }
