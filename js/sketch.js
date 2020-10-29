@@ -1178,11 +1178,13 @@ class ToolBar{
               return;
             }
           }
-          //remove breeding stuff
+          //remove displays from saving
+          console.log(game.displayIndex)
           game.parent1 = 0;
           game.parent2 = 0;
           game.lastParent = 0;
           game.displayBreed = false;
+          game.stats.displayIndex = -1;
 
           game.cursor = buttonArray[i].image;
           state = buttonArray[i].name
