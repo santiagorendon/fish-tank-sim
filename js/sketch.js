@@ -553,7 +553,7 @@ class Fish{
     ellipse(this.x+this.hitBoxXOf, this.y+this.hitBoxYOf, this.hitBox, this.hitBox)
   }
   draw(){
-    //this.drawHitBox();
+    // this.drawHitBox();
     if(this.xMovement > 0){ //fish moving right
       image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
     }
@@ -601,7 +601,7 @@ class Fish{
     else {
       this.health = 0
       this.price = 0
-      if (this.y<= (canvasHeight-(this.hitBox/2))){
+      if (this.y+this.hitBoxYOf <= (canvasHeight-(this.hitBox/2))){
         this.y += 1
       }
     }
