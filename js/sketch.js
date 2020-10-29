@@ -46,8 +46,8 @@ var coinArr = [];
 
 class Game{
   constructor(storeItems=[]){
-    // this.scene = 'menu';
     this.scene = 'menu';
+    //this.scene = 'tank';
     //fish holder
     this.fishArr = [];
     this.balance = 150;
@@ -90,23 +90,28 @@ class Game{
     this.lastParent = 0;
   }
   drawBreedStats(){
+    textAlign(CENTER, CENTER);
+    let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
     let middleX = game.breedStats.x+(game.breedStats.w/2);
     let middleY = (game.breedStats.y+game.breedStats.h)/2;
     //background
     fill(game.breedStats.background);
     strokeWeight(1);
     rect(game.breedStats.x ,game.breedStats.y ,game.breedStats.w ,game.breedStats.h );
-    //line through middle
-    // line(middleX, game.breedStats.y,middleX ,game.breedStats.y+game.breedStats.h);
-    fill('black')
     //CLOSE Button
-
-    //ellipse(game.breedStats.x+game.breedStats.w-12, game.breedStats.y+15, 20, 20);
     image(closeImg, game.breedStats.x+game.breedStats.w-12, game.breedStats.y+15, 20, 20);
+    this.breedIsClosed();
 
+    if(alreadyOwned){
+      fill('black')
+      textSize(20);
+      image(mysteryEggImage, middleX, middleY-20, 100, 100);
+      text('Please hatch your current egg\nbefore you breed again.', middleX ,middleY+60)
+      return
+    }
+    fill('black')
     //draw parent 1
     if(this.parent1){
-      textAlign(CENTER, CENTER);
       textSize(30);
       text(this.parent1.type, (game.breedStats.x+middleX)/2, middleY-75);
       image(this.parent1.imageArray[1][0], (game.breedStats.x+middleX)/2-this.parent1.hitBoxXOf, middleY-15-this.parent1.hitBoxYOf, this.parent1.width, this.parent1.height);
@@ -140,10 +145,15 @@ class Game{
       textSize(20);
       text(`(${this.parent2.rarity}/100)`, (middleX+canvasWidth)/2+15, middleY+65);
     }
+    else{
+      text('Please select\n another parent',  (middleX+canvasWidth)/2, middleY)
+      fill('black');
+      line(middleX, game.breedStats.y,middleX ,game.breedStats.y+game.breedStats.h);
+
+    }
 
 
     textAlign(CENTER, TOP);
-    this.breedIsClosed();
     this.breedIsPressed(middleX, middleY);
   }
   breedIsPressed(middleX, middleY){
@@ -778,7 +788,7 @@ function preload(){
   toiletImage = loadImage('images/toilet.png', updateCounter)
   cursorImage = loadImage('images/cursor.png', updateCounter)
   shopImage = loadImage('images/shop.png', updateCounter)
-  breedImage = loadImage('images/heart.png', updateCounter)
+  breedImage = loadImage('images/breed.png', updateCounter)
   coinImg = loadImage('images/coin.png', updateCounter);
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3", updateCounter)
@@ -1179,7 +1189,6 @@ class ToolBar{
             }
           }
           //remove displays from saving
-          console.log(game.displayIndex)
           game.parent1 = 0;
           game.parent2 = 0;
           game.lastParent = 0;
