@@ -24,6 +24,7 @@ var rareFishFoodObject;
 var legendaryFishFoodObject;
 var cursorObject;
 var shopObject;
+var breedObject;
 var toiletObject;
 
 
@@ -45,9 +46,8 @@ var coinArr = [];
 
 class Game{
   constructor(storeItems=[]){
-    this.scene = 'menu';
-    /* stats */
-    this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
+    // this.scene = 'menu';
+    this.scene = 'tank';
     //fish holder
     this.fishArr = [];
     this.balance = 150;
@@ -66,8 +66,8 @@ class Game{
     this.buyDelay = 11;
     this.cursor = waterImage;
     //flush
-    this.flushCounter = 0;
-    this.flushDelay =11;
+    this.clickCounter = 0;
+    this.clickDelay =11;
     //menu text
     this.angle = 0;
     this.rotationSpeed = 0.35;
@@ -77,6 +77,93 @@ class Game{
     this.textSizeMin= 30;
     this.textSizeMax = 35;
     this.textSizeIncSpeed = 0.1;
+    /* stats vars*/
+    this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
+    //breed stats vars
+    this.breedStats = {background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)', x: 658, y:5, w: 337, h: 236}
+    this.displayBreed = false;
+    let rarity =80;
+    // this.parent1 = new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60)
+    // this.parent2 = new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85)
+    this.parent1 = 0;
+    this.parent2 = 0;
+    this.lastParent = 0;
+  }
+  drawBreedStats(){
+    let middleX = game.breedStats.x+(game.breedStats.w/2);
+    let middleY = (game.breedStats.y+game.breedStats.h)/2;
+    //background
+    fill(game.breedStats.background);
+    strokeWeight(1);
+    rect(game.breedStats.x ,game.breedStats.y ,game.breedStats.w ,game.breedStats.h );
+    //line through middle
+    // line(middleX, game.breedStats.y,middleX ,game.breedStats.y+game.breedStats.h);
+    fill('black')
+    //CLOSE Button
+
+    //ellipse(game.breedStats.x+game.breedStats.w-12, game.breedStats.y+15, 20, 20);
+    image(closeImg, game.breedStats.x+game.breedStats.w-12, game.breedStats.y+15, 20, 20);
+
+    //draw parent 1
+    if(this.parent1){
+      textAlign(CENTER, CENTER);
+      textSize(30);
+      text(this.parent1.type, (game.breedStats.x+middleX)/2, middleY-75);
+      image(this.parent1.imageArray[1][0], (game.breedStats.x+middleX)/2-this.parent1.hitBoxXOf, middleY-15-this.parent1.hitBoxYOf, this.parent1.width, this.parent1.height);
+      image(rarityImg, (game.breedStats.x+middleX)/2-55, middleY+65, 80, 80);
+      fill(game.breedStats.bar);
+      let parent1RarityW = map(this.parent1.rarity, 0, 100, 0, 92);
+      rect(game.breedStats.x+50, middleY+53, parent1RarityW, 25);
+      fill(255,255,255,0);
+      rect(game.breedStats.x+50, middleY+53, 92, 25);
+      fill(0, 0, 0);
+      textSize(20);
+      text(`(${this.parent1.rarity}/100)`, (game.breedStats.x+middleX)/2+15, middleY+65);
+    }
+    //draw parent 2 and heart
+    if(this.parent2){
+      //breed button
+      textSize(20);
+      text('Breed', middleX ,middleY+20)
+      image(heartImg, middleX+3, middleY, 100, 100);
+      textSize(30);
+      text(this.parent2.type, (middleX+canvasWidth)/2, middleY-75);
+
+      image(this.parent2.imageArray[0][0], (middleX+canvasWidth)/2-this.parent2.hitBoxXOf, middleY-15-this.parent2.hitBoxYOf, this.parent2.width, this.parent2.height);
+      image(rarityImg, (middleX+canvasWidth)/2-55, middleY+65, 80, 80);
+      fill(game.breedStats.bar);
+      let parent2RarityW = map(this.parent2.rarity, 0, 100, 0, 92);
+      rect(middleX+50, middleY+53, parent2RarityW, 25);
+      fill(255,255,255,0);
+      rect(middleX+50, middleY+53, 92, 25);
+      fill(0, 0, 0);
+      textSize(20);
+      text(`(${this.parent2.rarity}/100)`, (middleX+canvasWidth)/2+15, middleY+65);
+    }
+
+
+    textAlign(CENTER, TOP);
+    this.breedIsClosed();
+    this.breedIsPressed(middleX, middleY);
+  }
+  breedIsPressed(middleX, middleY){
+    if(mouseIsPressed && dist(mouseX, mouseY, middleX, middleY-5) <= 20){
+      if(this.parent1.alive && this.parent2.alive){
+        createMysteryEgg(this.parent1.rarity, this.parent1.rarity);
+      }
+      this.parent1 = 0;
+      this.parent2 = 0;
+      this.lastParent = 0;
+      this.displayBreed = false;
+    }
+  }
+  breedIsClosed(){
+    if(mouseIsPressed && dist(mouseX, mouseY, game.breedStats.x+game.breedStats.w-12, game.breedStats.y+15) < 10){
+      this.parent1 = 0;
+      this.parent2 = 0;
+      this.lastParent = 0;
+      this.displayBreed = false;
+    }
   }
   drawBalance(){
     noStroke()
@@ -246,7 +333,13 @@ class Game{
 
   }
   drawTank(){
-    game.flushCounter += 1;
+    let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
+    if(alreadyOwned){
+      if (frameCount % 60 == 0 && mysteryEggObject.hatchTimer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
+        mysteryEggObject.hatchTimer -= 1;
+      }
+    }
+    game.clickCounter += 1;
     backgroundFill(100,200,255);
     drawFloor();
     // ADD SAND
@@ -276,11 +369,32 @@ class Game{
       if((game.cursor === cursorImage || game.cursor === fishFoodImage || game.cursor === rareFishFoodImage || game.cursor === legendaryFishFoodImage)){
         game.stats.displayIndex = fishHitIndex; //display stats
       }
+      else if(game.cursor === breedImage && game.clickCounter  >= this.clickDelay && game.fishArr[fishHitIndex].alive){
+        this.clickCounter = 0;
+        //only one parent is chosen and u cant choose same parent twice
+        if(game.parent1 !== game.fishArr[fishHitIndex] && (game.parent1 && !game.parent2)){
+          this.lastParent = 2;
+          game.parent2 = game.fishArr[fishHitIndex];
+        }
+        //you cant choose same parent twice both parents chosen or only one chosen
+        else if((game.parent1 !== game.fishArr[fishHitIndex] && game.parent2 !== game.fishArr[fishHitIndex]) && (game.parent1 && game.parent2) || !game.parent1){
+          if(this.lastParent === 0 || this.lastParent === 2){ // no parent chosen yet or last chose parent2
+            this.lastParent = 1;
+            game.parent1 = game.fishArr[fishHitIndex];
+          }
+          else{
+            this.lastParent = 2;
+            game.parent2 = game.fishArr[fishHitIndex];
+          }
+
+        }
+        game.displayBreed = true;
+      }
       //if cursor is toilet
       else if(state === 'toilet'){
-        if(game.flushCounter  >= this.flushDelay){//prevent overlapping fish from being flushed
+        if(game.clickCounter  >= this.clickDelay){//prevent overlapping fish from being flushed
           game.fishArr[fishHitIndex].flush(fishHitIndex); //flush fish
-          game.flushCounter = 0;
+          game.clickCounter = 0;
         }
       }
     }
@@ -325,15 +439,17 @@ class Game{
         i-=1
       }
     }
-
     // DISPLAY STATS, BUTTONS, AND TANK WALLS
     //displayEnvironmentalStats()
     this.drawBalance();
     displayButtons()
     displayTankWalls()
     this.drawFish();
-    if(game.stats.displayIndex != -1 && (game.cursor === cursorImage || game.cursor === fishFoodImage || game.cursor === rareFishFoodImage || game.cursor === legendaryFishFoodImage) && (game.scene !== 'store')){
-      game.fishArr[game.stats.displayIndex].drawStats();
+    if(this.displayBreed && this.cursor===breedImage){
+      this.drawBreedStats();
+    }
+    if(this.stats.displayIndex != -1 && (this.cursor === cursorImage || this.cursor === fishFoodImage || this.cursor === rareFishFoodImage || this.cursor === legendaryFishFoodImage) && (this.scene !== 'store')){
+      this.fishArr[this.stats.displayIndex].drawStats();
     }
   }
 }
@@ -363,6 +479,15 @@ function crackCommonEgg(){
   return ['F', offSpringRarity];
 }
 
+function createMysteryEgg(rarity1, rarity2){
+  let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
+  if(!alreadyOwned){
+    mysteryEggObject.setMystery(rarity1, rarity2);
+    mysteryEggObject.quantity = 1;
+    buttonArray.push(mysteryEggObject);
+  }
+}
+
 function breedFish(rarity1, rarity2){
   rarity3 = random(0, 100);
   offSpringRarity = Math.ceil((rarity3+rarity2+rarity3)/3);
@@ -389,7 +514,7 @@ class Fish{
     this.type = type;
     //stats
     this.rarity = rarity;
-    this.health = 100;
+    this.health = 10;
     // this.startingPrice = 15;
     this.price = 15;
     this.age = 0;
@@ -491,6 +616,8 @@ class Fish{
     fill(game.stats.bar);
     let healthW = map(this.health, 0, 100, 0, 135);
     rect(game.stats.x+65, game.stats.y+88, healthW, 25);
+    fill(255,255,255,0);
+    rect(game.stats.x+65, game.stats.y+88, 135, 25);
     fill(0, 0, 0);
     text(`(${int(this.health)}/100)`, game.stats.x+129, game.stats.y+91);
 
@@ -498,6 +625,8 @@ class Fish{
     fill(game.stats.bar);
     let rarityW = map(this.rarity, 0, 100, 0, 135);
     rect(game.stats.x+65, game.stats.y+145, rarityW, 25);
+    fill(255,255,255,0);
+    rect(game.stats.x+65, game.stats.y+145, 135, 25);
     fill(0, 0, 0);
     text(`(${this.rarity}/100)`, game.stats.x+129, game.stats.y+148);
 
@@ -528,7 +657,6 @@ class Fish{
       if (! sellSound.isPlaying() ) { // .isPlaying() returns a boolean
         sellSound.play();
       }
-
     }
   }
   isClosed(){ //check if close button pressed
@@ -632,6 +760,7 @@ function preload(){
     loadImage('images/legendaryFish/legendaryFish12.png', updateCounter)
   ]];
   //fish eggs
+  mysteryEggImage = loadImage('images/mysteryEgg.png', updateCounter);
   commonEggImage = loadImage('images/commonEgg.png', updateCounter);
   rareEggImage = loadImage('images/rareEgg.png', updateCounter);
   legendaryEggImage = loadImage('images/legendaryEgg.png', updateCounter);
@@ -649,6 +778,7 @@ function preload(){
   toiletImage = loadImage('images/toilet.png', updateCounter)
   cursorImage = loadImage('images/cursor.png', updateCounter)
   shopImage = loadImage('images/shop.png', updateCounter)
+  breedImage = loadImage('images/heart.png', updateCounter)
   coinImg = loadImage('images/coin.png', updateCounter);
   //sounds
   waterSound = loadSound("sounds/bubbles.mp3", updateCounter)
@@ -684,7 +814,11 @@ function setup() {
 
   cursorObject = new Button('cursor', cursorImage, 1000)
   shopObject = new Button('shop', shopImage, 1000)
-  buttonArray = [cursorObject, shopObject, commonEggObject]
+  breedObject = new Button('breed', breedImage, 1000)
+
+  mysteryEggObject = new Button('mysteryEgg', mysteryEggImage, 1, 1);
+
+  buttonArray = [cursorObject, shopObject, breedObject, commonEggObject]
 
   let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '15', soldOut: false},
                     {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '15', soldOut: false},
@@ -900,11 +1034,24 @@ function displayEnvironmentalStats(){
 
 function mousePressed(){
   if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && mouseY >= 200){//decoration
-    console.log(window[state+"Object"].yOffset)
     decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size, window[state+"Object"].yOffset));
     window[state+"Object"].quantity -= 1;
   }
   // ADD FISH
+  if (mouseIsPressed && state == 'mysteryEgg' && mouseY >= 200){
+    fishBeingHit.push(0);
+    let newFish = crackCommonEgg();
+    let type = newFish[0];
+    let rarity = newFish[1];
+    //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
+    if(type === 'D'){
+      game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
+    }
+    else{
+      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    }
+    mysteryEggObject.quantity -= 1
+  }
   else if (mouseIsPressed && state=='commonEgg' && mouseY >= 200){
     fishBeingHit.push(0);
     let newFish = crackCommonEgg();
@@ -917,7 +1064,6 @@ function mousePressed(){
     else{
       game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
     }
-
   }
   // ADD FISH
   else if (mouseIsPressed && state=='rareEgg' && mouseY >= 200){
@@ -1005,11 +1151,19 @@ class ToolBar{
         fill(0)
         textSize(15);
         textAlign(CENTER, TOP);
-        if(buttonArray[i].name !== 'cursor' && buttonArray[i].name !== 'shop' && buttonArray[i].name !== 'toilet'){
-          text(`${int(buttonArray[i].quantity)}/${int(buttonArray[i].max)}` , (this.buttonX+25), this.buttonY+55)
+        if(buttonArray[i].name === 'cursor' || buttonArray[i].name === 'shop' || buttonArray[i].name === 'breed' || buttonArray[i].name === 'toilet'){
+          text(buttonArray[i].name , (this.buttonX+25), this.buttonY+55)
+        }
+        else if(buttonArray[i].name === 'mysteryEgg'){
+          if(buttonArray[i].hatchTimer > 0){
+            text(`${buttonArray[i].hatchTimer}s` , (this.buttonX+25), this.buttonY+55)
+          }
+          else{
+            text(`${int(buttonArray[i].quantity)}/${int(buttonArray[i].max)}` , (this.buttonX+25), this.buttonY+55)
+          }
         }
         else{
-          text(buttonArray[i].name , (this.buttonX+25), this.buttonY+55)
+          text(`${int(buttonArray[i].quantity)}/${int(buttonArray[i].max)}` , (this.buttonX+25), this.buttonY+55)
         }
         this.buttonX += 50
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
@@ -1019,8 +1173,19 @@ class ToolBar{
             game.scene = 'store';
             return 'cursor';
           }
+          else if(buttonArray[i].name === 'mysteryEgg'){ //disable mystery egg if timer is not up
+            if(buttonArray[i].hatchTimer > 0){
+              return;
+            }
+          }
+          //remove breeding stuff
+          game.parent1 = 0;
+          game.parent2 = 0;
+          game.lastParent = 0;
+          game.displayBreed = false;
+
           game.cursor = buttonArray[i].image;
-            state = buttonArray[i].name
+          state = buttonArray[i].name
         }
       }
   }
@@ -1040,5 +1205,10 @@ class Button{
     this.max = max;
     this.originalMax = max;
     this.size=size;
+  }
+  setMystery(parent1, parent2){ //used for mystery egg
+    this.parent1 = parent1;
+    this.parent2 = parent2;
+    this.hatchTimer = 20;
   }
 }
