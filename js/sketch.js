@@ -46,8 +46,8 @@ var coinArr = [];
 
 class Game{
   constructor(storeItems=[]){
-    this.scene = 'menu';
-    //this.scene = 'tank';
+    // this.scene = 'menu';
+    this.scene = 'tank';
     //fish holder
     this.fishArr = [];
     this.balance = 150;
@@ -523,10 +523,14 @@ class Fish{
   constructor(type, imageArray, w, h, rarity, frameNum=2, frameDelay=25, hitBox, xOf=0, yOf=0){
     this.type = type;
     //stats
-    this.rarity = rarity;
+    this.rarity = int(rarity);
     this.health = 100;
     // this.startingPrice = 15;
-    this.price = 15;
+    this.price = int(rarity**4/100000);
+    this.minPrice = 1;
+    if(this.price<this.minPrice){
+      this.price = 1;
+    }
     this.age = 0;
     this.alive = true;
     this.width = w;
@@ -1050,11 +1054,23 @@ function mousePressed(){
   // ADD FISH
   if (mouseIsPressed && state == 'mysteryEgg' && mouseY >= 200){
     fishBeingHit.push(0);
-    let newFish = crackCommonEgg();
+    let newFish = breedFish(mysteryEggObject.parent1, mysteryEggObject.parent2);
     let type = newFish[0];
     let rarity = newFish[1];
     //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
-    if(type === 'D'){
+    if(type === 'S'){
+      game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+    }
+    else if(type === 'A'){
+      game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
+    }
+    else if(type === 'B'){
+      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    }
+    else if(type === 'C'){
+      game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
+    }
+    else if(type === 'D'){
       game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
     }
     else{
