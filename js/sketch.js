@@ -47,7 +47,7 @@ var coinArr = [];
 class Game{
   constructor(storeItems=[]){
     // this.scene = 'menu';
-    this.scene = 'tank';
+    this.scene = 'menu';
     //fish holder
     this.fishArr = [];
     this.balance = 150;
@@ -514,7 +514,7 @@ class Fish{
     this.type = type;
     //stats
     this.rarity = rarity;
-    this.health = 10;
+    this.health = 100;
     // this.startingPrice = 15;
     this.price = 15;
     this.age = 0;
