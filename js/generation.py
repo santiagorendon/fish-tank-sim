@@ -8,7 +8,20 @@ def breed(rarity1, rarity2):
     return average
 
 def price(fish):
-    return fish**4/100000
+    bonus = 0
+    # if(fish >= 95): # s tier
+    #     bonus = 240
+    # if(fish >= 85): # a tier
+    #     bonus = 120
+    # if(fish >= 70): # b tier
+    #     bonus = 60
+    # if(fish >= 50): # c tier
+    #     bonus = 40
+    # if(fish >= 25): # d tier
+    #     bonus = 20
+    # else: # f tier
+    #     bonus = 10
+    return fish**4/100000+bonus
 
 def buyEgg(money, minParent):
     # priceOfLegendaryEgg = 815;
@@ -22,18 +35,20 @@ def buyEgg(money, minParent):
     return [-1, 0] #no egg bought
 
 def generation():
-    priceOfFood = 0
-    treasureBought = False;
-    money = 0
+    #commonFood
+    numFish = 2
+    priceOfFood = 18
+    priceOfFoodPerGen = (1/3)*priceOfFood*numFish
+    treasureBought = False
+    money = 8+18#+18 because they start with 1 food
     offspringCount = 0
     parent1 = 5
     parent2 = 5
     eggsCracked = 0;
-    totalRarityofFishDiscarded = 0;
+    totalRarityofFishDiscarded = 0
     fishDiscarded = 0
     offSpringRarity = 0
     while(offSpringRarity < 95 and parent1 < 95 and parent2 < 95):
-        money -= priceOfFood
         #try to buy a treasure chest if not alreadyOwned
         if((not treasureBought) and money > 400):
             money -= 400
@@ -71,6 +86,8 @@ def generation():
                 #replace parent with offspring
                 parent2 = offSpringRarity
         offspringCount += 1
+        if(offspringCount%6 == 0): #feed fish every 80 seconds
+            money -= priceOfFoodPerGen
     return [offspringCount, totalRarityofFishDiscarded/fishDiscarded, money, eggsCracked]
 
 def displayResults(agOffspringCount, agFishDiscarded, agMoney, agEggsCracked, generationCount):

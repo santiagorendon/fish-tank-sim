@@ -46,11 +46,12 @@ var coinArr = [];
 
 class Game{
   constructor(storeItems=[]){
-    // this.scene = 'menu';
-    this.scene = 'tank';
-    //fish holder
+    this.scene = 'menu';
+    // this.scene = 'tank';
+    //fish holde
     this.fishArr = [];
-    this.balance = 150;
+    this.balance = 8;
+    // this.balance = 1000008;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -186,19 +187,19 @@ class Game{
   drawStore(){
     strokeWeight(1);
     this.counter += 1;
-    backgroundFill(214, 253, 255,200);
-    fill(0, 0, 0);
-    textAlign(LEFT, TOP)
+   backgroundFill(214, 253, 255,200);
+   fill(0, 0, 0);
+   textAlign(LEFT, TOP)
    .textSize(80);
-    textFont(fishFont);
-    textAlign(CENTER, TOP);
-    text('STORE', canvasWidth/2, 10);
-    textAlign(LEFT, TOP);
-    text(`$${this.balance}`, 60, 10);
-    image(closeImg, this.storeCloseX, this.storeCloseY, this.storeCloseD, this.storeCloseD);
+   textFont(fishFont);
+   textAlign(CENTER, TOP);
+   text('STORE', canvasWidth/2, 10);
+   textAlign(LEFT, TOP);
+   text(`$${this.balance}`, 60, 10);
+   image(closeImg, this.storeCloseX, this.storeCloseY, this.storeCloseD, this.storeCloseD);
 
-    this.drawStoreItems();
-    this.isStoreClosed();
+   this.drawStoreItems();
+   this.isStoreClosed();
   }
   drawStoreItems(){
     for(let i=0;i<this.storeItems.length;i++){
@@ -409,19 +410,20 @@ class Game{
       }
     }
     //make sure the player is not hovering over the fish when they feed them
-    if(!fishIsHit && mouseIsPressed && state=='food' && mouseY >= 200){
-      var tempFood = new Food(mouseX, mouseY)
-      fishFoodObject.quantity-=0.1;
+    if(!fishIsHit && mouseIsPressed && state=='food'){
+      var tempFood = new Food(mouseX, mouseY, 0.7)
+
+      fishFoodObject.quantity-=0.08;
       foodArray.push(tempFood)
     }
-    if(!fishIsHit && mouseIsPressed && state=='food2' && mouseY >= 200){
-      var tempFood = new Food(mouseX, mouseY, 4)
-      rareFishFoodObject.quantity-=0.1;
+    if(!fishIsHit && mouseIsPressed && state=='food2'){
+      var tempFood = new Food(mouseX, mouseY, 1)
+      rareFishFoodObject.quantity-=0.05;
       foodArray.push(tempFood)
     }
-    if(!fishIsHit && mouseIsPressed && state=='food3' && mouseY >= 200){
-      var tempFood = new Food(mouseX, mouseY, 8)
-      legendaryFishFoodObject.quantity-=0.1;
+    if(!fishIsHit && mouseIsPressed && state=='food3'){
+      var tempFood = new Food(mouseX, mouseY, 1.8)
+      legendaryFishFoodObject.quantity-=0.05;
       foodArray.push(tempFood)
     }
 
@@ -525,6 +527,7 @@ class Fish{
     //stats
     this.rarity = int(rarity);
     this.health = 100;
+    this.healthLoss = 0.83;
     // this.startingPrice = 15;
     this.price = int(rarity**4/100000);
     this.minPrice = 1;
@@ -573,7 +576,9 @@ class Fish{
 
     // fish progressively loses health
     this.health = constrain(this.health, 1, 100)
-    this.health -=.01
+    if (frameCount % 60 == 0) {//a second has passed
+      this.health -= this.healthLoss;
+    }
     this.health = round(this.health, 2)
 
     // fish progressively ages
@@ -832,23 +837,25 @@ function setup() {
 
   mysteryEggObject = new Button('mysteryEgg', mysteryEggImage, 1, 1);
 
-  buttonArray = [cursorObject, shopObject, breedObject, commonEggObject]
+  buttonArray = [cursorObject, shopObject, breedObject, fishFoodObject]
 
-  let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '15', soldOut: false},
-                    {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '15', soldOut: false},
-                    {name:'Legendary Food', img: legendaryFishFoodImage, obj: legendaryFishFoodObject, price: '15', soldOut: false},
-                    {name:'Toilet', obj: toiletObject, img: toiletImage, price: '15', soldOut: false},
-                    {name:'Treasure', obj: treasureObject, img: treasureImage, price: '15', soldOut: false},
-                    {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '15', soldOut: false},
-                    {name:'Rare Egg', obj: rareEggObject, img: rareEggImage, price: '15', soldOut: false},
-                    {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '15', soldOut: false},
-                    {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
-                    {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
-                    {name:'Sand', obj: sandObject, img: sandImage, price: '15', soldOut: false},
-                    {name:'Log Sign', obj: logSignObject, img: logSignImage, price: '15', soldOut: false},
-                    {name:'Barrel', obj: barrelObject, img: barrelImage, price: '15', soldOut: false}
+  let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '18', soldOut: false},
+                    {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '38', soldOut: false},
+                    {name:'Legendary Food', img: legendaryFishFoodImage, obj: legendaryFishFoodObject, price: '95', soldOut: false},
+                    {name:'Toilet', obj: toiletObject, img: toiletImage, price: '20', soldOut: false},
+                    {name:'Treasure', obj: treasureObject, img: treasureImage, price: '400', soldOut: false},
+                    {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '10', soldOut: false},
+                    {name:'Rare Egg', obj: rareEggObject, img: rareEggImage, price: '300', soldOut: false},
+                    {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '1300', soldOut: false},
+                    {name:'Grass', obj: grassObject, img: grassImage, price: '100', soldOut: false},
+                    {name:'Rock', obj: rockObject, img: rockImage, price: '100', soldOut: false},
+                    {name:'Sand', obj: sandObject, img: sandImage, price: '50', soldOut: false},
+                    {name:'Log Sign', obj: logSignObject, img: logSignImage, price: '350', soldOut: false},
+                    {name:'Barrel', obj: barrelObject, img: barrelImage, price: '900', soldOut: false}
                   ]
   game = new Game(storeItems);
+  game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, 5, 2, 25, 60))
+  game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, 5, 2, 25, 60))
   noiseDetail(24);
 }
 
@@ -1090,6 +1097,7 @@ function mousePressed(){
     else{
       game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
     }
+    commonEggObject.quantity -= 1
   }
   // ADD FISH
   else if (mouseIsPressed && state=='rareEgg' && mouseY >= 200){
@@ -1103,6 +1111,7 @@ function mousePressed(){
     else{
       game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
     }
+    rareEggObject.quantity -= 1
   }
   else if (mouseIsPressed && state=='legendaryEgg' && mouseY >= 200){
     fishBeingHit.push(0);
@@ -1115,6 +1124,7 @@ function mousePressed(){
     else{
       game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
     }
+    legendaryEggObject.quantity -= 1
   }
 }
 
