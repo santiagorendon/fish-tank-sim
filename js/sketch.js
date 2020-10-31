@@ -655,7 +655,9 @@ class Fish{
     image(cashImg, game.stats.x+40, game.stats.y+210, 70, 70);
     text(`${this.price}`, game.stats.x+129, game.stats.y+201);
 
-    image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
+    if (this.alive){
+      image(sellImg, (game.stats.x+game.stats.x+game.stats.w)/2+10, game.stats.y+280, 150, 150);
+    }
 
     //add event listeners
     this.isClosed();
@@ -667,7 +669,7 @@ class Fish{
     let leftOfSell = mouseX < (game.stats.x+game.stats.x+game.stats.w)/2+10  -25;
     let rightOfSell = mouseX > (game.stats.x+game.stats.x+game.stats.w)/2+10+150 -132;
     let isHit = (!higherThanSell && !lowerThanSell && !leftOfSell && !rightOfSell);
-    if(mouseIsPressed && isHit){
+    if(mouseIsPressed && isHit && this.alive){
       //increment price
       game.balance += this.price;
       //remove fish
