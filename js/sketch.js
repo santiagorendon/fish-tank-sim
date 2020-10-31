@@ -1,50 +1,42 @@
-var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImage, sellSound, foodImage, toiletImage, flushSound, cursorImage
+// IMAGES
+var fishImage, waterImage, grassImage, sandImage, foodImage, toiletImage, cursorImage
+
+// SOUNDS
+var waterSound, sellSound, flushSound
+
+// ARRAYS
 var sandArray = []
 var waterArray = []
 var decorationArray = []
 var bubblesArray = []
 var coinArray = []
 var foodArray = []
-var state, tempState
-var canvas;
+var buttonArray
+var fishBeingHit = [];
+var coinArr = [];
 
+// OBJECTS
+var waterObject, sandObject, rockObject, treasureObject, grassObject, commonEggObject, rareEggObject, legendaryEggObject, fishFoodObject, rareFishFoodObject, legendaryFishFoodObject, cursorObject, shopObject, breedObject, toiletObject
+
+
+// MISC
 var counter = 0;
 var maxCounter = 35;
-
 var findBarrelPosition;
-var waterObject;
-var sandObject;
-var rockObject;
-var treasureObject;
-var grassObject;
-var commonEggObject;
-var rareEggObject;
-var legendaryEggObject;
-var fishFoodObject;
-var rareFishFoodObject;
-var legendaryFishFoodObject;
-var cursorObject;
-var shopObject;
-var breedObject;
-var toiletObject;
-
-
+var state, tempState
+var canvas;
 var waterLevelMapped, grassLevelMapped, rockLevelMapped, sandLevelMapped
-
 var yoff = 0;
 var level1=700;
 var level2=800;
 var canvasHeight = 800;
 var canvasWidth = 1000;
-
 var waterLevel = 0
 var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
-var buttonArray
-var fishBeingHit = [];
-var coinArr = [];
 
+// main game play
 class Game{
   constructor(storeItems=[]){
     this.scene = 'menu';
@@ -52,7 +44,6 @@ class Game{
     //fish holder
     this.fishArr = [];
     this.balance = 8;
-    // this.balance = 1000008;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -79,19 +70,17 @@ class Game{
     this.textSizeMin= 30;
     this.textSizeMax = 35;
     this.textSizeIncSpeed = 0.1;
-    /* stats vars*/
+    // stats vars
     this.stats = {displayIndex: -1, background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)',x: 770, y: 5, w: 225, h: 315};
     //breed stats vars
     this.breedStats = {background: 'rgba(221,221,221,0.95)', bar: 'rgba(132, 43, 215, 0.6)', x: 658, y:5, w: 337, h: 236}
     this.displayBreed = false;
     let rarity =80;
-    // this.parent1 = new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60)
-    // this.parent2 = new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85)
     this.parent1 = 0;
     this.parent2 = 0;
     this.lastParent = 0;
   }
-  drawBreedStats(){
+  drawBreedStats(){ // draw the stats for breeding two fish together
     textAlign(CENTER, CENTER);
     let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
     let middleX = game.breedStats.x+(game.breedStats.w/2);
@@ -103,7 +92,6 @@ class Game{
     //CLOSE Button
     image(closeImg, game.breedStats.x+game.breedStats.w-12, game.breedStats.y+15, 20, 20);
     this.breedIsClosed();
-
     if(alreadyOwned){
       fill('black')
       textSize(20);
@@ -135,7 +123,6 @@ class Game{
       image(heartImg, middleX+3, middleY, 100, 100);
       textSize(30);
       text(this.parent2.type, (middleX+canvasWidth)/2, middleY-75);
-
       image(this.parent2.imageArray[0][0], (middleX+canvasWidth)/2-this.parent2.hitBoxXOf, middleY-15-this.parent2.hitBoxYOf, this.parent2.width, this.parent2.height);
       image(rarityImg, (middleX+canvasWidth)/2-55, middleY+65, 80, 80);
       fill(game.breedStats.bar);
@@ -153,12 +140,10 @@ class Game{
       line(middleX, game.breedStats.y,middleX ,game.breedStats.y+game.breedStats.h);
 
     }
-
-
     textAlign(CENTER, TOP);
     this.breedIsPressed(middleX, middleY);
   }
-  breedIsPressed(middleX, middleY){
+  breedIsPressed(middleX, middleY){ // click the breed button
     if(mouseIsPressed && dist(mouseX, mouseY, middleX, middleY-5) <= 20){
       if(this.parent1.alive && this.parent2.alive){
         createMysteryEgg(this.parent1.rarity, this.parent1.rarity);
@@ -169,7 +154,7 @@ class Game{
       this.displayBreed = false;
     }
   }
-  breedIsClosed(){
+  breedIsClosed(){ // close the breed panel
     if(mouseIsPressed && dist(mouseX, mouseY, game.breedStats.x+game.breedStats.w-12, game.breedStats.y+15) < 10){
       this.parent1 = 0;
       this.parent2 = 0;
@@ -177,7 +162,7 @@ class Game{
       this.displayBreed = false;
     }
   }
-  drawBalance(){
+  drawBalance(){ // draw game balance
     noStroke()
     fill(0,0,0);
     textFont(fishFont);
@@ -185,7 +170,7 @@ class Game{
     textAlign(LEFT, TOP);
     text("Balance: $" + round(this.balance,2), 48, 25 );
   }
-  drawStore(){
+  drawStore(){ // main function for drawing the store
     strokeWeight(1);
     this.counter += 1;
    backgroundFill(214, 253, 255,200);
@@ -198,13 +183,12 @@ class Game{
    textAlign(LEFT, TOP);
    text(`$${this.balance}`, 60, 10);
    image(closeImg, this.storeCloseX, this.storeCloseY, this.storeCloseD, this.storeCloseD);
-
    this.drawStoreItems();
    this.isStoreClosed();
   }
-  drawStoreItems(){
+  drawStoreItems(){ // add the items in the store
     for(let i=0;i<this.storeItems.length;i++){
-      // do not sell items if they have more tthan 1000
+      // do not sell items if they have more than 1000
       if(game.storeItems[i].name !== 'Toilet' && game.storeItems[i].name !== 'Treasure'){
         if(this.storeItems[i].obj.quantity >= 1000){
           game.storeItems[i].soldOut = true;
@@ -243,7 +227,7 @@ class Game{
     this.storeItemX = this.storeItemOrigX;
     this.storeItemY = this.storeItemOrigY;
   }
-  isStoreItemClicked(index){
+  isStoreItemClicked(index){ // clicking a store item
     let name = game.storeItems[index].name;
     let obj = game.storeItems[index].obj;
     let price = game.storeItems[index].price;
@@ -272,18 +256,18 @@ class Game{
       this.counter = 0;
     }
   }
-  isStoreClosed(){
+  isStoreClosed(){ // close the store
     if((dist(mouseX, mouseY, this.storeCloseX, this.storeCloseY) <= this.storeCloseD/2) && mouseIsPressed){
       state = 'cursor';
       this.scene = 'tank';
     }
   }
-  drawFish(){
+  drawFish(){ // draw fish
     for(let i=0; i < this.fishArr.length; i++){
       this.fishArr[i].draw();
     }
   }
-  drawMenuText(){
+  drawMenuText(){ // pre-game loading screen
     textFont(fishFont)
     strokeWeight(1);
     textAlign(CENTER, CENTER);
@@ -321,21 +305,20 @@ class Game{
           waterSound.play();
         }
       }
-      level1 -= 3;
+      level1 -= 3; // how fast to fill the tank
       level2 -= 3;
       var drop = new Water(mouseX, mouseY);
       waterArray.push(drop)
     }
-    for (var i = waterArray.length-1; i >= 0; i--) {
+    for (var i = waterArray.length-1; i >= 0; i--) { // display and remove water particles
       let check = waterArray[i].display()
       if (check == 'gone'){
         waterArray.splice(i, 1)
         i-=1
       }
     }
-    // displayButtons()
-    displayTankWalls()
-    waterLevelMapped = int(map(waterLevel, 0, 250, 1, 100))
+    displayTankWalls() // walls of the tank
+    waterLevelMapped = int(map(waterLevel, 0, 250, 1, 100)) // finish filling the tank?
     if (waterLevelMapped==100){
       if (waterSound.isPlaying() ) { // .isPlaying() returns a boolean
         waterSound.pause();
@@ -345,7 +328,6 @@ class Game{
       game.scene = 'tank'
     }
     this.drawMenuText();
-
   }
   drawTank(){
     let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
@@ -416,7 +398,6 @@ class Game{
     //make sure the player is not hovering over the fish when they feed them
     if(!fishIsHit && mouseIsPressed && state=='food'){
       var tempFood = new Food(mouseX, mouseY, 0.7)
-
       fishFoodObject.quantity-=0.08;
       foodArray.push(tempFood)
     }
@@ -458,7 +439,6 @@ class Game{
       }
     }
     // DISPLAY STATS, BUTTONS, AND TANK WALLS
-    //displayEnvironmentalStats()
     this.drawBalance();
     displayButtons()
     displayTankWalls()
@@ -473,6 +453,7 @@ class Game{
 }
 
 
+// functions for cracking an egg
 function crackLegendaryEgg(){
   let offSpringRarity = Math.floor(random(85, 100));
   if(offSpringRarity >= 95){
@@ -527,6 +508,7 @@ function breedFish(rarity1, rarity2){
   return ['F', offSpringRarity];
 }
 
+// main class for fish
 class Fish{
   constructor(type, imageArray, w, h, rarity, frameNum=2, frameDelay=25, hitBox, xOf=0, yOf=0){
     this.type = type;
@@ -559,7 +541,7 @@ class Fish{
     this.yMovement = 0;
     this.imageArray = imageArray;
   }
-  drawHitBox(){
+  drawHitBox(){ // each fish has its own hit box
     stroke('black')
     strokeWeight(1);
     fill('rgba(0,255,0,0.1)')
@@ -575,10 +557,7 @@ class Fish{
     }
 
 
-    // fish price varies depending on health
-    // this.price = round(((this.health/100) * this.startingPrice), 2)
     this.price = constrain(this.price, 0, 100000)
-
 
     // fish progressively loses health
     this.health = constrain(this.health, 1, 100)
@@ -587,8 +566,6 @@ class Fish{
     }
     this.health = round(this.health, 2)
 
-    // fish progressively ages
-    //this.age += .0001
 
     // fish starved or grew too old?
     if (this.health <= 1 || this.age >= 10){
@@ -622,7 +599,7 @@ class Fish{
     }
     //this.isClicked();
   }
-  drawStats(){
+  drawStats(){ // stats for each fish
     fill(game.stats.background);
     strokeWeight(1);
     rect(game.stats.x ,game.stats.y ,game.stats.w ,game.stats.h );
@@ -666,7 +643,7 @@ class Fish{
     this.isClosed();
     this.isSold();
   }
-  isSold(){
+  isSold(){ // selling a fish
     let higherThanSell = mouseY < game.stats.y+280 -35;
     let lowerThanSell = mouseY > game.stats.y+280 +150 -125;
     let leftOfSell = mouseX < (game.stats.x+game.stats.x+game.stats.w)/2+10  -25;
@@ -711,10 +688,8 @@ class Fish{
 }
 
 function updateCounter() {
-  // increase our counter
-  counter++;
+  counter++;   // increase our counter
   // maxCounter++
-
   // use the counter to set the style on the '#progress_bar' div
   var progress_bar = select('#progress_bar');
   progress_bar.style('width', int(counter/maxCounter*100) + "%");
@@ -817,7 +792,6 @@ function preload(){
 }
 
 
-
 function setup() {
   state = 'water'
   canvas = createCanvas(canvasWidth, canvasHeight);
@@ -838,15 +812,11 @@ function setup() {
   fishFoodObject = new Button('food', fishFoodImage, 50, 50)
   rareFishFoodObject = new Button('food2', rareFishFoodImage, 50, 50)
   legendaryFishFoodObject = new Button('food3', legendaryFishFoodImage, 50, 50)
-
   cursorObject = new Button('cursor', cursorImage, 1000)
   shopObject = new Button('shop', shopImage, 1000)
   breedObject = new Button('breed', breedImage, 1000)
-
   mysteryEggObject = new Button('mysteryEgg', mysteryEggImage, 1, 1);
-
   buttonArray = [cursorObject, shopObject, breedObject, fishFoodObject]
-
   let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '18', soldOut: false},
                     {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '38', soldOut: false},
                     {name:'Legendary Food', img: legendaryFishFoodImage, obj: legendaryFishFoodObject, price: '95', soldOut: false},
@@ -884,7 +854,7 @@ function draw() {
   image(game.cursor, mouseX, mouseY, 20, 20);
 }
 
-class Coin{
+class Coin{ // magic coin that comes from the treasure box
   constructor(x=250, y=250){
     this.x = x;
     this.y = y;
@@ -937,7 +907,7 @@ class Bubbles { // bubbles come out of the barrel
     this.xNoiseOffset += 0.01;
   }
 }
-class Decoration {
+class Decoration { // main class to store decorations
   constructor(image, x, y, size=100, yOffset=0){
     this.x = x
     this.y = y;
@@ -974,7 +944,6 @@ class Decoration {
 }
 
 // SAND CLASS
-
 class Sand {
   constructor(x, y){
       this.x = x
@@ -1024,7 +993,7 @@ class Water {
       }
   }
 }
-
+// FOOD CLASS
 class Food {
     constructor(x, y, healthIncrease=2){
       this.x = x
@@ -1071,23 +1040,6 @@ function displayTankWalls() {
     line(0, height, width, height)
     line(width, 0, width, height)
 }
-
-// ENVIRONMENTAL STATS
-function displayEnvironmentalStats(){
-  fill(0)
-   waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
-  text("Water level: " + waterLevelMapped + "%", width-120, 20 )
-
-   sandLevelMapped = int(map(sandLevel, 0, 200, 1, 100))
-  text("Sand level: " + sandLevelMapped + "%", width-120, 60 )
-
-   rockLevelMapped = int(map(rockLevel, 0, 4, 1, 100))
-  text("Rock level: " + rockLevelMapped + "%", width-120, 100 )
-
-   grassLevelMapped = int(map(grassLevel, 0, 4, 1, 100));
-  text("Grass level: " + grassLevelMapped + "%", width-120, 140 );
-}
-
 
 
 function mousePressed(){
@@ -1195,7 +1147,7 @@ function drawWater() { // https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm
   endShape(CLOSE);
 }
 
-class ToolBar{
+class ToolBar{ // class to store the things in your toolbar
   constructor(x, y){
     this.x = x;
     this.y = y;
@@ -1270,7 +1222,7 @@ function displayButtons(){
     toolBar.draw(buttonArray, mouseX, mouseY);
 }
 
-class Button{
+class Button{ // class to create an object
   constructor(name, image, quantity=0, max=0, size=100, yOffset=0){
     this.yOffset = yOffset;
     this.name = name;
