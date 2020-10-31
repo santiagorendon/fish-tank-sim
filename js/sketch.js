@@ -2,6 +2,7 @@ var rock, rock2, c1, c2, fishImage, waterImage, waterSound, grassImage, sandImag
 var sandArray = []
 var waterArray = []
 var decorationArray = []
+var bubblesArray = []
 var coinArray = []
 var foodArray = []
 var state, tempState
@@ -10,7 +11,7 @@ var canvas;
 var counter = 0;
 var maxCounter = 35;
 
-
+var findBarrelPosition;
 var waterObject;
 var sandObject;
 var rockObject;
@@ -47,7 +48,7 @@ var coinArr = [];
 class Game{
   constructor(storeItems=[]){
     this.scene = 'menu';
-    //this.scene = 'tank';
+    // this.scene = 'tank';
     //fish holder
     this.fishArr = [];
     this.balance = 150;
@@ -309,7 +310,7 @@ class Game{
   drawMainMenu(){
     // FILL TANK
     drawWater();
-    if (mouseIsPressed && state == 'water' && mouseY >= 200){
+    if (mouseIsPressed && state == 'water'){
       drawWater();
       if (waterLevel<=500){
         waterLevel +=1
@@ -431,7 +432,9 @@ class Game{
       sandArray[i].display()
     }
 
-
+    for (var i=0; i < bubblesArray.length; i++){
+      bubblesArray[i].display()
+    }
     for(var i = 0; i < decorationArray.length; i++) {
       decorationArray[i].display();
     }
@@ -900,6 +903,24 @@ class Coin{
   }
 }
 
+class Bubbles { // bubbles come out of the barrel
+  constructor(){
+    this.ellipseY = decorationArray[findBarrelPosition].y
+    this.ellipseX = decorationArray[findBarrelPosition].x
+    this.randomSize = random(5, 25)
+    this.xNoiseOffset = random(0,1000);
+    this.xMovement = 0
+  }
+  display(){
+    stroke(255)
+    fill(255,255,255, 100)
+    ellipse(this.ellipseX, this.ellipseY, this.randomSize, this.randomSize)
+    this.ellipseY -= 1
+    this.xMovement = map( noise(this.xNoiseOffset), 0, 1, -1, 1 );
+    this.ellipseX += this.xMovement;
+    this.xNoiseOffset += 0.01;
+  }
+}
 class Decoration {
   constructor(image, x, y, size=100, yOffset=0){
     this.x = x
@@ -911,6 +932,17 @@ class Decoration {
     this.yOffset = yOffset; //how extra far to the bottom
   }
   display(){
+    for (var i=0; i<decorationArray.length; i++){ // find position of barrel in decorationArray
+      if (decorationArray[i].image === barrelImage){
+        findBarrelPosition = i
+      }
+    }
+    if (this.image === barrelImage){
+      if (frameCount % 120 == 0){
+        var bubbleParticle = new Bubbles()
+        bubblesArray.push(bubbleParticle)
+      }
+    }
     if(this.image === treasureImage){
       this.counter += 1;
       if(this.counter >= this.coinDelay){
