@@ -933,11 +933,11 @@ class Decoration {
   }
   display(){
     for (var i=0; i<decorationArray.length; i++){ // find position of barrel in decorationArray
-      if (decorationArray[i].size == 85){
+      if (decorationArray[i].image === barrelImage){
         findBarrelPosition = i
       }
     }
-    if (this.image == barrelImage){
+    if (this.image === barrelImage){
       if (frameCount % 120 == 0){
         var bubbleParticle = new Bubbles()
         bubblesArray.push(bubbleParticle)
