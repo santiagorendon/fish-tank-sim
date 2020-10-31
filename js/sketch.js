@@ -321,8 +321,8 @@ class Game{
           waterSound.play();
         }
       }
-      level1 -= 1.5;
-      level2 -= 1.5;
+      level1 -= 3;
+      level2 -= 3;
       var drop = new Water(mouseX, mouseY);
       waterArray.push(drop)
     }
@@ -335,8 +335,11 @@ class Game{
     }
     // displayButtons()
     displayTankWalls()
-    waterLevelMapped = int(map(waterLevel, 0, 500, 1, 100))
+    waterLevelMapped = int(map(waterLevel, 0, 250, 1, 100))
     if (waterLevelMapped==100){
+      if (waterSound.isPlaying() ) { // .isPlaying() returns a boolean
+        waterSound.pause();
+      }
       game.state = cursor;
       game.cursor = cursorImage;
       game.scene = 'tank'
