@@ -279,16 +279,12 @@
                             some visual flair to your tank.
                           </p>
 
-                          <h4>Rock</h4>
+                          <h4>Misc. Decorations</h4>
                           <p>
-                            A basic decoration for your tank, you can drop in new <code>Rock</code> images to your tank.
+                            You can drop in new decorations from the store defined in the <code>Decoration</code> class to your tank.
                             As usual, they float to the bottom, and will be layered on top of the sand you added previously.
                           </p>
-                          <h4>Grass</h4>
-                          <p>
-                            Another basic decoration for your tank, you can add some greenery to your tank by using the <code>Grass</code>
-                            class. As usual, they float to the bottom, and will be layered on top of the sand you added previously.
-                          </p>
+
 
 
                         <h2>Fish</h2>
@@ -296,14 +292,14 @@
                         <h4>Feeding</h4>
                         <p>
                           Fish swim happily around the tank, but while this happens, they constantly get a bit more hungry,
-                          with a <code>this.health -= this.healthLoss</code> variable descreasing.
+                          with a <code>this.health -= this.healthLoss</code> variable decreasing.
                           Click on a fish to see its stats, including its hunger level.
                           To feed a fish, you can buy some fish food and drop it over a fish to restore its hunger level,
                           which uses basic distance collision to detect that the food is touching the fish.
                         </p>
                         <h4>Death</h4>
                         <p>
-                          A fish that you forgot to feed will have its alive variable change to<code>this.alive = false</code>, causing it sink to the bottom of the tank.
+                          A fish that you forgot to feed will eventually have its <code>health</code> propery reach 0, causing it sink to the bottom of the tank.
                           You won't be able to sell this fish, and will have to use the toilet tool to flush your dead fish away.
                         </p>
                         <h4>Movement</h4>
@@ -431,9 +427,14 @@
 
                             </ul>
 
-                          <!-- <h4>Functionality</h4>
+                          <h4>Draw Loop</h4>
                             <p>
-                              insert run down of preload setup and draw
+                              Our draw function is the main loop of the game.
+                              Here we will handle the different routes that the game will draw as well as add a custom cursor.
+                              The first being the main menu, then the tank scene, and finally the store.
+                              To see more of what each route does feel free to check them out on
+                              <a target="_blank" href="https://github.com/santiagorendon/fish-tank-sim/blob/c4ed9bde8fd5e3ffde21e61554747200becb2533/js/sketch.js#L48">Github</a>
+                              inside the defined methods of the <code>Game</code> class.
                             </p>
 <pre><code>
   function draw() {
@@ -454,9 +455,7 @@
   }
 </code></pre>
 
-                        <p>
-                          Talk more about code.
-                        </p> -->
+                        </p>
                         <blockquote>
                             <p>
                               No human being, however great, or powerful, was ever so free as a fish.
