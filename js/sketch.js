@@ -35,6 +35,7 @@ var waterLevel = 0
 var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
+var isHittingToolBarHitBox = false;
 
 // main game play
 class Game{
@@ -340,7 +341,7 @@ class Game{
     backgroundFill(100,200,255);
     drawFloor();
     // ADD SAND
-    if (mouseIsPressed && state=='sand' && mouseY >= 200){
+    if (mouseIsPressed && state=='sand' && !isHittingToolBarHitBox){
       var tempSand = new Sand(mouseX, mouseY)
       sandObject.quantity-=0.1;
       sandArray.push(tempSand)
@@ -396,17 +397,17 @@ class Game{
       }
     }
     //make sure the player is not hovering over the fish when they feed them
-    if(!fishIsHit && mouseIsPressed && state=='food'){
+    if(!fishIsHit && mouseIsPressed && state=='food' && !isHittingToolBarHitBox){
       var tempFood = new Food(mouseX, mouseY, 0.7)
       fishFoodObject.quantity-=0.08;
       foodArray.push(tempFood)
     }
-    if(!fishIsHit && mouseIsPressed && state=='food2'){
+    if(!fishIsHit && mouseIsPressed && state=='food2' && !isHittingToolBarHitBox){
       var tempFood = new Food(mouseX, mouseY, 1)
       rareFishFoodObject.quantity-=0.05;
       foodArray.push(tempFood)
     }
-    if(!fishIsHit && mouseIsPressed && state=='food3'){
+    if(!fishIsHit && mouseIsPressed && state=='food3' && !isHittingToolBarHitBox){
       var tempFood = new Food(mouseX, mouseY, 1.8)
       legendaryFishFoodObject.quantity-=0.05;
       foodArray.push(tempFood)
@@ -1043,12 +1044,12 @@ function displayTankWalls() {
 
 
 function mousePressed(){
-  if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && mouseY >= 200){//decoration
+  if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && !isHittingToolBarHitBox){//decoration
     decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size, window[state+"Object"].yOffset));
     window[state+"Object"].quantity -= 1;
   }
   // ADD FISH
-  if (mouseIsPressed && state == 'mysteryEgg' && mouseY >= 200){
+  if (mouseIsPressed && state == 'mysteryEgg' && !isHittingToolBarHitBox){
     fishBeingHit.push(0);
     let newFish = breedFish(mysteryEggObject.parent1, mysteryEggObject.parent2);
     let type = newFish[0];
@@ -1074,7 +1075,7 @@ function mousePressed(){
     }
     mysteryEggObject.quantity -= 1
   }
-  else if (mouseIsPressed && state=='commonEgg' && mouseY >= 200){
+  else if (mouseIsPressed && state=='commonEgg' && !isHittingToolBarHitBox){
     fishBeingHit.push(0);
     let newFish = crackCommonEgg();
     let type = newFish[0];
@@ -1089,7 +1090,7 @@ function mousePressed(){
     commonEggObject.quantity -= 1
   }
   // ADD FISH
-  else if (mouseIsPressed && state=='rareEgg' && mouseY >= 200){
+  else if (mouseIsPressed && state=='rareEgg' && !isHittingToolBarHitBox){
     fishBeingHit.push(0);
     let newFish = crackRareEgg();
     let type = newFish[0];
@@ -1102,7 +1103,7 @@ function mousePressed(){
     }
     rareEggObject.quantity -= 1
   }
-  else if (mouseIsPressed && state=='legendaryEgg' && mouseY >= 200){
+  else if (mouseIsPressed && state=='legendaryEgg' && !isHittingToolBarHitBox){
     fishBeingHit.push(0);
     let newFish = crackLegendaryEgg();
     let type = newFish[0];
@@ -1156,6 +1157,7 @@ class ToolBar{ // class to store the things in your toolbar
     this.highlightColor = 'rgba(255, 152, 100, 0.8)'
   }
   draw(buttonArray, mouseX, mouseY){
+
       for (var i=0; i<buttonArray.length; i++){
         if(buttonArray[i].quantity < 1){ //if tool runs out of uses
           game.cursor = cursorImage;
@@ -1191,6 +1193,13 @@ class ToolBar{ // class to store the things in your toolbar
           text(`${int(buttonArray[i].quantity)}/${int(buttonArray[i].max)}` , (this.buttonX+25), this.buttonY+55)
         }
         this.buttonX += 50
+        console.log(isHittingToolBarHitBox)
+        if (mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
+          isHittingToolBarHitBox = true
+        }
+        else {
+          isHittingToolBarHitBox = false
+        }
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
           if(buttonArray[i].name === 'shop'){
             game.cursor = cursorImage;
