@@ -40,10 +40,10 @@ var grassLevel = 0
 class Game{
   constructor(storeItems=[]){
     this.scene = 'menu';
-    // this.scene = 'tank';
+    this.scene = 'tank';
     //fish holder
     this.fishArr = [];
-    this.balance = 8;
+    this.balance = 8990;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -79,6 +79,8 @@ class Game{
     this.parent1 = 0;
     this.parent2 = 0;
     this.lastParent = 0;
+    this.alpha = 0
+    this.transaction = ''
   }
   drawBreedStats(){ // draw the stats for breeding two fish together
     textAlign(CENTER, CENTER);
@@ -169,6 +171,16 @@ class Game{
     textSize(20);
     textAlign(LEFT, TOP);
     text("Balance: $" + round(this.balance,2), 48, 25 );
+    if (this.alpha == 0){
+      this.transaction = ''
+    }
+    if (this.alpha != 0){
+      fill(0, 0, 0, this.alpha)
+      text("Transaction: "+this.transaction, 150, 25)
+      if (this.alpha >= 0){
+        this.alpha -= 1
+      }
+    }
   }
   drawStore(){ // main function for drawing the store
     strokeWeight(1);
@@ -253,6 +265,8 @@ class Game{
         }
       }
       this.balance -= price;
+      this.alpha = 255
+      this.transaction = ("-" + price)
       this.counter = 0;
     }
   }
@@ -652,6 +666,9 @@ class Fish{
     if(mouseIsPressed && isHit && this.alive){
       //increment price
       game.balance += this.price;
+      this.alpha = 255
+      this.transaction = ("+" + this.price)
+
       //remove fish
       game.fishArr.splice(game.stats.displayIndex, 1);
       fishBeingHit.splice(game.stats.displayIndex, 1);
@@ -885,6 +902,8 @@ class Coin{ // magic coin that comes from the treasure box
       this.age = this.lifeSpan;
       coinSound.play()
       game.balance += 5;
+      this.alpha = 255
+      this.transaction = ("+" + 5)
     }
   }
 }
