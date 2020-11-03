@@ -43,7 +43,7 @@ class Game{
     this.scene = 'tank';
     //fish holder
     this.fishArr = [];
-    this.balance = 8990;
+    this.balance = 8;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -80,6 +80,9 @@ class Game{
     this.parent2 = 0;
     this.lastParent = 0;
     this.alpha = 0
+    this.colorR = 0
+    this.colorG = 0
+    this.colorB = 0
     this.transaction = ''
   }
   drawBreedStats(){ // draw the stats for breeding two fish together
@@ -175,8 +178,8 @@ class Game{
       this.transaction = ''
     }
     if (this.alpha != 0){
-      fill(0, 0, 0, this.alpha)
-      text("Transaction: "+this.transaction, 150, 25)
+      fill(this.colorR, this.colorG, this.colorB, this.alpha)
+      text(this.transaction, 150, 25)
       if (this.alpha >= 0){
         this.alpha -= 1
       }
@@ -194,6 +197,16 @@ class Game{
    text('STORE', canvasWidth/2, 10);
    textAlign(LEFT, TOP);
    text(`$${this.balance}`, 60, 10);
+   if (this.alpha == 0){
+     this.transaction = ''
+   }
+   if (this.alpha != 0){
+     fill(this.colorR, this.colorG, this.colorB, this.alpha)
+     text(this.transaction, 200, 10)
+     if (this.alpha >= 0){
+       this.alpha -= 1
+     }
+   }
    image(closeImg, this.storeCloseX, this.storeCloseY, this.storeCloseD, this.storeCloseD);
    this.drawStoreItems();
    this.isStoreClosed();
@@ -266,6 +279,9 @@ class Game{
       }
       this.balance -= price;
       this.alpha = 255
+      this.colorR = 255
+      this.colorG = 0
+      this.colorB = 0
       this.transaction = ("-" + price)
       this.counter = 0;
     }
@@ -666,8 +682,11 @@ class Fish{
     if(mouseIsPressed && isHit && this.alive){
       //increment price
       game.balance += this.price;
-      this.alpha = 255
-      this.transaction = ("+" + this.price)
+      game.alpha = 255
+      game.colorR = 0
+      game.colorG = 255
+      game.colorB = 0
+      game.transaction = ("+" + this.price)
 
       //remove fish
       game.fishArr.splice(game.stats.displayIndex, 1);
@@ -902,8 +921,11 @@ class Coin{ // magic coin that comes from the treasure box
       this.age = this.lifeSpan;
       coinSound.play()
       game.balance += 5;
-      this.alpha = 255
-      this.transaction = ("+" + 5)
+      game.alpha = 255
+      game.colorR = 0
+      game.colorG = 255
+      game.colorB = 0
+      game.transaction = ("+" + 5)
     }
   }
 }
