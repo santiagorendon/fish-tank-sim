@@ -392,7 +392,7 @@ class Game{
     let fishHitIndex = fishBeingHit.indexOf(1);
 
     for(let i=0; i < coinArray.length; i++){
-      let isHit = coinArray[i].isClicked;
+      let isHit = coinArray[i].isClicked();
       if(isHit){
         coinBeingHit[i] = 1;
       }
@@ -446,7 +446,6 @@ class Game{
       }
     }
     //make sure the player is not hovering over the fish when they feed them
-    console.log(coinIsHit)
     let isHittingToolBar = isHittingToolBarHitBox();
     if(!fishIsHit && mouseIsPressed && !isHittingToolBar && !coinIsHit){
       if(state=='food'){
