@@ -833,11 +833,11 @@ function setup() {
                     {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '10', soldOut: false},
                     {name:'Rare Egg', obj: rareEggObject, img: rareEggImage, price: '300', soldOut: false},
                     {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '1300', soldOut: false},
-                    {name:'Grass', obj: grassObject, img: grassImage, price: '100', soldOut: false},
-                    {name:'Rock', obj: rockObject, img: rockImage, price: '100', soldOut: false},
-                    {name:'Sand', obj: sandObject, img: sandImage, price: '50', soldOut: false},
-                    {name:'Log Sign', obj: logSignObject, img: logSignImage, price: '350', soldOut: false},
-                    {name:'Barrel', obj: barrelObject, img: barrelImage, price: '900', soldOut: false}
+                    {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
+                    {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
+                    {name:'Sand', obj: sandObject, img: sandImage, price: '10', soldOut: false},
+                    {name:'Log Sign', obj: logSignObject, img: logSignImage, price: '100', soldOut: false},
+                    {name:'Barrel', obj: barrelObject, img: barrelImage, price: '150', soldOut: false}
                   ]
   game = new Game(storeItems);
   game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, 5, 2, 25, 60))
