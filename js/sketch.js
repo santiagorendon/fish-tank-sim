@@ -14,6 +14,7 @@ var foodArray = []
 var buttonArray
 var fishBeingHit = [];
 var coinArr = [];
+var coinBeingHit = [];
 
 // OBJECTS
 var waterObject, sandObject, rockObject, treasureObject, grassObject, commonEggObject, rareEggObject, legendaryEggObject, fishFoodObject, rareFishFoodObject, legendaryFishFoodObject, cursorObject, shopObject, breedObject, toiletObject
@@ -389,6 +390,18 @@ class Game{
     }
     let fishIsHit = (fishBeingHit.indexOf(1) !== -1);
     let fishHitIndex = fishBeingHit.indexOf(1);
+
+    for(let i=0; i < coinArray.length; i++){
+      let isHit = coinArray[i].isClicked;
+      if(isHit){
+        coinBeingHit[i] = 1;
+      }
+      else{
+        coinBeingHit[i] = 0;
+      }
+    }
+    let coinIsHit = (coinBeingHit.indexOf(1) !== -1);
+    let coinHitIndex = fishBeingHit.indexOf(1);
     if(mouseIsPressed && fishIsHit){ //if fish is clicked
       //if cursor is selector or food
       if((game.cursor === cursorImage || game.cursor === fishFoodImage || game.cursor === rareFishFoodImage || game.cursor === legendaryFishFoodImage)){
@@ -423,9 +436,8 @@ class Game{
         }
       }
     }
-    let isHittingToolBar = isHittingToolBarHitBox();
     // ADD SAND
-    if (mouseIsPressed && state=='sand' && !isHittingToolBar){
+    if (mouseIsPressed && state=='sand' && !isHittingToolBar && !coinIsHit){
       var tempSand = new Sand(mouseX, mouseY)
       sandObject.quantity-=0.1;
       sandArray.push(tempSand)
@@ -434,7 +446,9 @@ class Game{
       }
     }
     //make sure the player is not hovering over the fish when they feed them
-    if(!fishIsHit && mouseIsPressed && !isHittingToolBar){
+    console.log(coinIsHit)
+    let isHittingToolBar = isHittingToolBarHitBox();
+    if(!fishIsHit && mouseIsPressed && !isHittingToolBar && !coinIsHit){
       if(state=='food'){
         fishFoodObject.quantity-=0.08;
         foodArray.push(new Food(mouseX, mouseY, 0.7))
@@ -462,8 +476,10 @@ class Game{
     }
     for(var i = 0; i < coinArray.length; i++) {
       coinArray[i].display();
+      coinArray[i].isClicked();
       if(coinArray[i].age >= coinArray[i].lifeSpan){
-        coinArray.splice(i, 1)
+        coinArray.splice(i, 1);
+        coinBeingHit.splice(i, 1);
         i -= 1;
       }
     }
@@ -927,10 +943,9 @@ class Coin{ // magic coin that comes from the treasure box
     }
     //this.drawHitBox();
     image(coinImg, this.x, this.y, this.size, this.size);
-    this.isClicked();
   }
   isClicked(){
-    if(mouseIsPressed && dist(mouseX, mouseY, this.x, this.y) < (this.hitBox/2) && game.cursor === cursorImage){
+    if(mouseIsPressed && dist(mouseX, mouseY, this.x, this.y) < (this.hitBox/2)){
       this.age = this.lifeSpan;
       coinSound.play()
       game.balance += 5;
@@ -939,7 +954,9 @@ class Coin{ // magic coin that comes from the treasure box
       game.balanceColorG = 65
       game.balanceColorB = 22
       game.transaction = ("+" + this.value)
+      return true;
     }
+    return false;
   }
 }
 
@@ -986,6 +1003,7 @@ class Decoration { // main class to store decorations
     if(this.image === treasureImage){
       this.counter += 1;
       if(this.counter >= this.coinDelay){
+        coinBeingHit.push(0);
         coinArray.push(new Coin(this.x-15, this.y-15));
         this.counter = 0;
       }
@@ -1102,8 +1120,9 @@ function mousePressed(){
     decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size, window[state+"Object"].yOffset));
     window[state+"Object"].quantity -= 1;
   }
+  let coinIsHit = (coinBeingHit.indexOf(1) !== -1);
   // ADD FISH
-  if(mouseIsPressed && !isHittingToolBar){
+  if(mouseIsPressed && !isHittingToolBar && !coinIsHit){
     if ( state == 'mysteryEgg'){
       fishBeingHit.push(0);
       let newFish = breedFish(mysteryEggObject.parent1, mysteryEggObject.parent2);
