@@ -36,14 +36,16 @@ var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
 
+
+
 // main game play
 class Game{
   constructor(storeItems=[]){
-    this.scene = 'menu';
-    // this.scene = 'tank';
+    // this.scene = 'menu';
+    this.scene = 'tank';
     //fish holder
     this.fishArr = [];
-    this.balance = 8;
+    this.balance = 10008;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -339,15 +341,6 @@ class Game{
     game.clickCounter += 1;
     backgroundFill(100,200,255);
     drawFloor();
-    // ADD SAND
-    if (mouseIsPressed && state=='sand' && mouseY >= 200){
-      var tempSand = new Sand(mouseX, mouseY)
-      sandObject.quantity-=0.1;
-      sandArray.push(tempSand)
-      if(sandLevel<=200){
-        sandLevel +=1
-      }
-    }
 
     // check if any fish is being selected
     for(let i=0; i < game.fishArr.length;i++){
@@ -395,23 +388,31 @@ class Game{
         }
       }
     }
+    let isHittingToolBar = isHittingToolBarHitBox();
+    // ADD SAND
+    if (mouseIsPressed && state=='sand' && !isHittingToolBar){
+      var tempSand = new Sand(mouseX, mouseY)
+      sandObject.quantity-=0.1;
+      sandArray.push(tempSand)
+      if(sandLevel<=200){
+        sandLevel +=1
+      }
+    }
     //make sure the player is not hovering over the fish when they feed them
-    if(!fishIsHit && mouseIsPressed && state=='food'){
-      var tempFood = new Food(mouseX, mouseY, 0.7)
-      fishFoodObject.quantity-=0.08;
-      foodArray.push(tempFood)
+    if(!fishIsHit && mouseIsPressed && !isHittingToolBar){
+      if(state=='food'){
+        fishFoodObject.quantity-=0.08;
+        foodArray.push(new Food(mouseX, mouseY, 0.7))
+      }
+      else if(state=='food2'){
+        rareFishFoodObject.quantity-=0.05;
+        foodArray.push(new Food(mouseX, mouseY, 1))
+      }
+      else if(state=='food3'){
+        legendaryFishFoodObject.quantity-=0.05;
+        foodArray.push(new Food(mouseX, mouseY, 1.8))
+      }
     }
-    if(!fishIsHit && mouseIsPressed && state=='food2'){
-      var tempFood = new Food(mouseX, mouseY, 1)
-      rareFishFoodObject.quantity-=0.05;
-      foodArray.push(tempFood)
-    }
-    if(!fishIsHit && mouseIsPressed && state=='food3'){
-      var tempFood = new Food(mouseX, mouseY, 1.8)
-      legendaryFishFoodObject.quantity-=0.05;
-      foodArray.push(tempFood)
-    }
-
 
     // DISPLAY CLASSES
     for (var i = sandArray.length-1; i >= 0; i--) {
@@ -452,6 +453,13 @@ class Game{
   }
 }
 
+function isHittingToolBarHitBox(){
+  let leftOfToolBar = mouseX < 50;
+  let rightOfToolBar = mouseX > buttonArray.length*50 + 50;
+  let upOfToolbar = 50 > mouseY;
+  let downOfToolbar = 100 < mouseY;
+  return !leftOfToolBar && !rightOfToolBar && !upOfToolbar && !downOfToolbar;
+}
 
 // functions for cracking an egg
 function crackLegendaryEgg(){
@@ -1043,77 +1051,80 @@ function displayTankWalls() {
 
 
 function mousePressed(){
-  if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && mouseY >= 200){//decoration
+  let isHittingToolBar = isHittingToolBarHitBox();
+  if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && !isHittingToolBar){//decoration
     decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size, window[state+"Object"].yOffset));
     window[state+"Object"].quantity -= 1;
   }
   // ADD FISH
-  if (mouseIsPressed && state == 'mysteryEgg' && mouseY >= 200){
-    fishBeingHit.push(0);
-    let newFish = breedFish(mysteryEggObject.parent1, mysteryEggObject.parent2);
-    let type = newFish[0];
-    let rarity = newFish[1];
-    //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
-    if(type === 'S'){
-      game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+  if(mouseIsPressed && !isHittingToolBar){
+    if ( state == 'mysteryEgg'){
+      fishBeingHit.push(0);
+      let newFish = breedFish(mysteryEggObject.parent1, mysteryEggObject.parent2);
+      let type = newFish[0];
+      let rarity = newFish[1];
+      //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
+      if(type === 'S'){
+        game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+      }
+      else if(type === 'A'){
+        game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
+      }
+      else if(type === 'B'){
+        game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+      }
+      else if(type === 'C'){
+        game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
+      }
+      else if(type === 'D'){
+        game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
+      }
+      else{
+        game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+      }
+      mysteryEggObject.quantity -= 1
     }
-    else if(type === 'A'){
-      game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
+    else if (state=='commonEgg'){
+      fishBeingHit.push(0);
+      let newFish = crackCommonEgg();
+      let type = newFish[0];
+      let rarity = newFish[1];
+      //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
+      if(type === 'D'){
+        game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
+      }
+      else{
+        game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+      }
+      commonEggObject.quantity -= 1
     }
-    else if(type === 'B'){
-      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    // ADD FISH
+    else if (state=='rareEgg'){
+      fishBeingHit.push(0);
+      let newFish = crackRareEgg();
+      let type = newFish[0];
+      let rarity = newFish[1];
+      if(type === 'C'){
+        game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
+      }
+      else{
+        game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+      }
+      rareEggObject.quantity -= 1
     }
-    else if(type === 'C'){
-      game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
+    else if (state=='legendaryEgg'){
+      fishBeingHit.push(0);
+      let newFish = crackLegendaryEgg();
+      let type = newFish[0];
+      let rarity = newFish[1];
+      if(type === 'A'){
+        game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
+      }
+      else{
+        game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+      }
+      legendaryEggObject.quantity -= 1
     }
-    else if(type === 'D'){
-      game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
-    }
-    else{
-      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
-    }
-    mysteryEggObject.quantity -= 1
-  }
-  else if (mouseIsPressed && state=='commonEgg' && mouseY >= 200){
-    fishBeingHit.push(0);
-    let newFish = crackCommonEgg();
-    let type = newFish[0];
-    let rarity = newFish[1];
-    //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
-    if(type === 'D'){
-      game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
-    }
-    else{
-      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
-    }
-    commonEggObject.quantity -= 1
-  }
-  // ADD FISH
-  else if (mouseIsPressed && state=='rareEgg' && mouseY >= 200){
-    fishBeingHit.push(0);
-    let newFish = crackRareEgg();
-    let type = newFish[0];
-    let rarity = newFish[1];
-    if(type === 'C'){
-      game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
-    }
-    else{
-      game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
-    }
-    rareEggObject.quantity -= 1
-  }
-  else if (mouseIsPressed && state=='legendaryEgg' && mouseY >= 200){
-    fishBeingHit.push(0);
-    let newFish = crackLegendaryEgg();
-    let type = newFish[0];
-    let rarity = newFish[1];
-    if(type === 'A'){
-      game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
-    }
-    else{
-      game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
-    }
-    legendaryEggObject.quantity -= 1
   }
 }
 
@@ -1156,6 +1167,7 @@ class ToolBar{ // class to store the things in your toolbar
     this.highlightColor = 'rgba(255, 152, 100, 0.8)'
   }
   draw(buttonArray, mouseX, mouseY){
+
       for (var i=0; i<buttonArray.length; i++){
         if(buttonArray[i].quantity < 1){ //if tool runs out of uses
           game.cursor = cursorImage;
