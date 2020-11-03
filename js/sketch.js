@@ -35,7 +35,8 @@ var waterLevel = 0
 var sandLevel = 0
 var rockLevel = 0
 var grassLevel = 0
-var isHittingToolBarHitBox = false;
+
+
 
 // main game play
 class Game{
@@ -341,6 +342,11 @@ class Game{
     backgroundFill(100,200,255);
     drawFloor();
     // ADD SAND
+    var leftOfToolBar = mouseX < 50;
+    var rightOfToolBar = mouseX > buttonArray.length*50 + 50;
+    var upOfToolbar = 50 > mouseY;
+    var downOfToolbar = 100 < mouseY;
+    var isHittingToolBarHitBox = !leftOfToolBar && !rightOfToolBar && !upOfToolbar && !downOfToolbar;
     if (mouseIsPressed && state=='sand' && !isHittingToolBarHitBox){
       var tempSand = new Sand(mouseX, mouseY)
       sandObject.quantity-=0.1;
@@ -396,6 +402,11 @@ class Game{
         }
       }
     }
+    var leftOfToolBar = mouseX < 50;
+    var rightOfToolBar = mouseX > buttonArray.length*50 + 50;
+    var upOfToolbar = 50 > mouseY;
+    var downOfToolbar = 100 < mouseY;
+    var isHittingToolBarHitBox = !leftOfToolBar && !rightOfToolBar && !upOfToolbar && !downOfToolbar;
     //make sure the player is not hovering over the fish when they feed them
     if(!fishIsHit && mouseIsPressed && state=='food' && !isHittingToolBarHitBox){
       var tempFood = new Food(mouseX, mouseY, 0.7)
@@ -1044,6 +1055,11 @@ function displayTankWalls() {
 
 
 function mousePressed(){
+  var leftOfToolBar = mouseX < 50;
+  var rightOfToolBar = mouseX > buttonArray.length*50 + 50;
+  var upOfToolbar = 50 > mouseY;
+  var downOfToolbar = 100 < mouseY;
+  var isHittingToolBarHitBox = !leftOfToolBar && !rightOfToolBar && !upOfToolbar && !downOfToolbar;
   if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && !isHittingToolBarHitBox){//decoration
     decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size, window[state+"Object"].yOffset));
     window[state+"Object"].quantity -= 1;
@@ -1193,13 +1209,6 @@ class ToolBar{ // class to store the things in your toolbar
           text(`${int(buttonArray[i].quantity)}/${int(buttonArray[i].max)}` , (this.buttonX+25), this.buttonY+55)
         }
         this.buttonX += 50
-        console.log(isHittingToolBarHitBox)
-        if (mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
-          isHittingToolBarHitBox = true
-        }
-        else {
-          isHittingToolBarHitBox = false
-        }
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
           if(buttonArray[i].name === 'shop'){
             game.cursor = cursorImage;
