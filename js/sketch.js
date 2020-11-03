@@ -183,7 +183,7 @@ class Game{
       fill(this.colorR, this.colorG, this.colorB, this.alpha)
       text(this.transaction, 150, 25)
       if (this.alpha >= 0){
-        this.alpha -= 1
+        this.alpha -= 2
       }
     }
   }
@@ -203,10 +203,11 @@ class Game{
      this.transaction = ''
    }
    if (this.alpha != 0){
+     noStroke()
      fill(this.colorR, this.colorG, this.colorB, this.alpha)
      text(this.transaction, 200, 10)
      if (this.alpha >= 0){
-       this.alpha -= 1
+       this.alpha -= 2
      }
    }
    image(closeImg, this.storeCloseX, this.storeCloseY, this.storeCloseD, this.storeCloseD);
@@ -692,7 +693,7 @@ class Fish{
       game.balance += this.price;
       game.alpha = 255
       game.colorR = 0
-      game.colorG = 255
+      game.colorG = 128
       game.colorB = 0
       game.transaction = ("+" + this.price)
 
@@ -931,7 +932,7 @@ class Coin{ // magic coin that comes from the treasure box
       game.balance += 5;
       game.alpha = 255
       game.colorR = 0
-      game.colorG = 255
+      game.colorG = 128
       game.colorB = 0
       game.transaction = ("+" + 5)
     }
