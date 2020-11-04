@@ -103,10 +103,7 @@
 
                                 <h4>Functional Tools</h4>
                                   <p>Here is a list of tools that can be used to interact with the fish and the enviornment.
-                                  These tools are stored in the <code>Toolbar</code> class, and use hitboxes to detect when
-                                  you click on one of the tools. Additionally, the <code>state</code> variable updates
-                                  to reflect your current tool, such as <code>cursor</code> or <code>sand</code>, and the
-                                  <code>cursorImage</code> also updates to reflect your current tool.</p>
+
                                   <div class="table-responsive">
                                       <table >
                                               <thead>
@@ -190,7 +187,7 @@
                                   </div>
                                   <h4>Cosmetic Tools</h4>
                                     <p>Here is a list of tools that can be used to enhance and customize the look of the environment.
-                                    These tools use the same mechanics as described above, but are stored in the <code>Decoration</code> class.</p>
+                                    </p>
                                     <div class="table-responsive">
                                         <table>
                                                 <thead>
@@ -246,69 +243,8 @@
                               for more.
                             </p>
 
-                          <h4>Mechanics</h4>
-                            <p>
-                            The majority of the tank code is stored in the <code>Game</code> class.
-                            The state of the game is stored in the <code>game.scene</code> variable, with the three possible values being:
-                            <ul>
-                              <li><code>menu</code> for pre-game play, before you start the game and have to fill the tank with water</li>
-                              <li><code>tank</code> for the main game play, when you feed and interact with your fish</li>
-                              <li><code>store</code> for the store scene, when you can buy new items for your tank</li>
-                            </ul>
-                            </p>
-
-
-                        <h2>Environment</h2>
-                          <h4>Water</h4>
-                          <p>
-                            The most basic component of the fish tank's environment is water, constructed by the
-                            <code>Water</code> class. However, this class just represents the randomly colored and
-                            sized water particles that flow out of your mouse's position and float downwards. The
-                            real magic is in the <code>drawWater()</code> function, which is adapated from
-                            <a href='https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm'> YiyunJia's</a> code.
-                            Using Perlin noise, a visual effect is created where it looks like the water is wavy
-                            and sloshing around in your tank as you fill it up. For added fun, there's also a sound
-                            that gets triggered as you fill the fish tank.
-                          </p>
-
-                          <h4>Sand</h4>
-                          <p>
-                            Sand particles are creating using the <code>Sand</code> class, with new sand being
-                            dropped into the tank and stored in an array when you have that tool selected. Sand
-                            particles are randomly sized, and sink to the bottom of the tank to add
-                            some visual flair to your tank.
-                          </p>
-
-                          <h4>Misc. Decorations</h4>
-                          <p>
-                            You can drop in new decorations from the store defined in the <code>Decoration</code> class to your tank.
-                            As usual, they float to the bottom, and will be layered on top of the sand you added previously.
-                          </p>
-
-
-
                         <h2>Fish</h2>
 
-                        <h4>Feeding</h4>
-                        <p>
-                          Fish swim happily around the tank, but while this happens, they constantly get a bit more hungry,
-                          with a <code>this.health -= this.healthLoss</code> variable decreasing.
-                          Click on a fish to see its stats, including its hunger level.
-                          To feed a fish, you can buy some fish food and drop it over a fish to restore its hunger level,
-                          which uses basic distance collision to detect that the food is touching the fish.
-                        </p>
-                        <h4>Death</h4>
-                        <p>
-                          A fish that you forgot to feed will eventually have its <code>health</code> propery reach 0, causing it sink to the bottom of the tank.
-                          You won't be able to sell this fish, and will have to use the toilet tool to flush your dead fish away.
-                        </p>
-                        <h4>Movement</h4>
-                        <p>
-                          If a fish is alive, it can  move around the tank using Perlin noise, so that its movement seems natural.
-                          We used the <code>constrain</code> function to ensure that the fish doesn't hit the edges of the walls.
-                          To make this seem even more realistic, each fish has its own <code>this.hitBox</code> to keep track of
-                          what it can touch.
-                        </p>
                         <h4>Rarity</h4>
                           <p>The game is set up to have 6 different kinds of fish that go from tiers S to F.
                             The rarity of the fish determine the tier the fish will be in and each tier
@@ -335,9 +271,7 @@
                             and press the breed button on the top right menu.
                             However, the player can only hatch one egg at a time, so the player must wait for the offspring egg to hatch before they can breed again.
                             The offspring's rarity range will depend on both of their parent's rarity as well as a 'random' factor.
-                            The forumla for calculating an offspring's rarity is:
-                            <code>(parent1+parent2+parent3)/3</code>. Where parent3 is a random number between 0-100, and parent1 and parent2
-                            are the selected parents of the fish.
+
                           </p>
                         </p>
                         <h4>Fish Types</h4>
@@ -365,8 +299,8 @@
                                     <td>(85-94)</td>
                                   </tr>
                                   <tr>
-                                    <td><img class="fishIcons" src="images/legendaryFish2.png"></td>
-                                    <td>Aqua</td>
+                                    <td><img class="fishIcons" src="../images/horseFish/horseFish2.png"></td>
+                                    <td>Sea Horse</td>
                                     <td>B</td>
                                     <td>(70-84)</td>
                                   </tr>
@@ -454,6 +388,75 @@
     image(game.cursor, mouseX, mouseY, 20, 20);
   }
 </code></pre>
+
+                        </p>
+                        <h4>Game Class</h4>
+                          <p>
+                          The majority of the tank code is stored in the <code>Game</code> class.
+                          The state of the game is stored in the <code>game.scene</code> variable, with the three possible values being:
+                          <ul>
+                            <li><code>menu</code> for pre-game play, before you start the game and have to fill the tank with water</li>
+                            <li><code>tank</code> for the main game play, when you feed and interact with your fish</li>
+                            <li><code>store</code> for the store scene, when you can buy new items for your tank</li>
+                          </ul>
+                          </p>
+                        <h4>Fish Class</h4>
+                          <p>
+                            Fish swim happily around the tank, but while this happens, they constantly get a bit more hungry,
+                            with a <code>this.health -= this.healthLoss</code> variable decreasing.
+                            The fish also have a <code>drawstats()</code> method that is called when a fish is clicked.
+
+
+                            A fish that you forgot to feed will eventually have its <code>health</code> propery reach 0, causing it sink to the bottom of the tank.
+                            You won't be able to sell this fish, and will have to use the toilet tool to flush your dead fish away.
+
+                            If a fish is alive, it can  move around the tank using Perlin noise, so that its movement seems natural.
+                            The animation fo the fish is done through cycling through an array of fish images.
+                            We used the <code>constrain</code> function to ensure that the fish doesn't hit the edges of the walls.
+                            To make this seem even more realistic, each fish has its own <code>this.hitBox</code> to keep track of
+                            what it can touch.
+
+                            Finally, fish can bread provided our forumla for calculating an offspring's rarity:
+                            <code>(parent1+parent2+parent3)/3</code>. Where parent3 is a random number between 0-100, and parent1 and parent2
+                            are the selected parents of the fish.
+                          </p>
+                        <h4>Food Class</h4>
+                        <p>
+                          To feed a fish, you can buy some fish food and drop it over a fish to restore its hunger level.
+                          The class fish food uses basic collision to detect that the food is touching the fish and if so restores
+                          the fish by the food instance's<code>healthIncrease</code> property. Each food partical will slowly disolve
+                          by lowering its alpha value by a factor of the food instance's <code>disolveSpeed</code> property.
+                        </p>
+                        <h4>Tool Class</h4>
+                        <p>
+                          Tools are stored in the <code>Toolbar</code> class, and use hitboxes to detect when
+                          you click on one of the tools. Additionally, the <code>state</code> variable updates
+                          to reflect your current tool, such as <code>cursor</code> or <code>sand</code>, and the
+                          <code>cursorImage</code> also updates to reflect your current tool.
+                        </p>
+                        <h4>Water Class</h4>
+                        <p>
+                          The most basic component of the fish tank's environment is water, constructed by the
+                          <code>Water</code> class. However, this class just represents the randomly colored and
+                          sized water particles that flow out of your mouse's position and float downwards. The
+                          real magic is in the <code>drawWater()</code> function, which is adapated from
+                          <a href='https://editor.p5js.org/YiyunJia/sketches/BJz5BpgFm'> YiyunJia's</a> code.
+                          Using Perlin noise, a visual effect is created where it looks like the water is wavy
+                          and sloshing around in your tank as you fill it up. For added fun, there's also a sound
+                          that gets triggered as you fill the fish tank.
+                        </p>
+                        <h4>Sand Class</h4>
+                        <p>
+                          Sand particles are modeled after the <code>Sand</code> class, with new sand being
+                          dropped into the tank and stored in an array. Sand
+                          particles are randomly sized and sink to the bottom of the tank by a factor of the sand instance's <code>ySpeed</code>, to add
+                          some visual flair to your tank.
+                        </p>
+                        <h4>Decorations Class</h4>
+                        <p>
+                          You can drop in new decorations defined in the <code>Decoration</code> class to your tank.
+                          As usual, they float to the bottom, and will be layered on top of the sand you added previously.
+                          However, the treasure chest is a special decoration that will drop a coin at the interval given by it's property <code>coinDelay</code>.
 
                         </p>
                         <blockquote>

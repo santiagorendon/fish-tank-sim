@@ -54,7 +54,7 @@ def generation():
             money -= 400
             treasureBought = True
         if(treasureBought): #every generation you get 20 coins
-            money += 30
+            money += 70
         # try to buy an egg first if u can
         minParentRarity = min(parent1, parent2);
         crackEgg = buyEgg(money, minParentRarity)
