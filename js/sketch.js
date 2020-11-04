@@ -1,3 +1,4 @@
+let initalBalance = 8;
 // IMAGES
 var fishImage, waterImage, grassImage, sandImage, foodImage, toiletImage, cursorImage
 
@@ -17,7 +18,7 @@ var coinArr = [];
 var coinBeingHit = [];
 
 // OBJECTS
-var waterObject, sandObject, rockObject, treasureObject, grassObject, commonEggObject, rareEggObject, legendaryEggObject, fishFoodObject, rareFishFoodObject, legendaryFishFoodObject, cursorObject, shopObject, breedObject, toiletObject
+var water, sand, rock, treasure, grass, commonEgg, rareEgg, legendaryEgg, fishFood, rareFishFood, legendaryFishFood, cursor, shop, breed, toilet
 
 
 // MISC
@@ -46,7 +47,7 @@ class Game{
     // this.scene = 'tank';
     //fish holder
     this.fishArr = [];
-    this.balance = 10008;
+    this.balance = initalBalance;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -94,7 +95,7 @@ class Game{
   }
   drawBreedStats(){ // draw the stats for breeding two fish together
     textAlign(CENTER, CENTER);
-    let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
+    let alreadyOwned = buttonArray.indexOf(mysteryEgg) !== -1;
     let middleX = game.breedStats.x+(game.breedStats.w/2);
     let middleY = (game.breedStats.y+game.breedStats.h)/2;
     //background
@@ -116,7 +117,7 @@ class Game{
     if(this.parent1){
       textSize(30);
       text(this.parent1.type, (game.breedStats.x+middleX)/2, middleY-75);
-      image(this.parent1.imageArray[1][0], (game.breedStats.x+middleX)/2-this.parent1.hitBoxXOf, middleY-15-this.parent1.hitBoxYOf, this.parent1.width, this.parent1.height);
+      image(window[this.parent1.imageArray][1][0], (game.breedStats.x+middleX)/2-this.parent1.hitBoxXOf, middleY-15-this.parent1.hitBoxYOf, this.parent1.width, this.parent1.height);
       image(rarityImg, (game.breedStats.x+middleX)/2-55, middleY+65, 80, 80);
       fill(game.breedStats.bar);
       let parent1RarityW = map(this.parent1.rarity, 0, 100, 0, 92);
@@ -135,7 +136,7 @@ class Game{
       image(heartImg, middleX+3, middleY, 100, 100);
       textSize(30);
       text(this.parent2.type, (middleX+canvasWidth)/2, middleY-75);
-      image(this.parent2.imageArray[0][0], (middleX+canvasWidth)/2-this.parent2.hitBoxXOf, middleY-15-this.parent2.hitBoxYOf, this.parent2.width, this.parent2.height);
+      image(window[this.parent2.imageArray][0][0], (middleX+canvasWidth)/2-this.parent2.hitBoxXOf, middleY-15-this.parent2.hitBoxYOf, this.parent2.width, this.parent2.height);
       image(rarityImg, (middleX+canvasWidth)/2-55, middleY+65, 80, 80);
       fill(game.breedStats.bar);
       let parent2RarityW = map(this.parent2.rarity, 0, 100, 0, 92);
@@ -225,7 +226,7 @@ class Game{
     for(let i=0;i<this.storeItems.length;i++){
       // do not sell items if they have more than 1000
       if(game.storeItems[i].name !== 'Toilet' && game.storeItems[i].name !== 'Treasure'){
-        if(this.storeItems[i].obj.quantity >= 1000){
+        if(window[this.storeItems[i].obj].quantity >= 1000){
           game.storeItems[i].soldOut = true;
         }
         else{
@@ -268,23 +269,23 @@ class Game{
     let price = game.storeItems[index].price;
     let isHit = (dist(mouseX, mouseY, this.storeItemX, this.storeItemY) <= (this.storeItemSize/2))
     if((this.balance >= price) && (mouseIsPressed) && (this.counter >= this.buyDelay) && (isHit)){
-      let alreadyOwned = buttonArray.indexOf(obj) !== -1;
+      let alreadyOwned = buttonArray.indexOf(window[obj]) !== -1;
       if(name === 'Toilet'){//if toilet is added add it to index 2
-        buttonArray.splice(2, 0, obj);
+        buttonArray.splice(2, 0, window[obj]);
         game.storeItems[index].soldOut = true;
       }
       else if(name === 'Treasure'){//treasures
-        buttonArray.push(obj);
+        buttonArray.push(window[obj]);
         game.storeItems[index].soldOut = true;
       }
       else{ //if any item is added besides toilet or treasure
         if(alreadyOwned){
-          obj.quantity = obj.quantity + obj.originalMax;
-          obj.max = obj.quantity;
+          window[obj].quantity = window[obj].quantity + window[obj].originalMax;
+          window[obj].max = window[obj].quantity;
         }
         else{
-          obj.quantity = obj.max;
-          buttonArray.push(obj)
+          window[obj].quantity = window[obj].max;
+          buttonArray.push(window[obj])
         }
       }
       this.balance -= price;
@@ -334,7 +335,32 @@ class Game{
   }
 
   resetGame(){
-    // reset game function goes here
+    localStorage.clear();
+    game.balance = initalBalance;
+    game.fishArr = []
+    game.fishArr.push(new Fish("Gold Fish", 'commonFishImgArr', 100, 100, 5, 2, 25, 60));
+    game.fishArr.push(new Fish("Gold Fish", 'commonFishImgArr', 100, 100, 5, 2, 25, 60));
+    sandArray = [];
+    decorationArray = [];
+    water = new Button('water', "waterImage", 100, 100, 100)
+    sand = new Button('sand', "sandImage", 100, 100, 100)
+    toilet = new Button('toilet', "toiletImage", 100, 100, 100)
+    rock = new Button('rock', "rockImage", 3, 3, 3)
+    grass = new Button('grass', "grassImage", 3, 3, 3, 70, -10);
+    treasure = new Button('treasure', "treasureImage", 1, 1, 1, 100, 3)
+    barrel = new Button('barrel', "barrelImage", 1, 1, 1, 85, -10)
+    logSign = new Button('logSign', "logSignImage", 1, 1, 1, 120, -20)
+    commonEgg = new Button('commonEgg', "commonEggImage", 1, 1, 1)
+    rareEgg = new Button('rareEgg', "rareEggImage", 1, 1, 1)
+    legendaryEgg = new Button('legendaryEgg', "legendaryEggImage", 1, 1, 1)
+    fishFood = new Button('fishFood', "fishFoodImage", 50, 50, 50)
+    rareFishFood = new Button('rareFishFood', "rareFishFoodImage", 50, 50, 50)
+    legendaryFishFood = new Button('legendaryFishFood', "legendaryFishFoodImage", 50, 50, 50)
+    cursor = new Button('cursor', "cursorImage", 1000)
+    shop = new Button('shop', "shopImage", 1000)
+    breed = new Button('breed', "breedImage", 1000)
+    mysteryEgg = new Button('mysteryEgg', "mysteryEggImage", 1, 1, 1);
+    buttonArray = [cursor, shop, breed, fishFood];
   }
 
   drawResetButton(){
@@ -419,10 +445,10 @@ class Game{
 
   }
   drawTank(){
-    let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
+    let alreadyOwned = buttonArray.indexOf(mysteryEgg) !== -1;
     if(alreadyOwned){
-      if (frameCount % 60 == 0 && mysteryEggObject.hatchTimer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
-        mysteryEggObject.hatchTimer -= 1;
+      if (frameCount % 60 == 0 && mysteryEgg.hatchTimer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
+        mysteryEgg.hatchTimer -= 1;
       }
     }
     game.clickCounter += 1;
@@ -491,7 +517,7 @@ class Game{
     let isHittingToolBar = isHittingToolBarHitBox();
     if (mouseIsPressed && state=='sand' && !isHittingToolBar && !coinIsHit){
       var tempSand = new Sand(mouseX, mouseY)
-      sandObject.quantity-=0.1;
+      sand.quantity-=0.1;
       sandArray.push(tempSand)
       if(sandLevel<=200){
         sandLevel +=1
@@ -499,16 +525,16 @@ class Game{
     }
     //make sure the player is not hovering over the fish when they feed them
     if(!fishIsHit && mouseIsPressed && !isHittingToolBar && !coinIsHit){
-      if(state=='food'){
-        fishFoodObject.quantity-=0.08;
+      if(state=='fishFood'){
+        fishFood.quantity-=0.08;
         foodArray.push(new Food(mouseX, mouseY, 0.7))
       }
-      else if(state=='food2'){
-        rareFishFoodObject.quantity-=0.05;
+      else if(state=='rareFishFood'){
+        rareFishFood.quantity-=0.05;
         foodArray.push(new Food(mouseX, mouseY, 1))
       }
-      else if(state=='food3'){
-        legendaryFishFoodObject.quantity-=0.05;
+      else if(state=='legendaryFishFood'){
+        legendaryFishFood.quantity-=0.05;
         foodArray.push(new Food(mouseX, mouseY, 1.8))
       }
     }
@@ -556,59 +582,86 @@ class Game{
 
 function saveGame(){
   // let progress = {fishArray: game.fishArr,
-  //                 fishBeingHit: fishBeingHit,
-  //                 sandArray: sandArray,
-  //                 decorationArray: decorationArray,
-  //                 coinArray: coinArr,
   //                 balance: game.balance,
-  //                 buttonArray: buttonArray
+  //
+  //                 decorationArray: decorationArray,
+  //                 sandArray: sandArray,
+  //      buttonArray: buttonArray,
+  //                 coinArray: coinArr,
   //               }
   // let tempFishArr = [];
-  // for(let i=0; i < game.fishArr.length; i++){
-  //   tempFishArr.push(game.fishArr[i].type, game.fishArr[i].rarity, game.fishArr[i].health);
-  // }
-  console.log('lit5')
-  let progress = {fishArr: game.fishArray
+  let progress = {
+                  balance: game.balance,
+                  fishArr: game.fishArr,
+                  sandArr: sandArray,
+                  decorationArr: decorationArray,
+                  buttonArr: []
                 }
-
+  for(let i=0; i< buttonArray.length;i++){
+    if(buttonArray[i].name !== 'mysteryEgg'){ //mystery eggs do not save
+      progress.buttonArr.push(window[buttonArray[i].name])
+    }
+  }
   localStorage.setItem('progress', JSON.stringify(progress));
 }
-function deleteProgress(){
-  localStorage.clear();
-}
-function loadGame(){
-  const progress = JSON.parse(localStorage.getItem('progresss'));
 
-  if(progress){
-    // for(let i=0; i < progress['tempFishArr'].length; i++){
-    //   let tmpFish = progress['tempFishArr'][i];
-    //   let rarity = tmpFish.rarity;
-    //   let health = tmpFish.health;
-    //   l
-    //   if(tmpFish.type === 'Aqua'){
-    //
-    //   }
-    //   else if(tmpFish.type === 'Bull Shark'){
-    //
-    //   }
-    //   else if(tmpFish.type === 'Sea Horse'){
-    //
-    //   }
-    //   else if(tmpFish.type === 'Angel Fish'){
-    //
-    //   }
-    //   else if(tmpFish.type === 'Puffer Fish'){
-    //     game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
-    //   }
-    //   else{
-    //
-    //   }
-    // }
-    console.log('lii', progress)
-    game.fishArr = progress['fishArr'];
+function loadGame(){
+  const progress = JSON.parse(localStorage.getItem('progress'));
+  if(progress !== null && progress !=={}){
+    //load balance
+    game.balance = progress['balance'];
+    //load button array
+    buttonArray = []
+    for(let i=0; i < progress['buttonArr'].length; i++){
+      let tmpButton = progress['buttonArr'][i];
+      window[tmpButton.name] = new Button(tmpButton.name, tmpButton.image, tmpButton.quantity, tmpButton.max, tmpButton.originalMax, tmpButton.size, tmpButton.yOffset);
+      buttonArray.push(window[tmpButton.name]);
+    }
+    //load fish arr
+    game.fishArr = []
+    for(let i=0; i < progress['fishArr'].length; i++){
+      let tmpFish = progress['fishArr'][i];
+      game.fishArr.push(new Fish(tmpFish.type, tmpFish.imageArray, tmpFish.width, tmpFish.height, tmpFish.rarity, tmpFish.frameNum, tmpFish.frameDelay, tmpFish.hitBox, tmpFish.hitBoxXOf, tmpFish.hitBoxYOf));
+    }
+    //load sand arr
+    sandArray = []
+    for(let i=0; i < progress['sandArr'].length; i++){
+      let tmpSand = progress['sandArr'][i];
+      sandArray.push(new Sand(tmpSand.x, tmpSand.y));
+    }
+    //load decorations array
+    decorationArray = []
+    for(let i=0; i < progress['decorationArr'].length; i++){
+      let tmpDecoration = progress['decorationArr'][i];
+      decorationArray.push(new Decoration(tmpDecoration.image, tmpDecoration.x, tmpDecoration.y, tmpDecoration.size, tmpDecoration.yOffset));
+    }
   }
 }
 
+// for(let i=0; i < progress['tempFishArr'].length; i++){
+//   let tmpFish = progress['tempFishArr'][i];
+//   let rarity = tmpFish.rarity;
+//   let health = tmpFish.health;
+//   l
+//   if(tmpFish.type === 'Aqua'){
+//
+//   }
+//   else if(tmpFish.type === 'Bull Shark'){
+//
+//   }
+//   else if(tmpFish.type === 'Sea Horse'){
+//
+//   }
+//   else if(tmpFish.type === 'Angel Fish'){
+//
+//   }
+//   else if(tmpFish.type === 'Puffer Fish'){
+//     game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+//   }
+//   else{
+//
+//   }
+// }
 function isHittingToolBarHitBox(){
   let leftOfToolBar = mouseX < 50;
   let rightOfToolBar = mouseX > buttonArray.length*50 + 50;
@@ -643,11 +696,11 @@ function crackCommonEgg(){
 }
 
 function createMysteryEgg(rarity1, rarity2){
-  let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;
+  let alreadyOwned = buttonArray.indexOf(mysteryEgg) !== -1;
   if(!alreadyOwned){
-    mysteryEggObject.setMystery(rarity1, rarity2);
-    mysteryEggObject.quantity = 1;
-    buttonArray.push(mysteryEggObject);
+    mysteryEgg.setMystery(rarity1, rarity2);
+    mysteryEgg.quantity = 1;
+    buttonArray.push(mysteryEgg);
   }
 }
 
@@ -1019,44 +1072,44 @@ function setup() {
   canvas.parent('#container');
   canvas.style('width', '100%');
   canvas.style('height', '100%');
-  waterObject = new Button('water', waterImage, 100, 100)
-  sandObject = new Button('sand', sandImage, 100, 100)
-  toiletObject = new Button('toilet', toiletImage, 100, 100)
-  rockObject = new Button('rock', rockImage, 3, 3)
-  grassObject = new Button('grass', grassImage, 3, 3, 70, -10);
-  treasureObject = new Button('treasure', treasureImage, 1, 1, 100, 3)
-  barrelObject = new Button('barrel', barrelImage, 1, 1, 85, -10)
-  logSignObject = new Button('logSign', logSignImage, 1, 1, 120, -20)
-  commonEggObject = new Button('commonEgg', commonEggImage, 1, 1)
-  rareEggObject = new Button('rareEgg', rareEggImage, 1, 1)
-  legendaryEggObject = new Button('legendaryEgg', legendaryEggImage, 1, 1)
-  fishFoodObject = new Button('food', fishFoodImage, 50, 50)
-  rareFishFoodObject = new Button('food2', rareFishFoodImage, 50, 50)
-  legendaryFishFoodObject = new Button('food3', legendaryFishFoodImage, 50, 50)
-  cursorObject = new Button('cursor', cursorImage, 1000)
-  shopObject = new Button('shop', shopImage, 1000)
-  breedObject = new Button('breed', breedImage, 1000)
-  mysteryEggObject = new Button('mysteryEgg', mysteryEggImage, 1, 1);
-  buttonArray = [cursorObject, shopObject, breedObject, fishFoodObject]
-  let storeItems = [{name:'Common Food', img: fishFoodImage, obj: fishFoodObject, price: '18', soldOut: false},
-                    {name:'Rare Food', img: rareFishFoodImage, obj: rareFishFoodObject, price: '38', soldOut: false},
-                    {name:'Legendary Food', img: legendaryFishFoodImage, obj: legendaryFishFoodObject, price: '95', soldOut: false},
-                    {name:'Toilet', obj: toiletObject, img: toiletImage, price: '20', soldOut: false},
-                    {name:'Treasure', obj: treasureObject, img: treasureImage, price: '400', soldOut: false},
-                    {name:'Common Egg', obj: commonEggObject, img: commonEggImage, price: '10', soldOut: false},
-                    {name:'Rare Egg', obj: rareEggObject, img: rareEggImage, price: '300', soldOut: false},
-                    {name:'Legendary Egg', obj: legendaryEggObject, img: legendaryEggImage, price: '1300', soldOut: false},
-                    {name:'Grass', obj: grassObject, img: grassImage, price: '15', soldOut: false},
-                    {name:'Rock', obj: rockObject, img: rockImage, price: '15', soldOut: false},
-                    {name:'Sand', obj: sandObject, img: sandImage, price: '10', soldOut: false},
-                    {name:'Log Sign', obj: logSignObject, img: logSignImage, price: '100', soldOut: false},
-                    {name:'Barrel', obj: barrelObject, img: barrelImage, price: '150', soldOut: false}
+  water = new Button('water', "waterImage", 100, 100, 100)
+  sand = new Button('sand', "sandImage", 100, 100, 100)
+  toilet = new Button('toilet', "toiletImage", 100, 100, 100)
+  rock = new Button('rock', "rockImage", 3, 3, 3)
+  grass = new Button('grass', "grassImage", 3, 3, 3, 70, -10);
+  treasure = new Button('treasure', "treasureImage", 1, 1, 1, 100, 3)
+  barrel = new Button('barrel', "barrelImage", 1, 1, 1, 85, -10)
+  logSign = new Button('logSign', "logSignImage", 1, 1, 1, 120, -20)
+  commonEgg = new Button('commonEgg', "commonEggImage", 1, 1, 1)
+  rareEgg = new Button('rareEgg', "rareEggImage", 1, 1, 1)
+  legendaryEgg = new Button('legendaryEgg', "legendaryEggImage", 1, 1, 1)
+  fishFood = new Button('fishFood', "fishFoodImage", 50, 50, 50)
+  rareFishFood = new Button('rareFishFood', "rareFishFoodImage", 50, 50, 50)
+  legendaryFishFood = new Button('legendaryFishFood', "legendaryFishFoodImage", 50, 50, 50)
+  cursor = new Button('cursor', "cursorImage", 1000)
+  shop = new Button('shop', "shopImage", 1000)
+  breed = new Button('breed', "breedImage", 1000)
+  mysteryEgg = new Button('mysteryEgg', "mysteryEggImage", 1, 1, 1);
+  buttonArray = [cursor, shop, breed, fishFood]
+  let storeItems = [{name:'Common Food', img: fishFoodImage, obj: "fishFood", price: '18', soldOut: false},
+                    {name:'Rare Food', img: rareFishFoodImage, obj: "rareFishFood", price: '38', soldOut: false},
+                    {name:'Legendary Food', img: legendaryFishFoodImage, obj: "legendaryFishFood", price: '95', soldOut: false},
+                    {name:'Toilet', obj: "toilet", img: toiletImage, price: '20', soldOut: false},
+                    {name:'Treasure', obj: "treasure", img: treasureImage, price: '400', soldOut: false},
+                    {name:'Common Egg', obj: "commonEgg", img: commonEggImage, price: '10', soldOut: false},
+                    {name:'Rare Egg', obj: "rareEgg", img: rareEggImage, price: '300', soldOut: false},
+                    {name:'Legendary Egg', obj: "legendaryEgg", img: legendaryEggImage, price: '1300', soldOut: false},
+                    {name:'Grass', obj: "grass", img: grassImage, price: '15', soldOut: false},
+                    {name:'Rock', obj: "rock", img: rockImage, price: '15', soldOut: false},
+                    {name:'Sand', obj: "sand", img: sandImage, price: '10', soldOut: false},
+                    {name:'Log Sign', obj: "logSign", img: logSignImage, price: '100', soldOut: false},
+                    {name:'Barrel', obj: "barrel", img: barrelImage, price: '150', soldOut: false}
                   ]
   game = new Game(storeItems);
   game.fishArr.push(new Fish("Gold Fish", 'commonFishImgArr', 100, 100, 5, 2, 25, 60))
   game.fishArr.push(new Fish("Gold Fish", 'commonFishImgArr', 100, 100, 5, 2, 25, 60))
   noiseDetail(24);
-  //deleteProgress();
+  //game.resetGame();
   loadGame();
 }
 
@@ -1124,6 +1177,11 @@ class Coin{ // magic coin that comes from the treasure box
 
 class Bubbles { // bubbles come out of the barrel
   constructor(){
+    for (var i=0; i<decorationArray.length; i++){ // find position of barrel in decorationArray
+      if (decorationArray[i].image === "barrelImage"){
+        findBarrelPosition = i
+      }
+    }
     this.ellipseY = decorationArray[findBarrelPosition].y
     this.ellipseX = decorationArray[findBarrelPosition].x
     this.randomSize = random(5, 25)
@@ -1151,18 +1209,13 @@ class Decoration { // main class to store decorations
     this.yOffset = yOffset; //how extra far to the bottom
   }
   display(){
-    for (var i=0; i<decorationArray.length; i++){ // find position of barrel in decorationArray
-      if (decorationArray[i].image === barrelImage){
-        findBarrelPosition = i
-      }
-    }
-    if (this.image === barrelImage){
+    if (this.image === "barrelImage"){
       if (frameCount % 120 == 0){
         var bubbleParticle = new Bubbles()
         bubblesArray.push(bubbleParticle)
       }
     }
-    if(this.image === treasureImage){
+    if(this.image === "treasureImage"){
       this.counter += 1;
       if(this.counter >= this.coinDelay){
         coinBeingHit.push(0);
@@ -1170,7 +1223,7 @@ class Decoration { // main class to store decorations
         this.counter = 0;
       }
     }
-    image(this.image, this.x, this.y, this.size, this.size);
+    image(window[this.image], this.x, this.y, this.size, this.size);
     if (this.y < (height-(this.size/2))+this.yOffset){
       this.y += 1
     }
@@ -1279,15 +1332,15 @@ function displayTankWalls() {
 function mousePressed(){
   let isHittingToolBar = isHittingToolBarHitBox();
   if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && !isHittingToolBar){//decoration
-    decorationArray.push(new Decoration(window[state+"Image"], mouseX, mouseY, window[state+"Object"].size, window[state+"Object"].yOffset));
-    window[state+"Object"].quantity -= 1;
+    decorationArray.push(new Decoration(state+"Image", mouseX, mouseY, window[state].size, window[state].yOffset));
+    window[state].quantity -= 1;
   }
   let coinIsHit = (coinBeingHit.indexOf(1) !== -1);
   // ADD FISH
   if(mouseIsPressed && !isHittingToolBar && !coinIsHit){
     if ( state == 'mysteryEgg'){
       fishBeingHit.push(0);
-      let newFish = breedFish(mysteryEggObject.parent1, mysteryEggObject.parent2);
+      let newFish = breedFish(mysteryEgg.parent1, mysteryEgg.parent2);
       let type = newFish[0];
       let rarity = newFish[1];
       //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
@@ -1309,7 +1362,7 @@ function mousePressed(){
       else{
         game.fishArr.push(new Fish("Gold Fish", 'commonFishImgArr', 100, 100, rarity, 2, 25, 60));
       }
-      mysteryEggObject.quantity -= 1
+      mysteryEgg.quantity -= 1
     }
     else if (state=='commonEgg'){
       fishBeingHit.push(0);
@@ -1323,7 +1376,7 @@ function mousePressed(){
       else{
         game.fishArr.push(new Fish("Gold Fish", "commonFishImgArr", 100, 100, rarity, 2, 25, 60));
       }
-      commonEggObject.quantity -= 1
+      commonEgg.quantity -= 1
     }
     // ADD FISH
     else if (state=='rareEgg'){
@@ -1337,7 +1390,7 @@ function mousePressed(){
       else{
         game.fishArr.push(new Fish("Sea Horse", "horseFishImgArr", 80, 80, rarity, 4, 9, 85));
       }
-      rareEggObject.quantity -= 1
+      rareEgg.quantity -= 1
     }
     else if (state=='legendaryEgg'){
       fishBeingHit.push(0);
@@ -1350,7 +1403,7 @@ function mousePressed(){
       else{
         game.fishArr.push(new Fish("Aqua", "legendaryFishImgArr", 300, 300, rarity, 6, 8, 80, -10, -30));
       }
-      legendaryEggObject.quantity -= 1
+      legendaryEgg.quantity -= 1
     }
   }
 }
@@ -1399,6 +1452,7 @@ class ToolBar{ // class to store the things in your toolbar
         if(buttonArray[i].quantity < 1){ //if tool runs out of uses
           game.cursor = cursorImage;
           state = 'cursor';
+          buttonArray[i].quantity = buttonArray[i].originalMax;
           buttonArray.splice(i, 1);
           return;
         }
@@ -1410,7 +1464,7 @@ class ToolBar{ // class to store the things in your toolbar
           fill(this.highlightColor);
           rect(this.buttonX, this.buttonY, 50, 50);
         }
-        image(buttonArray[i].image, this.buttonX+25, this.buttonY+25, 30, 30)
+        image(window[buttonArray[i].image], this.buttonX+25, this.buttonY+25, 30, 30)
         noStroke()
         fill(0)
         textSize(15);
@@ -1449,7 +1503,7 @@ class ToolBar{ // class to store the things in your toolbar
           game.displayBreed = false;
           game.stats.displayIndex = -1;
 
-          game.cursor = buttonArray[i].image;
+          game.cursor = window[buttonArray[i].image];
           state = buttonArray[i].name
         }
       }
@@ -1462,13 +1516,13 @@ function displayButtons(){
 }
 
 class Button{ // class to create an object
-  constructor(name, image, quantity=0, max=0, size=100, yOffset=0){
+  constructor(name, image, quantity=0, max=0, originalMax=1000, size=100, yOffset=0){
     this.yOffset = yOffset;
     this.name = name;
     this.image = image;
     this.quantity = quantity;
     this.max = max;
-    this.originalMax = max;
+    this.originalMax = originalMax;
     this.size=size;
   }
   setMystery(parent1, parent2){ //used for mystery egg
