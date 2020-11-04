@@ -46,7 +46,7 @@ class Game{
     // this.scene = 'tank';
     //fish holder
     this.fishArr = [];
-    this.balance = 8;
+    this.balance = 10008;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -506,6 +506,61 @@ class Game{
   }
 }
 
+function saveGame(){
+  // let progress = {fishArray: game.fishArr,
+  //                 fishBeingHit: fishBeingHit,
+  //                 sandArray: sandArray,
+  //                 decorationArray: decorationArray,
+  //                 coinArray: coinArr,
+  //                 balance: game.balance,
+  //                 buttonArray: buttonArray
+  //               }
+  // let tempFishArr = [];
+  // for(let i=0; i < game.fishArr.length; i++){
+  //   tempFishArr.push(game.fishArr[i].type, game.fishArr[i].rarity, game.fishArr[i].health);
+  // }
+  console.log('lit5')
+  let progress = {fishArr: game.fishArray
+                }
+
+  localStorage.setItem('progress', JSON.stringify(progress));
+}
+function deleteProgress(){
+  localStorage.clear();
+}
+function loadGame(){
+  const progress = JSON.parse(localStorage.getItem('progresss'));
+
+  if(progress){
+    // for(let i=0; i < progress['tempFishArr'].length; i++){
+    //   let tmpFish = progress['tempFishArr'][i];
+    //   let rarity = tmpFish.rarity;
+    //   let health = tmpFish.health;
+    //   l
+    //   if(tmpFish.type === 'Aqua'){
+    //
+    //   }
+    //   else if(tmpFish.type === 'Bull Shark'){
+    //
+    //   }
+    //   else if(tmpFish.type === 'Sea Horse'){
+    //
+    //   }
+    //   else if(tmpFish.type === 'Angel Fish'){
+    //
+    //   }
+    //   else if(tmpFish.type === 'Puffer Fish'){
+    //     game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+    //   }
+    //   else{
+    //
+    //   }
+    // }
+    console.log('lii', progress)
+    game.fishArr = progress['fishArr'];
+  }
+}
+
 function isHittingToolBarHitBox(){
   let leftOfToolBar = mouseX < 50;
   let rightOfToolBar = mouseX > buttonArray.length*50 + 50;
@@ -612,17 +667,17 @@ class Fish{
     //this.drawHitBox();
     if(!this.alive){
       if(this.xMovement < 0){
-        image(this.imageArray[2][0], this.x, this.y, this.width, this.height);
+        image(window[this.imageArray][2][0], this.x, this.y, this.width, this.height);
       }
       else{
-        image(this.imageArray[2][1], this.x, this.y, this.width, this.height);
+        image(window[this.imageArray][2][1], this.x, this.y, this.width, this.height);
       }
     }
     else if(this.xMovement > 0){ //fish moving right
-      image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
+      image(window[this.imageArray][1][this.frame], this.x, this.y, this.width, this.height);
     }
     else{//fish moving left
-      image(this.imageArray[0][this.frame], this.x, this.y, this.width, this.height);
+      image(window[this.imageArray][0][this.frame], this.x, this.y, this.width, this.height);
     }
 
 
@@ -950,9 +1005,11 @@ function setup() {
                     {name:'Barrel', obj: barrelObject, img: barrelImage, price: '150', soldOut: false}
                   ]
   game = new Game(storeItems);
-  game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, 5, 2, 25, 60))
-  game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, 5, 2, 25, 60))
+  game.fishArr.push(new Fish("Gold Fish", 'commonFishImgArr', 100, 100, 5, 2, 25, 60))
+  game.fishArr.push(new Fish("Gold Fish", 'commonFishImgArr', 100, 100, 5, 2, 25, 60))
   noiseDetail(24);
+  //deleteProgress();
+  loadGame();
 }
 
 function draw() {
@@ -970,6 +1027,10 @@ function draw() {
   //add custom cursor
   noCursor();
   image(game.cursor, mouseX, mouseY, 20, 20);
+  //save every second
+  if (frameCount % 60 == 0) {
+    saveGame()
+  }
 }
 
 class Coin{ // magic coin that comes from the treasure box
@@ -1183,22 +1244,22 @@ function mousePressed(){
       let rarity = newFish[1];
       //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
       if(type === 'S'){
-        game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+        game.fishArr.push(new Fish("Aqua", 'legendaryFishImgArr', 300, 300, rarity, 6, 8, 80, -10, -30));
       }
       else if(type === 'A'){
-        game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
+        game.fishArr.push(new Fish("Bull Shark", 'sharkImgArr', 100, 100, rarity, 4, 9, 105));
       }
       else if(type === 'B'){
-        game.fishArr.push(new Fish("Sea Horse", horseFishImgArr, 80, 80, rarity, 4, 9, 85));
+        game.fishArr.push(new Fish("Sea Horse", 'horseFishImgArr', 80, 80, rarity, 4, 9, 85));
       }
       else if(type === 'C'){
-        game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
+        game.fishArr.push(new Fish("Angel Fish", 'angelFishImgArr', 75, 75, rarity, 4, 9, 80, 0, -10));
       }
       else if(type === 'D'){
-        game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
+        game.fishArr.push(new Fish("Puffer Fish", 'pufferFishImgArr', 80, 80, rarity, 2, 25, 85));
       }
       else{
-        game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+        game.fishArr.push(new Fish("Gold Fish", 'commonFishImgArr', 100, 100, rarity, 2, 25, 60));
       }
       mysteryEggObject.quantity -= 1
     }
@@ -1209,10 +1270,10 @@ function mousePressed(){
       let rarity = newFish[1];
       //name imagearray width height rarity framenum framedelay hitbox hiboxXof hitboxYof
       if(type === 'D'){
-        game.fishArr.push(new Fish("Puffer Fish", pufferFishImgArr, 80, 80, rarity, 2, 25, 85));
+        game.fishArr.push(new Fish("Puffer Fish", "pufferFishImgArr", 80, 80, rarity, 2, 25, 85));
       }
       else{
-        game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+        game.fishArr.push(new Fish("Gold Fish", "commonFishImgArr", 100, 100, rarity, 2, 25, 60));
       }
       commonEggObject.quantity -= 1
     }
@@ -1223,10 +1284,10 @@ function mousePressed(){
       let type = newFish[0];
       let rarity = newFish[1];
       if(type === 'C'){
-        game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
+        game.fishArr.push(new Fish("Angel Fish", "angelFishImgArr", 75, 75, rarity, 4, 9, 80, 0, -10));
       }
       else{
-        game.fishArr.push(new Fish("Sea Horse", horseFishImgArr, 80, 80, rarity, 4, 9, 85));
+        game.fishArr.push(new Fish("Sea Horse", "horseFishImgArr", 80, 80, rarity, 4, 9, 85));
       }
       rareEggObject.quantity -= 1
     }
@@ -1236,10 +1297,10 @@ function mousePressed(){
       let type = newFish[0];
       let rarity = newFish[1];
       if(type === 'A'){
-        game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
+        game.fishArr.push(new Fish("Bull Shark", "sharkImgArr", 100, 100, rarity, 4, 9, 105));
       }
       else{
-        game.fishArr.push(new Fish("Aqua", legendaryFishImgArr, 300, 300, rarity, 6, 8, 80, -10, -30));
+        game.fishArr.push(new Fish("Aqua", "legendaryFishImgArr", 300, 300, rarity, 6, 8, 80, -10, -30));
       }
       legendaryEggObject.quantity -= 1
     }
