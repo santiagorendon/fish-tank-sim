@@ -42,11 +42,11 @@ var grassLevel = 0
 // main game play
 class Game{
   constructor(storeItems=[]){
-    //this.scene = 'menu';
-    this.scene = 'tank';
+    this.scene = 'menu';
+    // this.scene = 'tank';
     //fish holder
     this.fishArr = [];
-    this.balance = 10008;
+    this.balance = 8;
     //store vars
     this.storeItems = storeItems;
     this.storeCloseX = canvasWidth-50;
@@ -363,6 +363,9 @@ class Game{
       }
       game.state = cursor;
       game.cursor = cursorImage;
+      if(!backgroundMusic.isPlaying()){
+        backgroundMusic.loop();
+      }
       game.scene = 'tank'
     }
     this.drawMenuText();
@@ -437,6 +440,7 @@ class Game{
       }
     }
     // ADD SAND
+    let isHittingToolBar = isHittingToolBarHitBox();
     if (mouseIsPressed && state=='sand' && !isHittingToolBar && !coinIsHit){
       var tempSand = new Sand(mouseX, mouseY)
       sandObject.quantity-=0.1;
@@ -446,7 +450,6 @@ class Game{
       }
     }
     //make sure the player is not hovering over the fish when they feed them
-    let isHittingToolBar = isHittingToolBarHitBox();
     if(!fishIsHit && mouseIsPressed && !isHittingToolBar && !coinIsHit){
       if(state=='food'){
         fishFoodObject.quantity-=0.08;
@@ -606,8 +609,16 @@ class Fish{
     ellipse(this.x+this.hitBoxXOf, this.y+this.hitBoxYOf, this.hitBox, this.hitBox)
   }
   draw(){
-    // this.drawHitBox();
-    if(this.xMovement > 0){ //fish moving right
+    //this.drawHitBox();
+    if(!this.alive){
+      if(this.xMovement < 0){
+        image(this.imageArray[2][0], this.x, this.y, this.width, this.height);
+      }
+      else{
+        image(this.imageArray[2][1], this.x, this.y, this.width, this.height);
+      }
+    }
+    else if(this.xMovement > 0){ //fish moving right
       image(this.imageArray[1][this.frame], this.x, this.y, this.width, this.height);
     }
     else{//fish moving left
@@ -772,8 +783,15 @@ function preload(){
   commonFishImgArr = [[
     loadImage('images/commonFish/commonFish1.png', updateCounter),
     loadImage('images/commonFish/commonFish2.png', updateCounter)],
-    [loadImage('images/commonFish/commonFish3.png', updateCounter),
-    loadImage('images/commonFish/commonFish4.png', updateCounter)]]
+    [
+    loadImage('images/commonFish/commonFish3.png', updateCounter),
+    loadImage('images/commonFish/commonFish4.png', updateCounter)
+    ],
+    [
+    loadImage('images/commonFish/commonFish5.png', updateCounter),
+    loadImage('images/commonFish/commonFish6.png', updateCounter)
+    ]
+  ]
   pufferFishImgArr = [[
     loadImage('images/pufferFish/pufferFish1.png', updateCounter),
     loadImage('images/pufferFish/pufferFish2.png', updateCounter)
@@ -781,6 +799,10 @@ function preload(){
     [
     loadImage('images/pufferFish/pufferFish3.png', updateCounter),
     loadImage('images/pufferFish/pufferFish4.png', updateCounter)
+    ],
+    [
+    loadImage('images/pufferFish/pufferFish5.png', updateCounter),
+    loadImage('images/pufferFish/pufferFish6.png', updateCounter)
     ]
   ]
   angelFishImgArr = [[
@@ -794,6 +816,27 @@ function preload(){
     loadImage('images/angelFish/angelFish6.png', updateCounter),
     loadImage('images/angelFish/angelFish7.png', updateCounter),
     loadImage('images/angelFish/angelFish8.png', updateCounter)
+    ],
+    [
+    loadImage('images/angelFish/angelFish9.png', updateCounter),
+    loadImage('images/angelFish/angelFish10.png', updateCounter)
+    ]
+  ]
+  horseFishImgArr = [[
+    loadImage('images/horseFish/horseFish1.png', updateCounter),
+    loadImage('images/horseFish/horseFish2.png', updateCounter),
+    loadImage('images/horseFish/horseFish3.png', updateCounter),
+    loadImage('images/horseFish/horseFish4.png', updateCounter)
+    ],
+    [
+    loadImage('images/horseFish/horseFish5.png', updateCounter),
+    loadImage('images/horseFish/horseFish6.png', updateCounter),
+    loadImage('images/horseFish/horseFish7.png', updateCounter),
+    loadImage('images/horseFish/horseFish8.png', updateCounter)
+    ],
+    [
+    loadImage('images/horseFish/horseFish9.png', updateCounter),
+    loadImage('images/horseFish/horseFish10.png', updateCounter)
     ]
   ]
   sharkImgArr = [[
@@ -807,6 +850,10 @@ function preload(){
     loadImage('images/shark/shark6.png', updateCounter),
     loadImage('images/shark/shark7.png', updateCounter),
     loadImage('images/shark/shark8.png', updateCounter)
+    ],
+    [
+    loadImage('images/shark/shark9.png', updateCounter),
+    loadImage('images/shark/shark10.png', updateCounter)
     ]
   ]
   legendaryFishImgArr = [[
@@ -824,6 +871,10 @@ function preload(){
     loadImage('images/legendaryFish/legendaryFish10.png', updateCounter),
     loadImage('images/legendaryFish/legendaryFish11.png', updateCounter),
     loadImage('images/legendaryFish/legendaryFish12.png', updateCounter)
+  ],
+  [
+    loadImage('images/legendaryFish/legendaryFish13.png', updateCounter),
+    loadImage('images/legendaryFish/legendaryFish14.png', updateCounter)
   ]];
   //fish eggs
   mysteryEggImage = loadImage('images/mysteryEgg.png', updateCounter);
@@ -853,6 +904,9 @@ function preload(){
   flushSound = loadSound("sounds/flush.mp3", updateCounter)
   coinSound = loadSound("sounds/coin.wav", updateCounter)
   coinSound.setVolume(0.2);
+
+  backgroundMusic = loadSound("sounds/gameMusic.mp3", updateCounter)
+  backgroundMusic.setVolume(0.5);
 }
 
 
@@ -927,7 +981,7 @@ class Coin{ // magic coin that comes from the treasure box
     this.ySpeed = 0.4;
     this.age = 0;
     this.lifeSpan = 250;
-    this.value = 5;
+    this.value = 35;
   }
   drawHitBox(){
     stroke('black')
@@ -1135,7 +1189,7 @@ function mousePressed(){
         game.fishArr.push(new Fish("Bull Shark", sharkImgArr, 100, 100, rarity, 4, 9, 105));
       }
       else if(type === 'B'){
-        game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+        game.fishArr.push(new Fish("Sea Horse", horseFishImgArr, 80, 80, rarity, 4, 9, 85));
       }
       else if(type === 'C'){
         game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
@@ -1172,7 +1226,7 @@ function mousePressed(){
         game.fishArr.push(new Fish("Angel Fish", angelFishImgArr, 75, 75, rarity, 4, 9, 80, 0, -10));
       }
       else{
-        game.fishArr.push(new Fish("Gold Fish", commonFishImgArr, 100, 100, rarity, 2, 25, 60));
+        game.fishArr.push(new Fish("Sea Horse", horseFishImgArr, 80, 80, rarity, 4, 9, 85));
       }
       rareEggObject.quantity -= 1
     }
