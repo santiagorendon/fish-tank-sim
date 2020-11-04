@@ -89,6 +89,8 @@ class Game{
     this.balanceColorG = 0;
     this.balanceColorB = 0;
     this.transaction = '';
+    this.fontSize = 20;
+    this.isTextClicked = false
   }
   drawBreedStats(){ // draw the stats for breeding two fish together
     textAlign(CENTER, CENTER);
@@ -330,10 +332,54 @@ class Game{
       this.rotationSpeed = -this.rotationSpeed;
     }
   }
+
+  resetGame(){
+    // reset game function goes here
+  }
+
+  drawResetButton(){
+    let resetCopy = "Reset game"
+    let resetWidth = textWidth(resetCopy)
+    let higherThanReset = mouseY < 20;
+    let lowerThanReset = mouseY > 40;
+    let leftOfReset = mouseX < 20;
+    let rightOfReset = mouseX > resetWidth;
+    this.isTextClicked = (!higherThanReset && !lowerThanReset && !leftOfReset && !rightOfReset);
+    let fontColor = 'black'
+    if (dist(mouseX, mouseY, 40, 20) <= 50){
+      fontColor = 'red'
+      if (this.fontSize <= 25){
+        this.fontSize += 1
+      }
+    }
+    else {
+      fontColor = 'black'
+      if (this.fontSize >= 20){
+        this.fontSize -= 1
+      }
+    }
+    stroke(fontColor)
+    fill(fontColor)
+    textAlign(LEFT, CENTER)
+    textSize(this.fontSize)
+    text(resetCopy, 20, 20)
+    if (this.isTextClicked){
+      game.cursor = cursorImage
+    }
+    else {
+      game.cursor = waterImage
+    }
+
+    if(mouseIsPressed && this.isTextClicked){
+      this.resetGame()
+    }
+
+  }
+
   drawMainMenu(){
     // FILL TANK
     drawWater();
-    if (mouseIsPressed && state == 'water'){
+    if (mouseIsPressed && state == 'water' && !this.isTextClicked){
       drawWater();
       if (waterLevel<=500){
         waterLevel +=1
@@ -369,6 +415,8 @@ class Game{
       game.scene = 'tank'
     }
     this.drawMenuText();
+    this.drawResetButton()
+
   }
   drawTank(){
     let alreadyOwned = buttonArray.indexOf(mysteryEggObject) !== -1;

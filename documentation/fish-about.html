@@ -411,20 +411,20 @@
                             You won't be able to sell this fish, and will have to use the toilet tool to flush your dead fish away.
 
                             If a fish is alive, it can  move around the tank using Perlin noise, so that its movement seems natural.
-                            The animation fo the fish is done through cycling through an array of fish images.
+                            The animation of the fish is done through cycling through an array of fish images.
                             We used the <code>constrain</code> function to ensure that the fish doesn't hit the edges of the walls.
                             To make this seem even more realistic, each fish has its own <code>this.hitBox</code> to keep track of
                             what it can touch.
 
-                            Finally, fish can bread provided our forumla for calculating an offspring's rarity:
-                            <code>(parent1+parent2+parent3)/3</code>. Where parent3 is a random number between 0-100, and parent1 and parent2
+                            Finally, fish can breed provided our forumla for calculating an offspring's rarity:
+                            <code>(parent1+parent2+parent3)/3</code>, where parent3 is a random number between 0-100, and parent1 and parent2
                             are the selected parents of the fish.
                           </p>
                         <h4>Food Class</h4>
                         <p>
                           To feed a fish, you can buy some fish food and drop it over a fish to restore its hunger level.
                           The class fish food uses basic collision to detect that the food is touching the fish and if so restores
-                          the fish by the food instance's<code>healthIncrease</code> property. Each food partical will slowly disolve
+                          the fish by the food instance's <code>healthIncrease</code> property. Each food particle will slowly disolve
                           by lowering its alpha value by a factor of the food instance's <code>disolveSpeed</code> property.
                         </p>
                         <h4>Tool Class</h4>
@@ -456,7 +456,7 @@
                         <p>
                           You can drop in new decorations defined in the <code>Decoration</code> class to your tank.
                           As usual, they float to the bottom, and will be layered on top of the sand you added previously.
-                          However, the treasure chest is a special decoration that will drop a coin at the interval given by it's property <code>coinDelay</code>.
+                          However, the treasure chest is a special decoration that will drop a coin at the interval given by its property <code>coinDelay</code>.
 
                         </p>
                         <blockquote>
