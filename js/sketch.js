@@ -389,12 +389,6 @@ class Game{
     textAlign(LEFT, CENTER)
     textSize(this.fontSize)
     text(resetCopy, 20, 20)
-    if (this.isTextClicked){
-      game.cursor = cursorImage
-    }
-    else {
-      game.cursor = waterImage
-    }
 
     if(mouseIsPressed && this.isTextClicked){
       this.resetGame()
@@ -433,12 +427,12 @@ class Game{
       if (waterSound.isPlaying() ) { // .isPlaying() returns a boolean
         waterSound.pause();
       }
-      game.state = cursor;
-      game.cursor = cursorImage;
       if(!backgroundMusic.isPlaying()){
         backgroundMusic.loop();
       }
-      game.scene = 'tank'
+      game.cursor = cursorImage;
+      state = 'cursor';
+      game.scene = 'tank';
     }
     this.drawMenuText();
     this.drawResetButton()
@@ -581,15 +575,6 @@ class Game{
 }
 
 function saveGame(){
-  // let progress = {fishArray: game.fishArr,
-  //                 balance: game.balance,
-  //
-  //                 decorationArray: decorationArray,
-  //                 sandArray: sandArray,
-  //      buttonArray: buttonArray,
-  //                 coinArray: coinArr,
-  //               }
-  // let tempFishArr = [];
   let progress = {
                   balance: game.balance,
                   fishArr: game.fishArr,
@@ -1045,7 +1030,7 @@ function preload(){
   barrelImage = loadImage('images/barrel.png', updateCounter);
   logSignImage = loadImage('images/logSign.png', updateCounter);
   sandImage = loadImage('images/sand.png', updateCounter);
-  fishFoodImage = loadImage('images/fishFood/fishfood.png', updateCounter)
+  fishFoodImage = loadImage('images/fishFood/fishFood.png', updateCounter)
   rareFishFoodImage = loadImage('images/fishFood/rareFishFood.png', updateCounter)
   legendaryFishFoodImage = loadImage('images/fishFood/legendaryFishFood.png', updateCounter)
   toiletImage = loadImage('images/toilet.png', updateCounter)
