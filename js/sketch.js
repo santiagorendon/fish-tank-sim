@@ -1,4 +1,4 @@
-let initalBalance = 8;
+let initalBalance = 10008;
 // IMAGES
 var fishImage, waterImage, grassImage, sandImage, foodImage, toiletImage, cursorImage
 
@@ -44,7 +44,7 @@ var grassLevel = 0
 class Game{
   constructor(storeItems=[]){
     this.scene = 'menu';
-    // this.scene = 'tank';
+    //this.scene = 'tank';
     //fish holder
     this.fishArr = [];
     this.balance = initalBalance;
@@ -1312,9 +1312,40 @@ function displayTankWalls() {
     line(0, height, width, height)
     line(width, 0, width, height)
 }
+function setState(i){
+  if(buttonArray[i].name === 'shop'){
+    game.cursor = cursorImage;
+    state = 'cursor';
+    game.scene = 'store';
+    return 'cursor';
+  }
+  else if(buttonArray[i].name === 'mysteryEgg'){ //disable mystery egg if timer is not up
+    if(buttonArray[i].hatchTimer > 0){
+      return;
+    }
+  }
+  //remove displays from saving
+  game.parent1 = 0;
+  game.parent2 = 0;
+  game.lastParent = 0;
+  game.displayBreed = false;
+  game.stats.displayIndex = -1;
 
-
+  game.cursor = window[buttonArray[i].image];
+  state = buttonArray[i].name
+}
+function keyPressed(){
+  if(game.scene === 'tank'){
+    i = keyCode - 49;
+    if(i >= 0 && i<=8){
+      if(i < buttonArray.length){
+        setState(i)
+      }
+    }
+  }
+}
 function mousePressed(){
+  console.log('huh2');
   let isHittingToolBar = isHittingToolBarHitBox();
   if((state == 'grass' || state == 'rock' || state === 'treasure' || state === 'barrel' || state === 'logSign') && !isHittingToolBar){//decoration
     decorationArray.push(new Decoration(state+"Image", mouseX, mouseY, window[state].size, window[state].yOffset));
@@ -1470,26 +1501,7 @@ class ToolBar{ // class to store the things in your toolbar
         }
         this.buttonX += 50
         if (mouseIsPressed && mouseX > this.buttonX-50 && mouseX < this.buttonX && mouseY > this.buttonY && mouseY < this.buttonY + 50) {
-          if(buttonArray[i].name === 'shop'){
-            game.cursor = cursorImage;
-            state = 'cursor';
-            game.scene = 'store';
-            return 'cursor';
-          }
-          else if(buttonArray[i].name === 'mysteryEgg'){ //disable mystery egg if timer is not up
-            if(buttonArray[i].hatchTimer > 0){
-              return;
-            }
-          }
-          //remove displays from saving
-          game.parent1 = 0;
-          game.parent2 = 0;
-          game.lastParent = 0;
-          game.displayBreed = false;
-          game.stats.displayIndex = -1;
-
-          game.cursor = window[buttonArray[i].image];
-          state = buttonArray[i].name
+          setState(i);
         }
       }
   }
