@@ -1,4 +1,4 @@
-let initalBalance = 10008;
+let initalBalance = 8;
 // IMAGES
 var fishImage, waterImage, grassImage, sandImage, foodImage, toiletImage, cursorImage
 
