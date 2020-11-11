@@ -1,6 +1,6 @@
 /*jshint esversion: 10 */
 
-let initalBalance = 80000;
+let initalBalance = 8;
 // IMAGES
 var waterImage;
 var grassImage;
